@@ -46,5 +46,6 @@ interface Database {
 
     fun getPlaylistFolders(): List<PlaylistFolder>
     fun createOrUpdatePlaylistFolder(playlistFolder: PlaylistFolder)
+    fun removePlaylistFolder(playlistFolder: PlaylistFolder)
 
 }
