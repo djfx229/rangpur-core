@@ -95,6 +95,15 @@ class PlaylistPresenter(val scope: CoroutineScope, val models: Models, val route
         }
     }
 
+    fun deletePlaylistFolder(folder: PlaylistFolder) {
+        scope.launch {
+            withContext(Dispatchers.IO) {
+                models.playlistLibrary.removePlaylistFolder(folder)
+                requestPlaylistFolders()
+            }
+        }
+    }
+
     fun deletePlaylist(playlist: Playlist) {
         scope.launch {
             withContext(Dispatchers.IO) {

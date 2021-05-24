@@ -31,6 +31,10 @@ class PlaylistLibraryModel(val database: Database) {
         database.removePlaylist(playlist)
     }
 
+    fun removePlaylistFolder(folder: PlaylistFolder) {
+        database.removePlaylistFolder(folder)
+    }
+
     fun getPlaylists(playlistFolder: PlaylistFolder? = null): List<Playlist> = database.getPlaylists(playlistFolder)
 
     fun addAudiosInPlaylist(audios: List<Audio>, playlist: Playlist) {
