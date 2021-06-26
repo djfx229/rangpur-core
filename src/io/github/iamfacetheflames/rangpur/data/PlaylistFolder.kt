@@ -1,7 +1,6 @@
 package io.github.iamfacetheflames.rangpur.data
 
-interface PlaylistFolder {
-    var id: Long
+interface PlaylistFolder : WithId {
     var name: String?
     var timestampCreated: Long
     var parentId: Long

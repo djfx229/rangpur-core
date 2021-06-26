@@ -7,6 +7,7 @@ object AudioField {
     const val FILE_NAME = "file_name"
     const val DIRECTORY_ID = "directory_id"
     const val ID = "id"
+    const val DEVICE_ID = "device_id"
     const val ALBUM_TRACK_NUMBER = "albumTrackNumber"
     const val ARTIST = "artist"
     const val TITLE = "title"

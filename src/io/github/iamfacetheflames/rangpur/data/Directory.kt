@@ -1,6 +1,8 @@
 package io.github.iamfacetheflames.rangpur.data
 
-interface Directory: WithId {
+import java.io.Serializable
+
+interface Directory : WithId {
     var parent: Directory?
     var locationInMusicDirectory: String?
     var name: String?

@@ -1,7 +1,6 @@
 package io.github.iamfacetheflames.rangpur.data
 
-interface AudioInPlaylist {
-    var id: Long
+interface AudioInPlaylist : WithId {
     var audio_id: Long
     var playlist_id: Long
     var audioObject: Audio?

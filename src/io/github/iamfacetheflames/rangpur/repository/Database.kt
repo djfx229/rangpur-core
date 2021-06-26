@@ -38,14 +38,20 @@ interface Database {
 
     fun createOrUpdatePlaylist(playlist: Playlist)
     fun removePlaylist(playlist: Playlist)
+    fun getPlaylists(): List<Playlist>
     fun getPlaylists(playlistFolder: PlaylistFolder?): List<Playlist>
-    fun getPlaylistAudios(playlist: Playlist): List<AudioInPlaylist>
+    fun savePlaylists(playlists: List<Playlist>)
+
+    fun getPlaylistAudios(): List<AudioInPlaylist>
+    fun getPlaylistAudios(playlist: Playlist?): List<AudioInPlaylist>
     fun addAudiosInPlaylist(audios: List<Audio>, playlistId: Long)
     fun deleteAudiosFromPlaylist(audios: List<AudioInPlaylist>, playlistId: Long)
     fun moveAudiosInPlaylistToNewPosition(audios: List<AudioInPlaylist>, newPosition: Int)
+    fun savePlaylistAudios(audios: List<AudioInPlaylist>)
 
     fun getPlaylistFolders(): List<PlaylistFolder>
     fun createOrUpdatePlaylistFolder(playlistFolder: PlaylistFolder)
+    fun savePlaylistFolders(folders: List<PlaylistFolder>)
     fun removePlaylistFolder(playlistFolder: PlaylistFolder)
 
 }

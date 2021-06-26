@@ -1,7 +1,9 @@
 package io.github.iamfacetheflames.rangpur.data
 
-interface Audio {
-    var id: Long
+import io.github.iamfacetheflames.rangpur.model.CachedDirectories
+import java.io.File
+
+interface Audio : WithId {
     var directory: Directory?
     var fileName: String?
     var albumTrackNumber: Int?
@@ -19,4 +21,9 @@ interface Audio {
     var duration: Long?
     var dateCreated: String?
     var timestampCreated: Long
+}
+
+fun Audio.getFullPath(cachedDirs: CachedDirectories): String {
+    val path = cachedDirs.getFullPath(this.directory!!)
+    return path + File.separator + this.fileName
 }
