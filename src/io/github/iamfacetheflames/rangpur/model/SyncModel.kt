@@ -32,11 +32,13 @@ class SyncModel(val database: Database, val config: Configuration) {
     private val PORT: Int = 54286
 
     suspend fun runServer(
-            port: Int = PORT
+        host: String = "localhost",
+        port: Int = PORT
     ) = withContext(Dispatchers.IO) {
         try {
+            println("runServer() start $host : $port")
             val socket = ServerSocketChannel.open()
-            socket.bind(InetSocketAddress("localhost", PORT))
+            socket.bind(InetSocketAddress(host, port))
             println("server sync: server running on port ${socket.socket().localPort}")
             socket.accept().use { client ->
                 println("server sync: client connected : ${client.socket().inetAddress.hostAddress}")
@@ -92,11 +94,11 @@ class SyncModel(val database: Database, val config: Configuration) {
     }
 
     suspend fun runClient(
-            host: String = "localhost",
-            port: Int = PORT
+        host: String = "localhost",
+        port: Int = PORT
     ) = withContext(Dispatchers.IO) {
         try {
-            println("runClient() start")
+            println("runClient() start $host : $port")
             SocketChannel.open(
                     InetSocketAddress(
                             host,
