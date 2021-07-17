@@ -226,7 +226,7 @@ class SyncModel(val database: Database, val config: Configuration) {
             try {
                 File(filePath).parentFile?.let { parent ->
                     if (!parent.exists()) {
-                        parent.mkdir()
+                        parent.mkdirs()
                     }
                 }
                 FileOutputStream(filePath).channel.use { fileFromServer ->
