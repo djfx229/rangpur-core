@@ -35,6 +35,7 @@ interface Database {
     fun saveAudios(audios: List<Audio>)
     fun getAudios(): List<Audio>
     fun getAudios(filter: Filter): List<Audio>
+    fun deleteAudios(audios: List<Audio>)
 
     fun createOrUpdatePlaylist(playlist: Playlist)
     fun removePlaylist(playlist: Playlist)
