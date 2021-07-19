@@ -1,0 +1,12 @@
+<component name="ArtifactManager">
+  <artifact name="rangpur-core-android:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/rangpur_core_android_jar</output-path>
+    <root id="root">
+      <element id="archive" name="rangpur-core.jar">
+        <element id="module-output" name="rangpur-core" />
+      </element>
+      <element id="library" level="project" name="KotlinJavaRuntime" />
+      <element id="library" level="project" name="org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.9" />
+    </root>
+  </artifact>
+</component>

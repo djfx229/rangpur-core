@@ -1,0 +1,11 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="rangpur-core:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/rangpur_core_jar</output-path>
+    <root id="archive" name="rangpur-core.jar">
+      <element id="module-output" name="rangpur-core" />
+      <element id="extracted-dir" path="$KOTLIN_BUNDLED$/lib/kotlin-stdlib.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$KOTLIN_BUNDLED$/lib/kotlin-reflect.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$KOTLIN_BUNDLED$/lib/kotlin-test.jar" path-in-jar="/" />
+    </root>
+  </artifact>
+</component>
