@@ -3,9 +3,10 @@ package io.github.iamfacetheflames.rangpur.model
 import io.github.iamfacetheflames.rangpur.data.*
 import io.github.iamfacetheflames.rangpur.repository.Configuration
 import io.github.iamfacetheflames.rangpur.repository.Database
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.withContext
 import java.io.*
-import java.lang.Exception
 import java.net.InetSocketAddress
 import java.nio.channels.ServerSocketChannel
 import java.nio.channels.SocketChannel
@@ -24,7 +25,9 @@ object Command {
     const val SEND_PLAYLISTS = "COMMAND_SEND_PLAYLISTS"
     const val REQUEST_PLAYLIST_AUDIOS = "COMMAND_REQUEST_PLAYLIST_AUDIOS"
     const val SEND_PLAYLIST_AUDIOS = "COMMAND_SEND_PLAYLIST_AUDIOS"
+    const val NEW_AUDIOS_AMOUNT = "COMMAND_NEW_AUDIOS_AMOUNT"
     const val DONE = "COMMAND_DONE"
+    const val ERROR = "COMMAND_ERROR"
 }
 
 class SyncModel(val database: Database, val config: Configuration) {
@@ -56,6 +59,8 @@ class SyncModel(val database: Database, val config: Configuration) {
                 val serverAudios = database.getAudios().sortedBy { it.id }
                 val clientDataIds = fromClient.readObject() as Set<Long>
                 val newAudios = serverAudios.filter { it.id !in clientDataIds }
+                toClient.writeObject(Command.NEW_AUDIOS_AMOUNT)
+                toClient.writeObject(newAudios.size)
                 for ((index, audio) in newAudios.withIndex()) {
                     toClient.writeObject(Command.SEND_AUDIO)
                     toClient.writeObject(audio)
@@ -95,87 +100,102 @@ class SyncModel(val database: Database, val config: Configuration) {
 
     suspend fun runClient(
         host: String = "localhost",
-        port: Int = PORT
+        port: Int = PORT,
+        listener: (ClientSyncInfo) -> Unit
     ) = withContext(Dispatchers.IO) {
-        try {
-            println("runClient() start $host : $port")
-            SocketChannel.open(
-                    InetSocketAddress(
-                            host,
-                            port
-                    )
-            ).use { server ->
-                println("runClient() get server")
-                val toServer = ObjectOutputStream(server.socket().getOutputStream())
-                toServer.writeObject(Command.START_SYNC)
-                val fromServer = ObjectInputStream(server.socket().getInputStream())
-                var command = fromServer.readObject() as String
-                val cachedDirs = CachedDirectories(database, config)
-                while (command != Command.DONE) {
-                    println("server send command: $command")
-                    when (command) {
-                        Command.REQUEST_DIRECTORIES -> {
-                            val directories = database.getDirectories()
-                            val set = mutableSetOf<Long>()
-                            directories.forEach { set.add(it.id) }
-                            toServer.writeObject(set)
-                        }
-                        Command.SEND_DIRECTORIES -> {
-                            val newDirectories = fromServer.readObject<List<Directory>>().sortedBy { it.id }
-                            database.saveDirectories(newDirectories)
-                        }
-                        Command.REQUEST_PLAYLIST_FOLDERS -> {
-                            val data = database.getPlaylistFolders()
-                            val set = mutableSetOf<Long>()
-                            data.forEach { set.add(it.id) }
-                            toServer.writeObject(set)
-                        }
-                        Command.SEND_PLAYLIST_FOLDERS -> {
-                            val data = fromServer.readObject<List<PlaylistFolder>>().sortedBy { it.id }
-                            database.savePlaylistFolders(data)
-                        }
-                        Command.REQUEST_PLAYLISTS -> {
-                            val data = database.getPlaylists()
-                            val set = mutableSetOf<Long>()
-                            data.forEach { set.add(it.id) }
-                            toServer.writeObject(set)
-                        }
-                        Command.SEND_PLAYLISTS -> {
-                            val data = fromServer.readObject<List<Playlist>>().sortedBy { it.id }
-                            database.savePlaylists(data)
-                        }
-                        Command.REQUEST_PLAYLIST_AUDIOS -> {
-                            val data = database.getPlaylistAudios()
-                            val set = mutableSetOf<Long>()
-                            data.forEach { set.add(it.id) }
-                            toServer.writeObject(set)
-                        }
-                        Command.SEND_PLAYLIST_AUDIOS -> {
-                            val data = fromServer.readObject<List<AudioInPlaylist>>().sortedBy { it.id }
-                            database.savePlaylistAudios(data)
-                        }
-                        Command.REQUEST_AUDIOS -> {
-                            val data = database.getAudios()
-                            val set = mutableSetOf<Long>()
-                            data.forEach { set.add(it.id) }
-                            toServer.writeObject(set)
-                        }
-                        Command.SEND_AUDIO -> {
-                            val audio = fromServer.readObject<Audio>()
-                            println("server send audio object with id ${audio.id} : ${audio.fileName}")
-                            server.transferFileTo(fromServer, audio.getFullPath(cachedDirs))
+        println("runClient() start $host : $port")
+        SocketChannel.open(
+                InetSocketAddress(
+                        host,
+                        port
+                )
+        ).use { server ->
+            println("runClient() get server")
+            val toServer = ObjectOutputStream(server.socket().getOutputStream())
+            toServer.writeObject(Command.START_SYNC)
+            val fromServer = ObjectInputStream(server.socket().getInputStream())
+            var command = fromServer.readObject() as String
+            val cachedDirs = CachedDirectories(database, config)
+            var audiosAmount = 0
+            var audiosProgress = 0
+            while (command != Command.DONE) {
+                println("server send command: $command")
+                when (command) {
+                    Command.REQUEST_DIRECTORIES -> {
+                        val directories = database.getDirectories()
+                        val set = mutableSetOf<Long>()
+                        directories.forEach { set.add(it.id) }
+                        toServer.writeObject(set)
+                    }
+                    Command.SEND_DIRECTORIES -> {
+                        val newDirectories = fromServer.readObject<List<Directory>>().sortedBy { it.id }
+                        database.saveDirectories(newDirectories)
+                    }
+                    Command.REQUEST_PLAYLIST_FOLDERS -> {
+                        val data = database.getPlaylistFolders()
+                        val set = mutableSetOf<Long>()
+                        data.forEach { set.add(it.id) }
+                        toServer.writeObject(set)
+                    }
+                    Command.SEND_PLAYLIST_FOLDERS -> {
+                        val data = fromServer.readObject<List<PlaylistFolder>>().sortedBy { it.id }
+                        database.savePlaylistFolders(data)
+                    }
+                    Command.REQUEST_PLAYLISTS -> {
+                        val data = database.getPlaylists()
+                        val set = mutableSetOf<Long>()
+                        data.forEach { set.add(it.id) }
+                        toServer.writeObject(set)
+                    }
+                    Command.SEND_PLAYLISTS -> {
+                        val data = fromServer.readObject<List<Playlist>>().sortedBy { it.id }
+                        database.savePlaylists(data)
+                    }
+                    Command.REQUEST_PLAYLIST_AUDIOS -> {
+                        val data = database.getPlaylistAudios()
+                        val set = mutableSetOf<Long>()
+                        data.forEach { set.add(it.id) }
+                        toServer.writeObject(set)
+                    }
+                    Command.SEND_PLAYLIST_AUDIOS -> {
+                        val data = fromServer.readObject<List<AudioInPlaylist>>().sortedBy { it.id }
+                        database.savePlaylistAudios(data)
+                    }
+                    Command.REQUEST_AUDIOS -> {
+                        val data = database.getAudios()
+                        val set = mutableSetOf<Long>()
+                        data.forEach { set.add(it.id) }
+                        toServer.writeObject(set)
+                    }
+                    Command.SEND_AUDIO -> {
+                        val audio = fromServer.readObject<Audio>()
+                        println("server send audio object with id ${audio.id} : ${audio.fileName}")
+                        listener.invoke(
+                            ReceivingAudio(
+                                audio,
+                                audiosProgress++,
+                                audiosAmount
+                            )
+                        )
+                        val path = audio.getFullPath(cachedDirs)
+                        server.transferFileTo(fromServer, path)
+                        if (File(path).exists()) {
                             database.saveAudios(mutableListOf(audio))
                             println("server send file")
                             toServer.writeObject(Command.DONE)
+                        } else {
+                            toServer.writeObject(Command.ERROR)
+                            break
                         }
                     }
-                    command = fromServer.readObject() as String
+                    Command.NEW_AUDIOS_AMOUNT -> {
+                        audiosAmount = fromServer.readObject<Int>()
+                    }
                 }
-                cachedDirs.release()
-                server.finishConnect()
+                command = fromServer.readObject() as String
             }
-        } catch (e: Exception) {
-            e.printStackTrace()
+            cachedDirs.release()
+            server.finishConnect()
         }
     }
 
