@@ -54,12 +54,12 @@ class OrmLitePlaylists(val source: ConnectionSource) : Database.Playlists {
             return dao.query(preparedQuery)
         } else {
             val query = "SELECT * FROM playlist " +
-                    "WHERE folder_id = ? " +
+                    "WHERE folder_uuid = ? " +
                     "ORDER BY timestamp_created DESC;"
             val queryResult: GenericRawResults<OrmLitePlaylist> = dao.queryRaw(
                 query,
                 dao.rawRowMapper,
-                playlistFolder?.id.toString()
+                playlistFolder?.uuid.toString()
             )
             return queryResult.results
         }

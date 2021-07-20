@@ -28,7 +28,7 @@ import java.util.*
 @DatabaseTable(tableName = "audio")
 class OrmLiteAudio : Audio {
 
-    @DatabaseField(columnName = "uuid", canBeNull = false, uniqueIndexName = "unique_uuid")
+    @DatabaseField(columnName = "uuid", id = true, canBeNull = false, uniqueIndexName = "unique_uuid")
     override var uuid: String = UUID.randomUUID().toString()
 
     override var directory: Directory?
@@ -82,9 +82,6 @@ class OrmLiteAudio : Audio {
 
     @DatabaseField(columnName = TIMESTAMP_CREATED, canBeNull = false)
     override var timestampCreated: Long = 0
-
-    @DatabaseField(columnName = ID, generatedId = true)
-    override var id: Long = 0
 
     @DatabaseField(columnName = DIRECTORY_UUID, foreign = true, foreignAutoRefresh = true, uniqueIndexName = "unique_audio_item")
     var ormDirectory: OrmLiteDirectory? = null

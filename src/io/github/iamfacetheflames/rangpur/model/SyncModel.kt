@@ -50,15 +50,15 @@ class SyncModel(val database: Database, val config: Configuration) {
                 val toClient = ObjectOutputStream(client.socket().getOutputStream())
                 toClient.writeObject(Command.REQUEST_DIRECTORIES)
                 val serverDirectories = database.getDirectories()
-                val clientDirectories = fromClient.readObject() as Set<Long>
-                val newDirectories = serverDirectories.filter { it.id !in clientDirectories }
+                val clientDirectories = fromClient.readObject() as Set<String>
+                val newDirectories = serverDirectories.filter { it.uuid !in clientDirectories }
                 toClient.writeObject(Command.SEND_DIRECTORIES)
                 toClient.writeObject(newDirectories)
                 val cachedDirs = CachedDirectories(database, config)
                 toClient.writeObject(Command.REQUEST_AUDIOS)
-                val serverAudios = database.getAudios().sortedBy { it.id }
-                val clientDataIds = fromClient.readObject() as Set<Long>
-                val newAudios = serverAudios.filter { it.id !in clientDataIds }
+                val serverAudios = database.getAudios().sortedBy { it.uuid }
+                val clientDataIds = fromClient.readObject() as Set<String>
+                val newAudios = serverAudios.filter { it.uuid !in clientDataIds }
                 toClient.writeObject(Command.NEW_AUDIOS_AMOUNT)
                 toClient.writeObject(newAudios.size)
                 for ((index, audio) in newAudios.withIndex()) {
@@ -123,53 +123,53 @@ class SyncModel(val database: Database, val config: Configuration) {
                 when (command) {
                     Command.REQUEST_DIRECTORIES -> {
                         val directories = database.getDirectories()
-                        val set = mutableSetOf<Long>()
-                        directories.forEach { set.add(it.id) }
+                        val set = mutableSetOf<String>()
+                        directories.forEach { set.add(it.uuid) }
                         toServer.writeObject(set)
                     }
                     Command.SEND_DIRECTORIES -> {
-                        val newDirectories = fromServer.readObject<List<Directory>>().sortedBy { it.id }
+                        val newDirectories = fromServer.readObject<List<Directory>>().sortedBy { it.uuid }
                         database.saveDirectories(newDirectories)
                     }
                     Command.REQUEST_PLAYLIST_FOLDERS -> {
                         val data = database.getPlaylistFolders()
-                        val set = mutableSetOf<Long>()
-                        data.forEach { set.add(it.id) }
+                        val set = mutableSetOf<String>()
+                        data.forEach { set.add(it.uuid) }
                         toServer.writeObject(set)
                     }
                     Command.SEND_PLAYLIST_FOLDERS -> {
-                        val data = fromServer.readObject<List<PlaylistFolder>>().sortedBy { it.id }
+                        val data = fromServer.readObject<List<PlaylistFolder>>().sortedBy { it.uuid }
                         database.savePlaylistFolders(data)
                     }
                     Command.REQUEST_PLAYLISTS -> {
                         val data = database.getPlaylists()
-                        val set = mutableSetOf<Long>()
-                        data.forEach { set.add(it.id) }
+                        val set = mutableSetOf<String>()
+                        data.forEach { set.add(it.uuid) }
                         toServer.writeObject(set)
                     }
                     Command.SEND_PLAYLISTS -> {
-                        val data = fromServer.readObject<List<Playlist>>().sortedBy { it.id }
+                        val data = fromServer.readObject<List<Playlist>>().sortedBy { it.uuid }
                         database.savePlaylists(data)
                     }
                     Command.REQUEST_PLAYLIST_AUDIOS -> {
                         val data = database.getPlaylistAudios()
-                        val set = mutableSetOf<Long>()
-                        data.forEach { set.add(it.id) }
+                        val set = mutableSetOf<String>()
+                        data.forEach { set.add(it.uuid) }
                         toServer.writeObject(set)
                     }
                     Command.SEND_PLAYLIST_AUDIOS -> {
-                        val data = fromServer.readObject<List<AudioInPlaylist>>().sortedBy { it.id }
+                        val data = fromServer.readObject<List<AudioInPlaylist>>().sortedBy { it.uuid }
                         database.savePlaylistAudios(data)
                     }
                     Command.REQUEST_AUDIOS -> {
                         val data = database.getAudios()
-                        val set = mutableSetOf<Long>()
-                        data.forEach { set.add(it.id) }
+                        val set = mutableSetOf<String>()
+                        data.forEach { set.add(it.uuid) }
                         toServer.writeObject(set)
                     }
                     Command.SEND_AUDIO -> {
                         val audio = fromServer.readObject<Audio>()
-                        println("server send audio object with id ${audio.id} : ${audio.fileName}")
+                        println("server send audio object with id ${audio.uuid} : ${audio.fileName}")
                         listener.invoke(
                             ReceivingAudio(
                                 audio,
@@ -207,8 +207,8 @@ class SyncModel(val database: Database, val config: Configuration) {
             serverData: List<WithId>
     ) {
         toClient.writeObject(requestCommand)
-        val clientDataIds = fromClient.readObject() as Set<Long>
-        val newData = serverData.filter { it.id !in clientDataIds }
+        val clientDataIds = fromClient.readObject() as Set<String>
+        val newData = serverData.filter { it.uuid !in clientDataIds }
         toClient.writeObject(sendCommand)
         toClient.writeObject(newData)
     }

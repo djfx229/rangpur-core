@@ -11,7 +11,7 @@ class CachedDirectories(val database: Database, val config: Configuration) {
 
     private var deque: Deque<String> =
         LinkedList()
-    private val cache: HashMap<Long, Directory> =
+    private val cache: HashMap<String, Directory> =
         HashMap()
 
     fun getFullPath(directory: Directory): String {
@@ -50,7 +50,7 @@ class CachedDirectories(val database: Database, val config: Configuration) {
     private fun findDirectory(directoryUUID: String): Directory? {
         val directory = cache[directoryUUID] ?: database.directories.getItem(directoryUUID)
         if (directory != null) {
-            cache[directory.id] = directory
+            cache[directory.uuid] = directory
         }
         return directory
     }

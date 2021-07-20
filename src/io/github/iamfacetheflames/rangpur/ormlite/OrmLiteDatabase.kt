@@ -171,7 +171,7 @@ fun inIds(field: String, array: List<WithId>): String {
         val arrayString = StringBuilder().apply {
             append("(")
             for ((index, item) in array.withIndex()) {
-                val id = item.id.toString()
+                val id = item.uuid
                 append(
                     if (index == 0) {
                         id

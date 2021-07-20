@@ -22,10 +22,10 @@ class OrmLitePlaylistWithAudios(val source: ConnectionSource): Database.Playlist
     override fun create(items: List<Audio>, playlistUUID: String) {
         val dao = DaoManager.createDao(source, OrmLiteAudioInPlaylist::class.java)
         dao.callBatchTasks {
-            val request = "INSERT INTO audio_in_playlist (audio_id, playlist_uuid, position) \n" +
-                    "VALUES (?, ?, (SELECT ifnull(MAX(position), 0)+1 FROM audio_in_playlist WHERE playlist_id = ?));"
+            val request = "INSERT INTO audio_in_playlist (audio_uuid, playlist_uuid, position) \n" +
+                    "VALUES (?, ?, (SELECT ifnull(MAX(position), 0)+1 FROM audio_in_playlist WHERE playlist_uuid = ?));"
             items.forEachIndexed { index, audio ->
-                dao.executeRaw(request, audio.id.toString(), playlistUUID, playlistUUID)
+                dao.executeRaw(request, audio.uuid, playlistUUID, playlistUUID)
             }
         }
     }

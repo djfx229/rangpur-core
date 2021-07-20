@@ -8,11 +8,8 @@ import java.util.*
 @DatabaseTable(tableName = "audio_in_playlist")
 class OrmLiteAudioInPlaylist : AudioInPlaylist {
 
-    @DatabaseField(columnName = "uuid", canBeNull = false, uniqueIndexName = "unique_uuid")
+    @DatabaseField(columnName = "uuid", id = true, canBeNull = false, uniqueIndexName = "unique_uuid")
     override var uuid: String = UUID.randomUUID().toString()
-
-    @DatabaseField(columnName = "id", generatedId = true)
-    override var id: Long = 0
 
     @DatabaseField(columnName = "position")
     override var position: Int = 0

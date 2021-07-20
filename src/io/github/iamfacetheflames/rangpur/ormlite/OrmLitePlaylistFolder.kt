@@ -9,11 +9,8 @@ import java.util.*
 @DatabaseTable(tableName = "playlist_folder")
 class OrmLitePlaylistFolder : PlaylistFolder {
 
-    @DatabaseField(columnName = "uuid", canBeNull = false, uniqueIndexName = "unique_uuid")
+    @DatabaseField(columnName = "uuid", id = true, canBeNull = false, uniqueIndexName = "unique_uuid")
     override var uuid: String = UUID.randomUUID().toString()
-
-    @DatabaseField(columnName = "id", generatedId = true)
-    override var id: Long = 0
 
     @DatabaseField(columnName = "name", canBeNull = false)
     override var name: String? = null

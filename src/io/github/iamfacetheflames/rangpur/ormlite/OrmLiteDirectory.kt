@@ -10,7 +10,7 @@ import java.util.*
 @DatabaseTable(tableName = "directory")
 class OrmLiteDirectory : Directory {
 
-    @DatabaseField(columnName = "uuid", canBeNull = false, uniqueIndexName = "unique_uuid")
+    @DatabaseField(columnName = "uuid", id = true, canBeNull = false, uniqueIndexName = "unique_uuid")
     override var uuid: String = UUID.randomUUID().toString()
 
     @DatabaseField(columnName = "name", canBeNull = false, uniqueIndexName = "unique_directory")
@@ -18,9 +18,6 @@ class OrmLiteDirectory : Directory {
 
     @DatabaseField(columnName = "location", canBeNull = false, uniqueIndexName = "unique_location")
     override var locationInMusicDirectory: String? = null
-
-    @DatabaseField(columnName = "id", generatedId = true)
-    override var id: Long = 0
 
     override var parent: Directory?
         get() = ormParent
