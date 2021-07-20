@@ -2,7 +2,7 @@ package io.github.iamfacetheflames.rangpur.model
 
 import io.github.iamfacetheflames.rangpur.data.Directory
 import io.github.iamfacetheflames.rangpur.repository.Configuration
-import io.github.iamfacetheflames.rangpur.repository.Database
+import io.github.iamfacetheflames.rangpur.repository.database.Database
 import java.io.File
 import java.util.*
 import kotlin.collections.HashMap
@@ -43,12 +43,12 @@ class CachedDirectories(val database: Database, val config: Configuration) {
         return if (directoryOnlyId == null) {
             null
         } else {
-            return findDirectory(directoryOnlyId.id)
+            return findDirectory(directoryOnlyId.uuid)
         }
     }
 
-    private fun findDirectory(directoryId: Long): Directory? {
-        val directory = cache[directoryId] ?: database.getDirectory(directoryId)
+    private fun findDirectory(directoryUUID: String): Directory? {
+        val directory = cache[directoryUUID] ?: database.directories.getItem(directoryUUID)
         if (directory != null) {
             cache[directory.id] = directory
         }

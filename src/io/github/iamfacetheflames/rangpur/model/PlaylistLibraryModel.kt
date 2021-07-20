@@ -1,6 +1,6 @@
 package io.github.iamfacetheflames.rangpur.model
 
-import io.github.iamfacetheflames.rangpur.repository.Database
+import io.github.iamfacetheflames.rangpur.repository.database.Database
 import io.github.iamfacetheflames.rangpur.data.Audio
 import io.github.iamfacetheflames.rangpur.data.AudioInPlaylist
 import io.github.iamfacetheflames.rangpur.data.Playlist
@@ -38,11 +38,11 @@ class PlaylistLibraryModel(val database: Database) {
     fun getPlaylists(playlistFolder: PlaylistFolder? = null): List<Playlist> = database.getPlaylists(playlistFolder)
 
     fun addAudiosInPlaylist(audios: List<Audio>, playlist: Playlist) {
-        database.addAudiosInPlaylist(audios, playlist.id)
+        database.playlistWithAudios.create(audios, playlist.uuid)
     }
 
     fun deleteAudiosFromPlaylist(audios: List<AudioInPlaylist>, playlist: Playlist) {
-        database.deleteAudiosFromPlaylist(audios, playlist.id)
+        database.playlistWithAudios.delete(audios, playlist.uuid)
     }
 
 }

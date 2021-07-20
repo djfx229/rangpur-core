@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="com.j256.ormlite:ormlite-jdbc:5.2" type="repository">
+    <properties maven-id="com.j256.ormlite:ormlite-jdbc:5.2" />
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/com/j256/ormlite/ormlite-jdbc/5.2/ormlite-jdbc-5.2.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/com/j256/ormlite/ormlite-core/5.2/ormlite-core-5.2.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

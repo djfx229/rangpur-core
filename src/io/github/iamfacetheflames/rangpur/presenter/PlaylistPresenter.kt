@@ -137,7 +137,7 @@ class PlaylistPresenter(val scope: CoroutineScope, val models: Models, val route
             val newAudioList = LinkedList<AudioInPlaylist>()
             val audioToNewPositionMap = mutableMapOf<AudioInPlaylist, Int>()
             audios.forEachIndexed { index, audioInPlaylist ->
-                val audio = audioInPlaylist.audioObject ?: return@forEachIndexed
+                val audio = audioInPlaylist.audio ?: return@forEachIndexed
                 println("audio: '${audio.fileName}' move from ${flowAudioListFromPlaylist.value.indexOf(audioInPlaylist)} to ${newPosition + index}")
                 audioToNewPositionMap.put(audioInPlaylist, newPosition + index)
             }

@@ -10,7 +10,7 @@ import io.github.iamfacetheflames.rangpur.data.AudioField.BITRATE
 import io.github.iamfacetheflames.rangpur.data.AudioField.BPM
 import io.github.iamfacetheflames.rangpur.data.AudioField.COMMENT
 import io.github.iamfacetheflames.rangpur.data.AudioField.DATE_CREATED
-import io.github.iamfacetheflames.rangpur.data.AudioField.DIRECTORY_ID
+import io.github.iamfacetheflames.rangpur.data.AudioField.DIRECTORY_UUID
 import io.github.iamfacetheflames.rangpur.data.AudioField.DURATION
 import io.github.iamfacetheflames.rangpur.data.AudioField.ENCODER
 import io.github.iamfacetheflames.rangpur.data.AudioField.FILE_NAME
@@ -22,9 +22,14 @@ import io.github.iamfacetheflames.rangpur.data.AudioField.TIMESTAMP_CREATED
 import io.github.iamfacetheflames.rangpur.data.AudioField.TITLE
 import io.github.iamfacetheflames.rangpur.data.AudioField.URL
 import io.github.iamfacetheflames.rangpur.data.Directory
+import io.github.iamfacetheflames.rangpur.data.equalsUUID
+import java.util.*
 
 @DatabaseTable(tableName = "audio")
 class OrmLiteAudio : Audio {
+
+    @DatabaseField(columnName = "uuid", canBeNull = false, uniqueIndexName = "unique_uuid")
+    override var uuid: String = UUID.randomUUID().toString()
 
     override var directory: Directory?
         get() = ormDirectory
@@ -81,11 +86,13 @@ class OrmLiteAudio : Audio {
     @DatabaseField(columnName = ID, generatedId = true)
     override var id: Long = 0
 
-    @DatabaseField(columnName = DIRECTORY_ID, foreign = true, foreignAutoRefresh = true, uniqueIndexName = "unique_audio_item")
+    @DatabaseField(columnName = DIRECTORY_UUID, foreign = true, foreignAutoRefresh = true, uniqueIndexName = "unique_audio_item")
     var ormDirectory: OrmLiteDirectory? = null
 
     override fun toString(): String {
         return fileName ?: super.toString()
     }
+
+    override fun equals(other: Any?): Boolean = equalsUUID(other)
 
 }

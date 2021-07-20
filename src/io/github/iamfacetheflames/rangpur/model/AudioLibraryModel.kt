@@ -1,6 +1,6 @@
 package io.github.iamfacetheflames.rangpur.model
 
-import io.github.iamfacetheflames.rangpur.repository.Database
+import io.github.iamfacetheflames.rangpur.repository.database.Database
 import io.github.iamfacetheflames.rangpur.data.Audio
 import io.github.iamfacetheflames.rangpur.data.AudioInPlaylist
 import io.github.iamfacetheflames.rangpur.data.Filter

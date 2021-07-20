@@ -1,19 +1,16 @@
 package io.github.iamfacetheflames.rangpur.ormlite
 
-import com.j256.ormlite.dao.Dao
 import com.j256.ormlite.dao.DaoManager
-import com.j256.ormlite.dao.GenericRawResults
 import com.j256.ormlite.support.ConnectionSource
 import com.j256.ormlite.table.TableUtils
-import io.github.iamfacetheflames.rangpur.repository.Database
 import io.github.iamfacetheflames.rangpur.data.*
-import java.lang.StringBuilder
+import io.github.iamfacetheflames.rangpur.repository.database.Database
 import java.sql.Date
 import java.sql.SQLException
 
 class OrmLiteDatabase(var source: ConnectionSource): Database {
 
-    private var builder = object : Database.DaoBuilder {
+    private var builder = object : Database.Builder {
 
         override fun createAudio(
             directory: Directory,
@@ -37,7 +34,7 @@ class OrmLiteDatabase(var source: ConnectionSource): Database {
             return OrmLitePlaylist().apply {
                 this.name = name
                 this.timestampCreated = java.util.Date().time
-                this.ormFolder = folder as OrmLitePlaylistFolder?
+                this.folder = folder
             }
         }
 
@@ -76,393 +73,117 @@ class OrmLiteDatabase(var source: ConnectionSource): Database {
         TableUtils.createTableIfNotExists(source, OrmLiteAudioInPlaylist::class.java)
     }
 
-    override fun getBuilder(): Database.DaoBuilder = builder
+    override fun getBuilder(): Database.Builder = builder
 
-    override fun saveDirectories(directories: List<Directory>) {
-        val dao = DaoManager.createDao(source, OrmLiteDirectory::class.java)
-        dao.callBatchTasks {
-            for (directory in directories) {
-                try {
-                    dao.createOrUpdate(directory as OrmLiteDirectory)
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                }
-            }
-        }
-    }
+    override val directories: Database.Directories = OrmLiteDirectories(source)
 
-    override fun getRootDirectories(): List<Directory> {
-        val dao = DaoManager.createDao(source, OrmLiteDirectory::class.java)
-        val queryBuilder = dao.queryBuilder()
-        queryBuilder.where().isNull("parent_id")
-        queryBuilder.orderByRaw("name COLLATE NOCASE")
-        val preparedQuery = queryBuilder.prepare()
-        return dao.query(preparedQuery)
-    }
+    override fun saveDirectories(items: List<Directory>) = directories.update(items)
+    override fun getRootDirectories(): List<Directory> = directories.getOnlyRoot()
+    override fun getDirectories(): List<Directory> = directories.getAll()
+    override fun getDirectories(parent: Directory): List<Directory> = directories.getFrom(parent)
+    override fun getDirectory(directoryUUID: String): Directory? = directories.getItem(directoryUUID)
 
-    override fun getDirectories(): List<Directory> {
-        val dao = DaoManager.createDao(source, OrmLiteDirectory::class.java)
-        val queryBuilder = dao.queryBuilder()
-        queryBuilder.orderByRaw("name COLLATE NOCASE")
-        val preparedQuery = queryBuilder.prepare()
-        return dao.query(preparedQuery)
-    }
+    override val calendar: Database.Calendar = OrmLiteCalendar(source)
 
-    override fun getDirectories(parent: Directory): List<Directory> {
-        val dao = DaoManager.createDao(source, OrmLiteDirectory::class.java)
-        val queryBuilder = dao.queryBuilder()
-        queryBuilder.where().eq("parent_id", parent)
-        queryBuilder.orderByRaw("name COLLATE NOCASE")
-        val preparedQuery = queryBuilder.prepare()
-        return dao.query(preparedQuery)
-    }
+    override val audios: Database.Audios = OrmLiteAudios(source)
 
-    override fun getDirectory(directoryId: Long): Directory? {
-        val dao = DaoManager.createDao(source, OrmLiteDirectory::class.java)
-        val queryBuilder = dao.queryBuilder()
-        queryBuilder.where().eq("id", directoryId)
-        val preparedQuery = queryBuilder.prepare()
-        return dao.query(preparedQuery).first()
-    }
+    override fun updateAudios(items: List<Audio>) = audios.update(items)
+    override fun saveAudios(items: List<Audio>) = audios.create(items)
+    override fun getAudios(): List<Audio> = audios.getAll()
+    override fun getAudios(filter: Filter): List<Audio> = audios.getFiltered(filter)
+    override fun deleteAudios(items: List<Audio>) = audios.delete(items)
 
-    override fun getDateList(): List<String> {
-        val dao = DaoManager.createDao(source, OrmLiteAudio::class.java)
-        val results = ArrayList<String>()
-        val request = "SELECT date_created FROM audio GROUP BY date_created ORDER BY timestamp_created DESC"
-        dao.queryRaw(request).results.forEach { results.add( it.first() ) }
-        return results
-    }
+    override val playlistFolders: Database.PlaylistFolders = OrmLitePlaylistFolders(source)
 
-    override fun getYears(): List<String> {
-        val dao = DaoManager.createDao(source, OrmLiteAudio::class.java)
-        val results = ArrayList<String>()
-        val request = "SELECT strftime('%Y', date_created) as t1 FROM audio GROUP BY t1 ORDER BY timestamp_created DESC"
-        dao.queryRaw(request).results.forEach { results.add( it.first() ) }
-        return results
-    }
+    override fun getPlaylistFolders(): List<PlaylistFolder> = playlistFolders.getAll()
+    override fun createOrUpdatePlaylistFolder(playlistFolder: PlaylistFolder) = playlistFolders.update(playlistFolder)
+    override fun savePlaylistFolders(folders: List<PlaylistFolder>) = playlistFolders.create(folders)
+    override fun removePlaylistFolder(playlistFolder: PlaylistFolder) = playlistFolders.delete(playlistFolder)
 
-    override fun getMonths(year: String): List<String> {
-        val dao = DaoManager.createDao(source, OrmLiteAudio::class.java)
-        val results = ArrayList<String>()
-        AudioField.apply {
-            val request = "SELECT strftime('%Y.%m', $DATE_CREATED) as t1 " +
-                    "FROM $AUDIO_TABLE_NAME WHERE $DATE_CREATED LIKE '$year%' " +
-                    "GROUP BY t1 ORDER BY $TIMESTAMP_CREATED DESC"
-            dao.queryRaw(request).results.forEach { results.add( it.first() ) }
-            return results
-        }
-    }
+    override val playlists: Database.Playlists = OrmLitePlaylists(source)
 
-    override fun getDays(yearAndMonth: String): List<String> {
-        val dao = DaoManager.createDao(source, OrmLiteAudio::class.java)
-        val results = ArrayList<String>()
-        AudioField.apply {
-            val request = "SELECT strftime('%Y.%m.%d', $DATE_CREATED) as t1 " +
-                    "FROM $AUDIO_TABLE_NAME WHERE $DATE_CREATED LIKE '$yearAndMonth%' " +
-                    "GROUP BY t1 ORDER BY $TIMESTAMP_CREATED DESC"
-            dao.queryRaw(request).results.forEach { results.add( it.first() ) }
-            return results
-        }
-    }
+    override fun createOrUpdatePlaylist(playlist: Playlist) = playlists.update(playlist)
+    override fun removePlaylist(playlist: Playlist) = playlists.delete(playlist)
+    override fun getPlaylists(): List<Playlist> = playlists.getAll()
+    override fun getPlaylists(playlistFolder: PlaylistFolder?): List<Playlist> = playlists.getFrom(playlistFolder)
+    override fun savePlaylists(items: List<Playlist>) = playlists.create(items)
 
-    override fun updateAudios(audios: List<Audio>) {
-        val dao: Dao<OrmLiteAudio, String> =
-            DaoManager.createDao(source, OrmLiteAudio::class.java)
-        dao.callBatchTasks {
-            for (audio in audios) {
-                dao.update(audio as OrmLiteAudio)
-            }
-        }
-    }
+    override val playlistWithAudios: Database.PlaylistWithAudios = OrmLitePlaylistWithAudios(source)
 
-    override fun saveAudios(audios: List<Audio>) {
-        val dao: Dao<OrmLiteAudio, String> =
-            DaoManager.createDao(source, OrmLiteAudio::class.java)
-        dao.callBatchTasks {
-            for (audio in audios) {
-                try {
-                    dao.createIfNotExists(audio as OrmLiteAudio)
-                } catch (e: SQLException) {
-                    if (e.cause?.message?.contains("SQLITE_CONSTRAINT_UNIQUE") == true) {
-                        // ignore
+    override fun getPlaylistAudios(): List<AudioInPlaylist> = playlistWithAudios.getAll()
+    override fun getPlaylistAudios(playlist: Playlist?): List<AudioInPlaylist> = playlistWithAudios.getFrom(playlist)
+    override fun addAudiosInPlaylist(audios: List<Audio>, playlistUUID: String) =
+        playlistWithAudios.create(audios, playlistUUID)
+    override fun deleteAudiosFromPlaylist(audios: List<AudioInPlaylist>, playlistUUID: String) =
+        playlistWithAudios.delete(audios, playlistUUID)
+    override fun moveAudiosInPlaylistToNewPosition(audios: List<AudioInPlaylist>, newPosition: Int) =
+        playlistWithAudios.changePosition(audios, newPosition)
+    override fun savePlaylistAudios(audios: List<AudioInPlaylist>) = playlistWithAudios.create(audios)
+
+}
+
+fun where(conditions: List<String>): String =
+    StringBuilder().apply {
+        if (conditions.isNotEmpty()) {
+            append("WHERE ")
+            for ((index, item) in conditions.withIndex()) {
+                append(
+                    if (index == 0) {
+                        "$item "
                     } else {
-                        e.printStackTrace()
+                        "AND $item "
                     }
-                }
+                )
             }
         }
-    }
+        append(" ")
+    }.toString()
 
-    override fun getAudios(): List<Audio> {
-        val dao = DaoManager.createDao(source, OrmLiteAudio::class.java)
-        val request = "SELECT * FROM audio ORDER BY ${AudioField.TIMESTAMP_CREATED} DESC;"
-        val queryResult: GenericRawResults<OrmLiteAudio> = dao.queryRaw(request, dao.rawRowMapper)
-        return queryResult.results
-    }
-
-    override fun getAudios(filter: Filter): List<Audio> {
-        val dao = DaoManager.createDao(source, OrmLiteAudio::class.java)
-        val request = StringBuilder().apply {
-            append("SELECT a.* FROM audio as a INNER JOIN directory as p ON a.directory_id = p.id ")
-            AudioField.apply {
-                val conditions = ArrayList<String>().apply {
-                    if (filter.isSearchRequest()) {
-                        val item: Pair<Int, Keys.Key>? = Keys.keyMap.filter { it.value.lancelot.equals(filter.searchRequest, true) }.toList().firstOrNull()
-                        if (item != null) {
-                            add(
-                                "(" + like(FILE_NAME, filter.searchRequest) + " OR $KEY = ${item.first} ) "
-                            )
-                        } else {
-                            add(
-                                like(FILE_NAME, filter.searchRequest)
-                            )
-                        }
+fun likeOrExpression(field: String, values: List<String>, startsWith: Boolean = false): String =
+    StringBuilder().apply {
+        if (values.isNotEmpty()) {
+            append("(")
+            for ((index, item) in values.withIndex()) {
+                val value = like(field, item, startsWith)
+                append(
+                    if (index == 0) {
+                        "$value "
+                    } else {
+                        "OR $value "
                     }
-                    if (filter.isDirectoriesFiltered()) {
-                        val locationDirs = mutableListOf<String>()
-                        filter.directories.forEach {
-                            it.locationInMusicDirectory?.let { location ->
-                                locationDirs.add(location)
-                            }
-                        }
-                        add(
-                            likeOrExpression("p.location", locationDirs, true)
-                        )
-                    }
-                    if (filter.isDateFiltered()) {
-                        add(
-                            likeOrExpression(DATE_CREATED, filter.dateList)
-                        )
-                    }
-                    if (filter.isOnlyWithoutPlaylist) {
-                        add("(SELECT COUNT(*) FROM audio_in_playlist AS aip WHERE aip.audio_id = a.id) == 0 ")
-                    }
-                }
-                append(where(conditions))
-                filter.sort.apply {
-                    append("ORDER BY $columnName $direction ")
-                }
-                append(";")
+                )
             }
+            append(")")
+        }
+        append(" ")
+    }.toString()
+
+fun like(field: String, value: String, startsWith: Boolean = false): String {
+    return if (startsWith) {
+        "$field LIKE \"$value%\" "
+    } else {
+        "$field LIKE \"%$value%\" "
+    }
+}
+
+fun inIds(field: String, array: List<WithId>): String {
+    return if (array.isNotEmpty()) {
+        val arrayString = StringBuilder().apply {
+            append("(")
+            for ((index, item) in array.withIndex()) {
+                val id = item.id.toString()
+                append(
+                    if (index == 0) {
+                        id
+                    } else {
+                        ", $id"
+                    }
+                )
+            }
+            append(")")
         }.toString()
-        val queryResult: GenericRawResults<OrmLiteAudio> = dao.queryRaw(request, dao.rawRowMapper)
-        return queryResult.results
+        "$field IN $arrayString "
+    } else {
+        " "
     }
-
-    override fun deleteAudios(audios: List<Audio>) {
-        val dao = DaoManager.createDao(source, OrmLiteAudio::class.java)
-        dao.delete(audios as List<OrmLiteAudio>)
-    }
-
-    override fun createOrUpdatePlaylist(playlist: Playlist) {
-        val dao = DaoManager.createDao(source, OrmLitePlaylist::class.java)
-        dao.createOrUpdate(playlist as OrmLitePlaylist)
-    }
-
-    override fun removePlaylist(playlist: Playlist) {
-        val dao = DaoManager.createDao(source, OrmLitePlaylist::class.java)
-        dao.delete(playlist as OrmLitePlaylist)
-    }
-
-    override fun removePlaylistFolder(playlistFolder: PlaylistFolder) {
-        val dao = DaoManager.createDao(source, OrmLitePlaylistFolder::class.java)
-        dao.delete(playlistFolder as OrmLitePlaylistFolder)
-    }
-
-    override fun getPlaylists(): List<Playlist> = getPlaylists(null)
-
-    override fun getPlaylists(playlistFolder: PlaylistFolder?): List<Playlist> {
-        val dao = DaoManager.createDao(source, OrmLitePlaylist::class.java)
-        if (playlistFolder == null) {
-            val queryBuilder = dao.queryBuilder()
-            queryBuilder.orderBy("timestamp_created", false)
-            val preparedQuery = queryBuilder.prepare()
-            return dao.query(preparedQuery)
-        } else {
-            val query = "SELECT * FROM playlist " +
-                    "WHERE folder_id = ? " +
-                    "ORDER BY timestamp_created DESC;"
-            val queryResult: GenericRawResults<OrmLitePlaylist> = dao.queryRaw(
-                query,
-                dao.rawRowMapper,
-                playlistFolder?.id.toString()
-            )
-            return queryResult.results
-        }
-    }
-
-    override fun savePlaylists(playlists: List<Playlist>) {
-        val dao = DaoManager.createDao(source, OrmLitePlaylist::class.java)
-        dao.callBatchTasks {
-            for (playlist in playlists) {
-                try {
-                    dao.createOrUpdate(playlist as OrmLitePlaylist)
-                } catch (e: SQLException) {
-                    if (e.cause?.message?.contains("SQLITE_CONSTRAINT_UNIQUE") == true) {
-                        // ignore
-                    } else {
-                        e.printStackTrace()
-                    }
-                }
-            }
-        }
-    }
-
-    override fun getPlaylistAudios(): List<AudioInPlaylist> = getPlaylistAudios(null)
-
-    override fun getPlaylistAudios(playlist: Playlist?): List<AudioInPlaylist> {
-        val dao = DaoManager.createDao(source, OrmLiteAudioInPlaylist::class.java)
-        val queryBuilder = dao.queryBuilder()
-        if (playlist != null) {
-            queryBuilder.where().eq("playlist_id", playlist)
-        }
-        queryBuilder.orderByRaw("position ASC")
-        val preparedQuery = queryBuilder.prepare()
-        return dao.query(preparedQuery)
-    }
-
-    override fun addAudiosInPlaylist(audios: List<Audio>, playlistId: Long) {
-        val dao = DaoManager.createDao(source, OrmLiteAudioInPlaylist::class.java)
-        dao.callBatchTasks {
-            val request = "INSERT INTO audio_in_playlist (audio_id, playlist_id, position) \n" +
-                    "VALUES (?, ?, (SELECT ifnull(MAX(position), 0)+1 FROM audio_in_playlist WHERE playlist_id = ?));"
-            audios.forEachIndexed { index, audio ->
-                dao.executeRaw(request, audio.id.toString(), playlistId.toString(), playlistId.toString())
-            }
-        }
-    }
-
-    override fun deleteAudiosFromPlaylist(audios: List<AudioInPlaylist>, playlistId: Long) {
-        val dao = DaoManager.createDao(source, OrmLiteAudioInPlaylist::class.java)
-        dao.callBatchTasks {
-            val request = "DELETE FROM audio_in_playlist WHERE id = ?;"
-            audios.forEachIndexed { index, audio ->
-                dao.executeRaw(request, audio.id.toString())
-            }
-        }
-    }
-
-    override fun moveAudiosInPlaylistToNewPosition(audios: List<AudioInPlaylist>, newPosition: Int) {
-        val dao = DaoManager.createDao(source, OrmLiteAudioInPlaylist::class.java)
-        dao.callBatchTasks {
-            val request = "UPDATE audio_in_playlist SET position = ? WHERE id = ?;"
-            audios.forEachIndexed { index, audio ->
-                dao.updateRaw(request, (index + 1).toString(), audio.id.toString())
-            }
-        }
-    }
-
-    override fun savePlaylistAudios(audios: List<AudioInPlaylist>) {
-        val dao = DaoManager.createDao(source, OrmLiteAudioInPlaylist::class.java)
-        dao.callBatchTasks {
-            for (audio in audios) {
-                try {
-                    dao.createOrUpdate(audio as OrmLiteAudioInPlaylist)
-                } catch (e: SQLException) {
-                    if (e.cause?.message?.contains("SQLITE_CONSTRAINT_UNIQUE") == true) {
-                        // ignore
-                    } else {
-                        e.printStackTrace()
-                    }
-                }
-            }
-        }
-    }
-
-    override fun getPlaylistFolders(): List<PlaylistFolder> {
-        val dao = DaoManager.createDao(source, OrmLitePlaylistFolder::class.java)
-        val queryBuilder = dao.queryBuilder()
-        queryBuilder.orderBy("timestamp_created", false)
-        val preparedQuery = queryBuilder.prepare()
-        return dao.query(preparedQuery)
-    }
-
-    override fun createOrUpdatePlaylistFolder(playlistFolder: PlaylistFolder) {
-        val dao = DaoManager.createDao(source, OrmLitePlaylistFolder::class.java)
-        dao.createOrUpdate(playlistFolder as OrmLitePlaylistFolder)
-    }
-
-    override fun savePlaylistFolders(folders: List<PlaylistFolder>) {
-        val dao = DaoManager.createDao(source, OrmLitePlaylistFolder::class.java)
-        dao.callBatchTasks {
-            for (folder in folders) {
-                try {
-                    dao.createOrUpdate(folder as OrmLitePlaylistFolder)
-                } catch (e: SQLException) {
-                    if (e.cause?.message?.contains("SQLITE_CONSTRAINT_UNIQUE") == true) {
-                        // ignore
-                    } else {
-                        e.printStackTrace()
-                    }
-                }
-            }
-        }
-    }
-
-    private fun where(conditions: List<String>): String =
-        StringBuilder().apply {
-            if (conditions.isNotEmpty()) {
-                append("WHERE ")
-                for ((index, item) in conditions.withIndex()) {
-                    append(
-                        if (index == 0) {
-                            "$item "
-                        } else {
-                            "AND $item "
-                        }
-                    )
-                }
-            }
-            append(" ")
-        }.toString()
-
-    private fun likeOrExpression(field: String, values: List<String>, startsWith: Boolean = false): String =
-        StringBuilder().apply {
-            if (values.isNotEmpty()) {
-                append("(")
-                for ((index, item) in values.withIndex()) {
-                    val value = like(field, item, startsWith)
-                    append(
-                        if (index == 0) {
-                            "$value "
-                        } else {
-                            "OR $value "
-                        }
-                    )
-                }
-                append(")")
-            }
-            append(" ")
-        }.toString()
-
-    private fun like(field: String, value: String, startsWith: Boolean = false): String {
-        return if (startsWith) {
-            "$field LIKE \"$value%\" "
-        } else {
-            "$field LIKE \"%$value%\" "
-        }
-    }
-
-    private fun inIds(field: String, array: List<WithId>): String {
-        return if (array.isNotEmpty()) {
-            val arrayString = StringBuilder().apply {
-                append("(")
-                for ((index, item) in array.withIndex()) {
-                    val id = item.id.toString()
-                    append(
-                        if (index == 0) {
-                            id
-                        } else {
-                            ", $id"
-                        }
-                    )
-                }
-                append(")")
-            }.toString()
-            "$field IN $arrayString "
-        } else {
-            " "
-        }
-    }
-
 }

@@ -5,7 +5,7 @@ object AudioField {
     const val TIMESTAMP_CREATED = "timestamp_created"
     const val DATE_CREATED = "date_created"
     const val FILE_NAME = "file_name"
-    const val DIRECTORY_ID = "directory_id"
+    const val DIRECTORY_UUID = "directory_uuid"
     const val ID = "id"
     const val DEVICE_ID = "device_id"
     const val ALBUM_TRACK_NUMBER = "albumTrackNumber"

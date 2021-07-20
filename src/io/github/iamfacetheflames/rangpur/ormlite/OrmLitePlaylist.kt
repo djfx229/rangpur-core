@@ -4,9 +4,14 @@ import com.j256.ormlite.field.DatabaseField
 import com.j256.ormlite.table.DatabaseTable
 import io.github.iamfacetheflames.rangpur.data.Playlist
 import io.github.iamfacetheflames.rangpur.data.PlaylistFolder
+import io.github.iamfacetheflames.rangpur.data.equalsUUID
+import java.util.*
 
 @DatabaseTable(tableName = "playlist")
 class OrmLitePlaylist : Playlist {
+
+    @DatabaseField(columnName = "uuid", canBeNull = false, uniqueIndexName = "unique_uuid")
+    override var uuid: String = UUID.randomUUID().toString()
 
     @DatabaseField(columnName = "id", generatedId = true)
     override var id: Long = 0
@@ -17,13 +22,17 @@ class OrmLitePlaylist : Playlist {
     @DatabaseField(columnName = "timestamp_created", canBeNull = false)
     override var timestampCreated: Long = 0
 
-    override var folderId: Long = 0
+    override var folder: PlaylistFolder?
+        get() = ormFolder
+        set(value) { ormFolder = value as OrmLitePlaylistFolder }
 
-    @DatabaseField(columnName = "folder_id", foreign = true, canBeNull = true)
-    var ormFolder: OrmLitePlaylistFolder? = null
+    @DatabaseField(columnName = "folder_uuid", foreign = true, canBeNull = true)
+    private var ormFolder: OrmLitePlaylistFolder? = null
 
     override fun toString(): String {
         return name ?: super.toString()
     }
+
+    override fun equals(other: Any?): Boolean = equalsUUID(other)
 
 }

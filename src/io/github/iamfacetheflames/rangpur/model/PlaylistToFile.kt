@@ -47,7 +47,7 @@ object PlaylistToFile {
     ): File {
         val lines = ArrayList<String>()
         audios.forEach {
-            it.audioObject?.apply {
+            it.audio?.apply {
                 lines.add("$artist - $title\n")
             }
         }
