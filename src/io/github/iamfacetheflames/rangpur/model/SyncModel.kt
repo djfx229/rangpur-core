@@ -7,6 +7,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import java.io.*
+import java.lang.IllegalStateException
 import java.net.InetSocketAddress
 import java.nio.channels.ServerSocketChannel
 import java.nio.channels.SocketChannel
@@ -63,6 +64,7 @@ class SyncModel(val database: Database, val config: Configuration) {
                 toClient.writeObject(newAudios.size)
                 for ((index, audio) in newAudios.withIndex()) {
                     toClient.writeObject(Command.SEND_AUDIO)
+                    toClient.writeObject(audio)
                     toClient.writeObject(audio)
                     client.sendFile(toClient, audio.getFullPath(cachedDirs))
                     if (fromClient.readObject() != Command.DONE) {
@@ -178,12 +180,18 @@ class SyncModel(val database: Database, val config: Configuration) {
                             )
                         )
                         val path = audio.getFullPath(cachedDirs)
-                        server.transferFileTo(fromServer, path)
-                        if (File(path).exists()) {
-                            database.saveAudios(mutableListOf(audio))
-                            println("server send file")
-                            toServer.writeObject(Command.DONE)
-                        } else {
+                        try {
+                            val size = server.transferFileTo(fromServer, path)
+                            val file = File(path)
+                            if (file.exists() && size == file.length()) {
+                                database.saveAudios(mutableListOf(audio))
+                                println("server send file")
+                                toServer.writeObject(Command.DONE)
+                            } else {
+                                toServer.writeObject(Command.ERROR)
+                                break
+                            }
+                        } catch (e: java.lang.Exception) {
                             toServer.writeObject(Command.ERROR)
                             break
                         }
@@ -240,18 +248,28 @@ class SyncModel(val database: Database, val config: Configuration) {
         }
     }
 
-    private suspend fun SocketChannel.transferFileTo(objectInputStream: ObjectInputStream, filePath: String): File {
+    private suspend fun SocketChannel.transferFileTo(objectInputStream: ObjectInputStream, filePath: String): Long {
         val size = objectInputStream.readObject<kotlin.Long>()
         return suspendCancellableCoroutine { continuation ->
             try {
-                File(filePath).parentFile?.let { parent ->
-                    if (!parent.exists()) {
-                        parent.mkdirs()
+                val file = File(filePath)
+                if (size <= 0L) continuation.resumeWithException(
+                    IllegalStateException("Невалидный размер файла: $size bites")
+                )
+                if (!file.exists() || size > file.length()) {
+                    if (file.exists()) {
+                        file.delete()
+                    } else {
+                        file.parentFile?.let { parent ->
+                            if (!parent.exists()) {
+                                parent.mkdirs()
+                            }
+                        }
                     }
-                }
-                FileOutputStream(filePath).channel.use { fileFromServer ->
-                    fileFromServer.transferFrom(this, 0, size)
-                    continuation.resume(File(filePath))
+                    FileOutputStream(filePath).channel.use { fileFromServer ->
+                        fileFromServer.transferFrom(this, 0, size)
+                        continuation.resume(size)
+                    }
                 }
             } catch (e: Exception) {
                 continuation.resumeWithException(e)
