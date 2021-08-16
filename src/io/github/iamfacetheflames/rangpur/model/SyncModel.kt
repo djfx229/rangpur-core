@@ -65,32 +65,31 @@ class SyncModel(val database: Database, val config: Configuration) {
                 for ((index, audio) in newAudios.withIndex()) {
                     toClient.writeObject(Command.SEND_AUDIO)
                     toClient.writeObject(audio)
-                    toClient.writeObject(audio)
-                    client.sendFile(toClient, audio.getFullPath(cachedDirs))
+                    client.sendFile(fromClient, toClient, audio.getFullPath(cachedDirs))
                     if (fromClient.readObject() != Command.DONE) {
                         break
                     }
                 }
                 syncDataWithClient(
-                        toClient,
-                        fromClient,
-                        Command.REQUEST_PLAYLIST_FOLDERS,
-                        Command.SEND_PLAYLIST_FOLDERS,
-                        database.getPlaylistFolders()
+                    toClient,
+                    fromClient,
+                    Command.REQUEST_PLAYLIST_FOLDERS,
+                    Command.SEND_PLAYLIST_FOLDERS,
+                    database.getPlaylistFolders()
                 )
                 syncDataWithClient(
-                        toClient,
-                        fromClient,
-                        Command.REQUEST_PLAYLISTS,
-                        Command.SEND_PLAYLISTS,
-                        database.getPlaylists()
+                    toClient,
+                    fromClient,
+                    Command.REQUEST_PLAYLISTS,
+                    Command.SEND_PLAYLISTS,
+                    database.getPlaylists()
                 )
                 syncDataWithClient(
-                        toClient,
-                        fromClient,
-                        Command.REQUEST_PLAYLIST_AUDIOS,
-                        Command.SEND_PLAYLIST_AUDIOS,
-                        database.getPlaylistAudios()
+                    toClient,
+                    fromClient,
+                    Command.REQUEST_PLAYLIST_AUDIOS,
+                    Command.SEND_PLAYLIST_AUDIOS,
+                    database.getPlaylistAudios()
                 )
                 toClient.writeObject(Command.DONE)
                 cachedDirs.release()
@@ -107,10 +106,10 @@ class SyncModel(val database: Database, val config: Configuration) {
     ) = withContext(Dispatchers.IO) {
         println("runClient() start $host : $port")
         SocketChannel.open(
-                InetSocketAddress(
-                        host,
-                        port
-                )
+            InetSocketAddress(
+                host,
+                port
+            )
         ).use { server ->
             println("runClient() get server")
             val toServer = ObjectOutputStream(server.socket().getOutputStream())
@@ -181,7 +180,7 @@ class SyncModel(val database: Database, val config: Configuration) {
                         )
                         val path = audio.getFullPath(cachedDirs)
                         try {
-                            val size = server.transferFileTo(fromServer, path)
+                            val size = server.transferFileTo(toServer, fromServer, path)
                             val file = File(path)
                             if (file.exists() && size == file.length()) {
                                 database.saveAudios(mutableListOf(audio))
@@ -208,11 +207,11 @@ class SyncModel(val database: Database, val config: Configuration) {
     }
 
     private fun syncDataWithClient(
-            toClient: ObjectOutputStream,
-            fromClient: ObjectInputStream,
-            requestCommand: String,
-            sendCommand: String,
-            serverData: List<WithId>
+        toClient: ObjectOutputStream,
+        fromClient: ObjectInputStream,
+        requestCommand: String,
+        sendCommand: String,
+        serverData: List<WithId>
     ) {
         toClient.writeObject(requestCommand)
         val clientDataIds = fromClient.readObject() as Set<Long>
@@ -232,15 +231,25 @@ class SyncModel(val database: Database, val config: Configuration) {
         }
     }
 
-    private suspend fun SocketChannel.sendFile(stream: ObjectOutputStream, filePath: String): File {
+    private suspend fun SocketChannel.sendFile(
+        fromClient: ObjectInputStream,
+        stream: ObjectOutputStream,
+        filePath: String
+    ): File {
         val file = File(filePath)
         val size = file.length()
         stream.writeObject(size)
+        val isRequestedFile = fromClient.readObject() as Boolean
         return suspendCancellableCoroutine { continuation ->
             try {
-                FileInputStream(filePath).channel.use { stream ->
-                    stream.transferTo(0, size, this)
-                    continuation.resume(File(filePath))
+                val file = File(filePath)
+                if (isRequestedFile) {
+                    FileInputStream(filePath).channel.use { stream ->
+                        stream.transferTo(0, size, this)
+                        continuation.resume(file)
+                    }
+                } else {
+                    continuation.resume(file)
                 }
             } catch (e: Exception) {
                 continuation.resumeWithException(e)
@@ -248,7 +257,11 @@ class SyncModel(val database: Database, val config: Configuration) {
         }
     }
 
-    private suspend fun SocketChannel.transferFileTo(objectInputStream: ObjectInputStream, filePath: String): Long {
+    private suspend fun SocketChannel.transferFileTo(
+        toServer: ObjectOutputStream,
+        objectInputStream: ObjectInputStream,
+        filePath: String
+    ): Long {
         val size = objectInputStream.readObject<kotlin.Long>()
         return suspendCancellableCoroutine { continuation ->
             try {
@@ -266,10 +279,14 @@ class SyncModel(val database: Database, val config: Configuration) {
                             }
                         }
                     }
+                    toServer.writeObject(true)
                     FileOutputStream(filePath).channel.use { fileFromServer ->
                         fileFromServer.transferFrom(this, 0, size)
                         continuation.resume(size)
                     }
+                } else {
+                    toServer.writeObject(false)
+                    continuation.resume(size)
                 }
             } catch (e: Exception) {
                 continuation.resumeWithException(e)
