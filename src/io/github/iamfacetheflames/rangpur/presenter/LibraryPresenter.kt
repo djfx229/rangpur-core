@@ -14,12 +14,12 @@ class LibraryPresenter(val scope: CoroutineScope, val models: Models, val router
     var selectedAudios = mutableListOf<Audio>()
     private val filter = Filter()
 
-    private val flowAudioList = MutableStateFlow<List<Audio>>(emptyList())
+    private val flowAudioList = MutableStateFlow<Result<List<Audio>>>(Result(emptyList<List<Audio>>()))
 
-    fun observableFilteredAudios(): StateFlow<List<Audio>> = flowAudioList
+    fun observableFilteredAudios(): StateFlow<Result<List<Audio>>> = flowAudioList
 
     fun setFilterDate(date: String? = null) {
-        scope.launch {
+        scope.launch(Dispatchers.IO) {
             if (date != null && date != DATE_ALL) {
                 filter.dateList.clear()
                 filter.dateList.add(date)
@@ -31,21 +31,21 @@ class LibraryPresenter(val scope: CoroutineScope, val models: Models, val router
     }
 
     fun setSort(sort: Sort) {
-        scope.launch {
+        scope.launch(Dispatchers.IO) {
             filter.sort = sort
             requestAudioList()
         }
     }
 
     fun setOnlyWithoutPlaylist(isOnlyWithoutPlaylist: Boolean) {
-        scope.launch {
+        scope.launch(Dispatchers.IO) {
             filter.isOnlyWithoutPlaylist = isOnlyWithoutPlaylist
             requestAudioList()
         }
     }
 
     fun setFilterDate(dates: List<String>) {
-        scope.launch {
+        scope.launch(Dispatchers.IO) {
             filter.dateList.clear()
             filter.dateList.addAll(dates)
             requestAudioList()
@@ -76,21 +76,26 @@ class LibraryPresenter(val scope: CoroutineScope, val models: Models, val router
     }
 
     fun setFilterString(searchText: String) {
-        scope.launch {
+        scope.launch(Dispatchers.IO) {
             filter.searchRequest = searchText
             requestAudioList()
         }
     }
 
     fun requestAudioList() {
-        scope.launch {
-            val audios = models.audioLibrary.getAudios(filter)
-            flowAudioList.value = audios
+        scope.launch(Dispatchers.IO) {
+            try {
+                val audios = models.audioLibrary.getAudios(filter)
+                delay(10000)
+                flowAudioList.value = Result(audios)
+            } catch (e: Exception) {
+                flowAudioList.value = Result.failure(e)
+            }
         }
     }
 
     fun exportFilteredAudiosInExternalPlaylist() {
-        scope.launch {
+        scope.launch(Dispatchers.IO) {
             withContext(Dispatchers.Main) {
                 val file = router.openSaveFileDialog("Куда сохранить:", "playlist.m3u8", "m3u file","m3u8","m3u")
                 withContext(Dispatchers.IO) {
@@ -103,7 +108,7 @@ class LibraryPresenter(val scope: CoroutineScope, val models: Models, val router
     }
 
     fun openFilteredAudiosInExternalPlayer() {
-        scope.launch {
+        scope.launch(Dispatchers.IO) {
             exportAudioListInM3u(File(File(".").canonicalPath), "RangExternalPlaylist.m3u8", true)
         }
     }

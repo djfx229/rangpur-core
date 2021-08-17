@@ -3,6 +3,7 @@ package io.github.iamfacetheflames.rangpur.presenter
 import io.github.iamfacetheflames.rangpur.data.Directory
 import io.github.iamfacetheflames.rangpur.model.Models
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -37,7 +38,7 @@ class FilterPresenter(val scope: CoroutineScope, val models: Models) {
     }
 
     private fun requestFilterFullDateList()  {
-        scope.launch {
+        scope.launch(Dispatchers.IO) {
             val dates = mutableListOf<String>().apply {
                 addAll(models.filterLibrary.getDateList())
             }
