@@ -11,10 +11,11 @@ import java.io.File
 
 class LibraryPresenter(val scope: CoroutineScope, val models: Models, val router: Router) {
 
-    var selectedAudios = mutableListOf<Audio>()
     private val filter = Filter()
-
     private val flowAudioList = MutableStateFlow<Result<List<Audio>>>(Result(emptyList<List<Audio>>()))
+    private var requestAudioList: Job = Job()
+
+    var selectedAudios = mutableListOf<Audio>()
 
     fun observableFilteredAudios(): StateFlow<Result<List<Audio>>> = flowAudioList
 
@@ -83,11 +84,17 @@ class LibraryPresenter(val scope: CoroutineScope, val models: Models, val router
     }
 
     fun requestAudioList() {
-        scope.launch(Dispatchers.IO) {
+        if (requestAudioList.isActive) {
+            requestAudioList.cancel()
+            requestAudioList = Job()
+        }
+        scope.launch(Dispatchers.IO + requestAudioList) {
             try {
+                flowAudioList.value = Result.waiting()
                 val audios = models.audioLibrary.getAudios(filter)
-                delay(10000)
-                flowAudioList.value = Result(audios)
+                if (isActive) {
+                    flowAudioList.value = Result(audios)
+                }
             } catch (e: Exception) {
                 flowAudioList.value = Result.failure(e)
             }

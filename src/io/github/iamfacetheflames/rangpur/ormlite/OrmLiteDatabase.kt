@@ -13,6 +13,8 @@ import java.sql.SQLException
 
 class OrmLiteDatabase(var source: ConnectionSource): Database {
 
+    private var currentAudiosRequest: GenericRawResults<OrmLiteAudio>? = null
+
     private var builder = object : Database.DaoBuilder {
 
         override fun createAudio(
@@ -201,6 +203,7 @@ class OrmLiteDatabase(var source: ConnectionSource): Database {
     }
 
     override fun getAudios(filter: Filter): List<Audio> {
+        currentAudiosRequest?.close()
         val dao = DaoManager.createDao(source, OrmLiteAudio::class.java)
         val request = StringBuilder().apply {
             append("SELECT a.* FROM audio as a INNER JOIN directory as p ON a.directory_id = p.id ")
@@ -246,6 +249,7 @@ class OrmLiteDatabase(var source: ConnectionSource): Database {
             }
         }.toString()
         val queryResult: GenericRawResults<OrmLiteAudio> = dao.queryRaw(request, dao.rawRowMapper)
+        currentAudiosRequest = queryResult
         return queryResult.results
     }
 

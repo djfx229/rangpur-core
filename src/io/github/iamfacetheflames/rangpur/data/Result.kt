@@ -2,7 +2,7 @@ package io.github.iamfacetheflames.rangpur.data
 
 import java.io.Serializable
 
-class Result<out T>(
+class Result<T>(
     val value: Any?
 ) {
 
@@ -33,6 +33,13 @@ class Result<out T>(
         when {
             isFailure -> null
             else -> value as T
+        }
+
+    fun getOrDefault(default: T): T =
+        if (value == null) {
+            default
+        } else {
+            value as T
         }
 
     internal class Failure(
