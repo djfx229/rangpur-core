@@ -33,4 +33,8 @@ class OrmLiteAudioInPlaylist : AudioInPlaylist {
             }
         }
 
+    override fun equals(other: Any?): Boolean {
+        return other is AudioInPlaylist && other.id == id
+    }
+
 }

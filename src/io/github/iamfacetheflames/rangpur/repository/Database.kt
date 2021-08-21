@@ -47,7 +47,7 @@ interface Database {
     fun getPlaylistAudios(playlist: Playlist?): List<AudioInPlaylist>
     fun addAudiosInPlaylist(audios: List<Audio>, playlistId: Long)
     fun deleteAudiosFromPlaylist(audios: List<AudioInPlaylist>, playlistId: Long)
-    fun moveAudiosInPlaylistToNewPosition(audios: List<AudioInPlaylist>, newPosition: Int)
+    fun moveAudiosInPlaylistToNewPosition(audios: List<AudioInPlaylist>)
     fun savePlaylistAudios(audios: List<AudioInPlaylist>)
 
     fun getPlaylistFolders(): List<PlaylistFolder>

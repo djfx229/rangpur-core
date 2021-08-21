@@ -132,22 +132,37 @@ class PlaylistPresenter(val scope: CoroutineScope, val models: Models, val route
         }
     }
 
-    fun moveAudiosInPlaylistToNewPosition(audios: List<AudioInPlaylist>, newPosition: Int) {
+    fun moveAudiosInPlaylistToNewPosition(selectedList: List<AudioInPlaylist>, movePosition: Int) {
         scope.launch(Dispatchers.IO) {
-            val newAudioList = LinkedList<AudioInPlaylist>()
-            val audioToNewPositionMap = mutableMapOf<AudioInPlaylist, Int>()
-            audios.forEachIndexed { index, audioInPlaylist ->
-                val audio = audioInPlaylist.audioObject ?: return@forEachIndexed
-                println("audio: '${audio.fileName}' move from ${flowAudioListFromPlaylist.value.indexOf(audioInPlaylist)} to ${newPosition + index}")
-                audioToNewPositionMap.put(audioInPlaylist, newPosition + index)
+            val fullList = flowAudioListFromPlaylist.value
+            if (
+                selectedList.isEmpty() ||
+                    selectedList.containsAll(fullList)
+            ) {
+                return@launch
             }
-            newAudioList.addAll(flowAudioListFromPlaylist.value)
-            audioToNewPositionMap.forEach { audio: AudioInPlaylist, position: Int ->
-                newAudioList.remove(audio)
-                newAudioList.add(position, audio)
+            val isUp = movePosition < selectedList.first().position
+            val nullableResultList = LinkedList<AudioInPlaylist?>()
+            nullableResultList.addAll(
+                fullList
+            )
+            selectedList.forEach {
+                nullableResultList.set(
+                    nullableResultList.indexOf(it),
+                    null
+                )
             }
-            models.database.moveAudiosInPlaylistToNewPosition(newAudioList, newPosition)
-            flowAudioListFromPlaylist.value = newAudioList
+            nullableResultList.addAll(
+                if (isUp) {
+                    movePosition
+                } else {
+                    movePosition + 1
+                },
+                selectedList
+            )
+            val finalList = nullableResultList.filterNotNull()
+            models.database.moveAudiosInPlaylistToNewPosition(finalList)
+            flowAudioListFromPlaylist.value = finalList
         }
     }
 
