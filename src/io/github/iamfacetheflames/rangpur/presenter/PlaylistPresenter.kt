@@ -29,7 +29,7 @@ class PlaylistPresenter(val scope: CoroutineScope, val models: Models, val route
     fun observablePlaylistFolders(): StateFlow<List<PlaylistFolder>> = flowPlaylistFolders
 
     fun requestAudioListForPlaylist(playlist: Playlist?) {
-        scope.launch {
+        scope.launch(Dispatchers.IO) {
             if (playlist != null) {
                 val audios = models.audioLibrary.getAudios(playlist)
                 flowAudioListFromPlaylist.value = audios
@@ -38,7 +38,7 @@ class PlaylistPresenter(val scope: CoroutineScope, val models: Models, val route
     }
 
     fun requestPlaylists(playlistFolder: PlaylistFolder? = null) {
-        scope.launch {
+        scope.launch(Dispatchers.IO) {
             selectedAudios = mutableListOf<AudioInPlaylist>()
             val playlists = models.playlistLibrary.getPlaylists(playlistFolder)
             flowPlaylists.value = playlists
@@ -46,14 +46,14 @@ class PlaylistPresenter(val scope: CoroutineScope, val models: Models, val route
     }
 
     fun requestPlaylistFolders() {
-        scope.launch {
+        scope.launch(Dispatchers.IO) {
             val folders = models.playlistLibrary.getPlaylistFolders()
             flowPlaylistFolders.value = folders
         }
     }
 
     fun createPlaylistFolder(router: Router) {
-        scope.launch {
+        scope.launch(Dispatchers.IO) {
             withContext(Dispatchers.Main) {
                 val name = router.openInputDialog("Название будущей папки:")
                 withContext(Dispatchers.IO) {
@@ -67,7 +67,7 @@ class PlaylistPresenter(val scope: CoroutineScope, val models: Models, val route
     }
 
     fun createPlaylist(router: Router) {
-        scope.launch {
+        scope.launch(Dispatchers.IO) {
             withContext(Dispatchers.Main) {
                 val name = router.openInputDialog("Название будущего плейлиста:")
                 withContext(Dispatchers.IO) {
@@ -81,7 +81,7 @@ class PlaylistPresenter(val scope: CoroutineScope, val models: Models, val route
     }
 
     fun renamePlaylist(playlist: Playlist, router: Router) {
-        scope.launch {
+        scope.launch(Dispatchers.IO) {
             withContext(Dispatchers.Main) {
                 val value = playlist.name
                 val name = router.openInputDialog("Новое имя плейлиста:", value)
@@ -96,7 +96,7 @@ class PlaylistPresenter(val scope: CoroutineScope, val models: Models, val route
     }
 
     fun deletePlaylistFolder(folder: PlaylistFolder) {
-        scope.launch {
+        scope.launch(Dispatchers.IO) {
             withContext(Dispatchers.IO) {
                 models.playlistLibrary.removePlaylistFolder(folder)
                 requestPlaylistFolders()
@@ -105,7 +105,7 @@ class PlaylistPresenter(val scope: CoroutineScope, val models: Models, val route
     }
 
     fun deletePlaylist(playlist: Playlist) {
-        scope.launch {
+        scope.launch(Dispatchers.IO) {
             withContext(Dispatchers.IO) {
                 models.playlistLibrary.removePlaylist(playlist)
                 requestPlaylists(currentFolder)
@@ -133,26 +133,41 @@ class PlaylistPresenter(val scope: CoroutineScope, val models: Models, val route
     }
 
     fun moveAudiosInPlaylistToNewPosition(audios: List<AudioInPlaylist>, newPosition: Int) {
-        scope.launch {
-            val newAudioList = LinkedList<AudioInPlaylist>()
-            val audioToNewPositionMap = mutableMapOf<AudioInPlaylist, Int>()
-            audios.forEachIndexed { index, audioInPlaylist ->
-                val audio = audioInPlaylist.audio ?: return@forEachIndexed
-                println("audio: '${audio.fileName}' move from ${flowAudioListFromPlaylist.value.indexOf(audioInPlaylist)} to ${newPosition + index}")
-                audioToNewPositionMap.put(audioInPlaylist, newPosition + index)
+        scope.launch(Dispatchers.IO) {
+            val fullList = flowAudioListFromPlaylist.value
+            if (
+                selectedList.isEmpty() ||
+                    selectedList.containsAll(fullList)
+            ) {
+                return@launch
             }
-            newAudioList.addAll(flowAudioListFromPlaylist.value)
-            audioToNewPositionMap.forEach { audio: AudioInPlaylist, position: Int ->
-                newAudioList.remove(audio)
-                newAudioList.add(position, audio)
+            val isUp = movePosition < selectedList.first().position
+            val nullableResultList = LinkedList<AudioInPlaylist?>()
+            nullableResultList.addAll(
+                fullList
+            )
+            selectedList.forEach {
+                nullableResultList.set(
+                    nullableResultList.indexOf(it),
+                    null
+                )
             }
-            models.database.moveAudiosInPlaylistToNewPosition(newAudioList, newPosition)
-            flowAudioListFromPlaylist.value = newAudioList
+            nullableResultList.addAll(
+                if (isUp) {
+                    movePosition
+                } else {
+                    movePosition + 1
+                },
+                selectedList
+            )
+            val finalList = nullableResultList.filterNotNull()
+            models.database.moveAudiosInPlaylistToNewPosition(finalList)
+            flowAudioListFromPlaylist.value = finalList
         }
     }
 
     fun exportPlaylistToTextFile(playlist: Playlist) {
-        scope.launch {
+        scope.launch(Dispatchers.IO) {
             withContext(Dispatchers.Main) {
                 val file = router.openSaveFileDialog("Куда сохранить:", "${playlist.name}.txt", "text file","txt") ?: return@withContext
                 withContext(Dispatchers.IO) {
