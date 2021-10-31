@@ -57,7 +57,7 @@ class OrmLitePlaylistWithAudios(val source: ConnectionSource): Database.Playlist
         }
     }
 
-    override fun changePosition(items: List<AudioInPlaylist>, newPosition: Int) {
+    override fun changePosition(items: List<AudioInPlaylist>) {
         val dao = DaoManager.createDao(source, OrmLiteAudioInPlaylist::class.java)
         dao.callBatchTasks {
             val request = "UPDATE audio_in_playlist SET position = ? WHERE uuid = ?;"

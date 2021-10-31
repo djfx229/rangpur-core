@@ -116,8 +116,8 @@ class OrmLiteDatabase(var source: ConnectionSource): Database {
         playlistWithAudios.create(audios, playlistUUID)
     override fun deleteAudiosFromPlaylist(audios: List<AudioInPlaylist>, playlistUUID: String) =
         playlistWithAudios.delete(audios, playlistUUID)
-    override fun moveAudiosInPlaylistToNewPosition(audios: List<AudioInPlaylist>, newPosition: Int) =
-        playlistWithAudios.changePosition(audios, newPosition)
+    override fun moveAudiosInPlaylistToNewPosition(audios: List<AudioInPlaylist>) =
+        playlistWithAudios.changePosition(audios)
     override fun savePlaylistAudios(audios: List<AudioInPlaylist>) = playlistWithAudios.create(audios)
 
 }

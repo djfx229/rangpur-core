@@ -41,7 +41,7 @@ interface Database {
         fun create(items: List<Audio>, playlistUUID: String)
         fun create(items: List<AudioInPlaylist>)
         fun delete(items: List<AudioInPlaylist>, playlistUUID: String)
-        fun changePosition(items: List<AudioInPlaylist>, newPosition: Int)
+        fun changePosition(items: List<AudioInPlaylist>)
     }
 
     interface Builder {
@@ -87,11 +87,17 @@ interface Database {
     fun getPlaylists(playlistFolder: PlaylistFolder?): List<Playlist>
 
     val playlistWithAudios: PlaylistWithAudios
+    @Deprecated("Please use playlistWithAudios.getAll() instead.")
     fun getPlaylistAudios(): List<AudioInPlaylist>
+    @Deprecated("Please use playlistWithAudios.getFrom(playlist) instead.")
     fun getPlaylistAudios(playlist: Playlist?): List<AudioInPlaylist>
+    @Deprecated("Please use playlistWithAudios.create(audios, playlistUUID) instead.")
     fun addAudiosInPlaylist(audios: List<Audio>, playlistUUID: String)
+    @Deprecated("Please use deleteAudiosFromPlaylist(audios: List<AudioInPlaylist>, playlistUUID: String) instead.")
     fun deleteAudiosFromPlaylist(items: List<AudioInPlaylist>, playlistUUID: String)
-    fun moveAudiosInPlaylistToNewPosition(audios: List<AudioInPlaylist>, newPosition: Int)
+    @Deprecated("Please use playlistWithAudios.changePosition(audios, newPosition) instead.")
+    fun moveAudiosInPlaylistToNewPosition(audios: List<AudioInPlaylist>)
+    @Deprecated("Please use playlistWithAudios.create(audios) instead.")
     fun savePlaylistAudios(audios: List<AudioInPlaylist>)
 
     fun getBuilder(): Builder

@@ -132,7 +132,7 @@ class PlaylistPresenter(val scope: CoroutineScope, val models: Models, val route
         }
     }
 
-    fun moveAudiosInPlaylistToNewPosition(audios: List<AudioInPlaylist>, newPosition: Int) {
+    fun moveAudiosInPlaylistToNewPosition(selectedList: List<AudioInPlaylist>, movePosition: Int) {
         scope.launch(Dispatchers.IO) {
             val fullList = flowAudioListFromPlaylist.value
             if (
