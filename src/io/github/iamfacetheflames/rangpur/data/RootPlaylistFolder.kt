@@ -3,7 +3,7 @@ package io.github.iamfacetheflames.rangpur.data
 class RootPlaylistFolder(
     override var name: String? = "All",
     override var timestampCreated: Long = 0,
-    override var parent: PlaylistFolder?,
+    override var parent: PlaylistFolder? = null,
     override var uuid: String = "All"
 ) : PlaylistFolder {
 

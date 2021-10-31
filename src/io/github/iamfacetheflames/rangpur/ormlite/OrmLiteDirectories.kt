@@ -11,7 +11,7 @@ class OrmLiteDirectories(var source: ConnectionSource) : Database.Directories {
     override fun getOnlyRoot(): List<Directory> {
         val dao = DaoManager.createDao(source, OrmLiteDirectory::class.java)
         val queryBuilder = dao.queryBuilder()
-        queryBuilder.where().isNull("parent_id")
+        queryBuilder.where().isNull("parent_uuid")
         queryBuilder.orderByRaw("name COLLATE NOCASE")
         val preparedQuery = queryBuilder.prepare()
         return dao.query(preparedQuery)
@@ -20,7 +20,7 @@ class OrmLiteDirectories(var source: ConnectionSource) : Database.Directories {
     override fun getFrom(parent: Directory): List<Directory> {
         val dao = DaoManager.createDao(source, OrmLiteDirectory::class.java)
         val queryBuilder = dao.queryBuilder()
-        queryBuilder.where().eq("parent_id", parent)
+        queryBuilder.where().eq("parent_uuid", parent)
         queryBuilder.orderByRaw("name COLLATE NOCASE")
         val preparedQuery = queryBuilder.prepare()
         return dao.query(preparedQuery)

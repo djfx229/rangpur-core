@@ -5,6 +5,7 @@ import com.j256.ormlite.support.ConnectionSource
 import io.github.iamfacetheflames.rangpur.data.*
 import io.github.iamfacetheflames.rangpur.repository.database.Database
 import java.sql.SQLException
+import java.util.*
 
 class OrmLitePlaylistWithAudios(val source: ConnectionSource): Database.PlaylistWithAudios {
 
@@ -22,10 +23,10 @@ class OrmLitePlaylistWithAudios(val source: ConnectionSource): Database.Playlist
     override fun create(items: List<Audio>, playlistUUID: String) {
         val dao = DaoManager.createDao(source, OrmLiteAudioInPlaylist::class.java)
         dao.callBatchTasks {
-            val request = "INSERT INTO audio_in_playlist (audio_uuid, playlist_uuid, position) \n" +
-                    "VALUES (?, ?, (SELECT ifnull(MAX(position), 0)+1 FROM audio_in_playlist WHERE playlist_uuid = ?));"
+            val request = "INSERT INTO audio_in_playlist (uuid, audio_uuid, playlist_uuid, position) \n" +
+                    "VALUES (?, ?, ?, (SELECT ifnull(MAX(position), 0)+1 FROM audio_in_playlist WHERE playlist_uuid = ?));"
             items.forEachIndexed { index, audio ->
-                dao.executeRaw(request, audio.uuid, playlistUUID, playlistUUID)
+                dao.executeRaw(request, UUID.randomUUID().toString(), audio.uuid, playlistUUID, playlistUUID)
             }
         }
     }
