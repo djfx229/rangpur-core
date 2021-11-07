@@ -33,7 +33,7 @@ object Command {
 
 class SyncModel(val database: Database, val config: Configuration) {
 
-    private val PORT: Int = 54286
+    val PORT: Int = 54286
 
     suspend fun runServer(
         host: String = "localhost",
