@@ -24,11 +24,11 @@ class OrmLiteAudios(var source: ConnectionSource) : Database.Audios {
                         val item: Pair<Int, Keys.Key>? = Keys.keyMap.filter { it.value.lancelot.equals(filter.searchRequest, true) }.toList().firstOrNull()
                         if (item != null) {
                             add(
-                                "(" + like(FILE_NAME, filter.searchRequest) + " OR $KEY = ${item.first} ) "
+                                "( $FILE_NAME LIKE ? OR $KEY = ${item.first} ) "
                             )
                         } else {
                             add(
-                                like(FILE_NAME, filter.searchRequest)
+                                "$FILE_NAME LIKE ? "
                             )
                         }
                     }
@@ -59,7 +59,11 @@ class OrmLiteAudios(var source: ConnectionSource) : Database.Audios {
                 append(";")
             }
         }.toString()
-        val queryResult: GenericRawResults<OrmLiteAudio> = dao.queryRaw(request, dao.rawRowMapper)
+        val queryResult: GenericRawResults<OrmLiteAudio> = if (filter.isSearchRequest()) {
+            dao.queryRaw(request, dao.rawRowMapper, "%${filter.searchRequest}%")
+        } else {
+            dao.queryRaw(request, dao.rawRowMapper)
+        }
         currentAudiosRequest = queryResult
         return queryResult.results
     }
