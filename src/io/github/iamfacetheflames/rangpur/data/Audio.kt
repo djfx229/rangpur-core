@@ -4,7 +4,7 @@ import io.github.iamfacetheflames.rangpur.model.CachedDirectories
 import java.io.File
 
 interface Audio : WithId {
-    var directory: Directory?
+    var directoryUUID: String
     var fileName: String?
     var albumTrackNumber: Int?
     var artist: String?
@@ -24,6 +24,8 @@ interface Audio : WithId {
 }
 
 fun Audio.getFullPath(cachedDirs: CachedDirectories): String {
-    val path = cachedDirs.getFullPath(this.directory!!)
+    val path = cachedDirs.getFullPath(
+        this.directoryUUID
+    )
     return path + File.separator + this.fileName
 }

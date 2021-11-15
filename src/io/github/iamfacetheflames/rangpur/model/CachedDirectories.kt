@@ -14,10 +14,10 @@ class CachedDirectories(val database: Database, val config: Configuration) {
     private val cache: HashMap<String, Directory> =
         HashMap()
 
-    fun getFullPath(directory: Directory): String {
+    fun getFullPath(directoryUUID: String): String {
         deque = LinkedList()
 
-        var current: Directory? = directory
+        var current: Directory? = findDirectory(directoryUUID)
         while (current != null) {
             deque.push(current.name)
             current = getDirectory(current.parent)

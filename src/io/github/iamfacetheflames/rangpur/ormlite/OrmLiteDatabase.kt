@@ -5,9 +5,7 @@ import com.j256.ormlite.support.ConnectionSource
 import com.j256.ormlite.table.TableUtils
 import io.github.iamfacetheflames.rangpur.data.*
 import io.github.iamfacetheflames.rangpur.repository.database.Database
-import org.sqlite.SQLiteException
 import java.sql.Date
-import java.sql.SQLException
 
 class OrmLiteDatabase(var source: ConnectionSource): Database {
 
@@ -21,7 +19,7 @@ class OrmLiteDatabase(var source: ConnectionSource): Database {
             dateCreated: Date
         ): Audio {
             return OrmLiteAudio().apply {
-                this.directory = directory
+                this.directoryUUID = directory.uuid
                 this.fileName = fileName
                 this.artist = artist
                 this.title = title

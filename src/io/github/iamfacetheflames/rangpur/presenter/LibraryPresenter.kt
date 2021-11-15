@@ -140,7 +140,7 @@ class LibraryPresenter(val scope: CoroutineScope, val models: Models, val router
 
     fun getAudioLocation(audio: Audio): File {
         val cachedDirs = CachedDirectories(models.database, models.config)
-        val fileLocation = cachedDirs.getFullPath(audio.directory!!) + "/" + audio.fileName
+        val fileLocation = cachedDirs.getFullPath(audio.directoryUUID) + "/" + audio.fileName
         cachedDirs.release()
         return File(fileLocation)
     }

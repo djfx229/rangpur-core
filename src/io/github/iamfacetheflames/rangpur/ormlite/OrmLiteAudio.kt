@@ -31,9 +31,15 @@ class OrmLiteAudio : Audio {
     @DatabaseField(columnName = "uuid", id = true, canBeNull = false, uniqueIndexName = "unique_uuid")
     override var uuid: String = UUID.randomUUID().toString()
 
-    override var directory: Directory?
-        get() = ormDirectory
-        set(value) {ormDirectory = value as OrmLiteDirectory}
+    override var directoryUUID: String
+        get() = ormDirectory?.uuid!!
+        set(value) {
+            if (ormDirectory != null) {
+                ormDirectory?.uuid = value
+            } else {
+                ormDirectory = OrmLiteDirectory().apply { uuid = value }
+            }
+        }
 
     @DatabaseField(columnName = FILE_NAME, canBeNull = false, uniqueIndexName = "unique_audio_item")
     override var fileName: String? = null
@@ -83,7 +89,7 @@ class OrmLiteAudio : Audio {
     @DatabaseField(columnName = TIMESTAMP_CREATED, canBeNull = false)
     override var timestampCreated: Long = 0
 
-    @DatabaseField(columnName = DIRECTORY_UUID, foreign = true, foreignAutoRefresh = true, uniqueIndexName = "unique_audio_item")
+    @DatabaseField(columnName = DIRECTORY_UUID, foreign = true, uniqueIndexName = "unique_audio_item")
     var ormDirectory: OrmLiteDirectory? = null
 
     override fun toString(): String {
