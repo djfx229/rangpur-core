@@ -16,7 +16,57 @@ class OrmLiteAudios(var source: ConnectionSource) : Database.Audios {
     override fun getFiltered(filter: Filter): List<Audio> {
         currentAudiosRequest?.close()
         val dao = DaoManager.createDao(source, OrmLiteAudio::class.java)
-        val request = StringBuilder().apply {
+        val request = when (filter.mode) {
+            Filter.Mode.LIBRARY -> getFilteredAudiosRequest(filter)
+            Filter.Mode.PLAYLIST -> getAudiosFromPlaylistRequest(filter)
+        }
+        val queryResult: GenericRawResults<OrmLiteAudio> = if (filter.isSearchRequest()) {
+            dao.queryRaw(request, dao.rawRowMapper, "%${filter.searchRequest}%")
+        } else {
+            dao.queryRaw(request, dao.rawRowMapper)
+        }
+        currentAudiosRequest = queryResult
+        return queryResult.results
+    }
+
+    private fun getAudiosFromPlaylistRequest(filter: Filter): String {
+        return StringBuilder().apply {
+            append("SELECT a.* FROM audio as a INNER JOIN audio_in_playlist as p ON a.uuid = p.audio_uuid ")
+            AudioField.apply {
+                val conditions = ArrayList<String>().apply {
+                    if (filter.isSearchRequest()) {
+                        val item: Pair<Int, Keys.Key>? = Keys.keyMap.filter { it.value.lancelot.equals(filter.searchRequest, true) }.toList().firstOrNull()
+                        if (item != null) {
+                            add(
+                                "( $FILE_NAME LIKE ? OR $KEY = ${item.first} ) "
+                            )
+                        } else {
+                            add(
+                                "$FILE_NAME LIKE ? "
+                            )
+                        }
+                    }
+                    add(
+                        "p.playlist_uuid = '${filter.playlistUUID}' "
+                    )
+                }
+                append(where(conditions))
+                if (filter.sort is DefaultSort) {
+                    filter.sort.apply {
+                        append("ORDER BY p.position $direction ")
+                    }
+                } else {
+                    filter.sort.apply {
+                        append("ORDER BY $columnName $direction ")
+                    }
+                }
+                append(";")
+            }
+        }.toString()
+    }
+
+    private fun getFilteredAudiosRequest(filter: Filter): String {
+        return StringBuilder().apply {
             append("SELECT a.* FROM audio as a INNER JOIN directory as p ON a.directory_uuid = p.uuid ")
             AudioField.apply {
                 val conditions = ArrayList<String>().apply {
@@ -53,19 +103,18 @@ class OrmLiteAudios(var source: ConnectionSource) : Database.Audios {
                     }
                 }
                 append(where(conditions))
-                filter.sort.apply {
-                    append("ORDER BY $columnName $direction ")
+                if (filter.sort is DefaultSort) {
+                    filter.sort.apply {
+                        append("ORDER BY $TIMESTAMP_CREATED $direction ")
+                    }
+                } else {
+                    filter.sort.apply {
+                        append("ORDER BY $columnName $direction ")
+                    }
                 }
                 append(";")
             }
         }.toString()
-        val queryResult: GenericRawResults<OrmLiteAudio> = if (filter.isSearchRequest()) {
-            dao.queryRaw(request, dao.rawRowMapper, "%${filter.searchRequest}%")
-        } else {
-            dao.queryRaw(request, dao.rawRowMapper)
-        }
-        currentAudiosRequest = queryResult
-        return queryResult.results
     }
 
     override fun create(items: List<Audio>) {

@@ -31,6 +31,20 @@ class LibraryPresenter(val scope: CoroutineScope, val models: Models, val router
         }
     }
 
+    fun setMode(mode: Filter.Mode) {
+        scope.launch(Dispatchers.IO) {
+            filter.mode = mode
+            requestAudioList()
+        }
+    }
+
+    fun setPlaylist(playlistUUID: String) {
+        scope.launch(Dispatchers.IO) {
+            filter.playlistUUID = playlistUUID
+            requestAudioList()
+        }
+    }
+
     fun setSort(sort: Sort) {
         scope.launch(Dispatchers.IO) {
             filter.sort = sort

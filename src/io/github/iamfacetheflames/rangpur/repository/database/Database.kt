@@ -69,7 +69,9 @@ interface Database {
     val audios: Audios
     fun updateAudios(audios: List<Audio>)
     fun saveAudios(audios: List<Audio>)
+    @Deprecated("Please use audios.getAll() instead.")
     fun getAudios(): List<Audio>
+    @Deprecated("Please use audios.getFiltered(filter) instead.")
     fun getAudios(filter: Filter): List<Audio>
     fun deleteAudios(audios: List<Audio>)
 

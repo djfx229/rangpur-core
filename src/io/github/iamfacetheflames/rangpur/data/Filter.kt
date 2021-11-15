@@ -3,10 +3,13 @@ package io.github.iamfacetheflames.rangpur.data
 import java.util.*
 
 class Filter {
+
+    var mode: Mode = Mode.LIBRARY
+    var playlistUUID: String? = null
     var dateList: LinkedList<String> = LinkedList<String>()
     var searchRequest = ""
     var directories: LinkedList<Directory> = LinkedList<Directory>()
-    var sort: Sort = DateSort()
+    var sort: Sort = DefaultSort()
     var isOnlyWithoutPlaylist: Boolean = false
 
     fun isDateFiltered(): Boolean = dateList.isNotEmpty()
@@ -17,4 +20,10 @@ class Filter {
         directories.clear()
         searchRequest = ""
     }
+
+    enum class Mode(val uiName: String) {
+        LIBRARY("Фильтры"),
+        PLAYLIST("Плейлисты")
+    }
+
 }
