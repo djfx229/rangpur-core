@@ -5,6 +5,7 @@ import com.j256.ormlite.support.ConnectionSource
 import com.j256.ormlite.table.TableUtils
 import io.github.iamfacetheflames.rangpur.data.*
 import io.github.iamfacetheflames.rangpur.repository.database.Database
+import org.sqlite.SQLiteException
 import java.sql.Date
 import java.sql.SQLException
 
@@ -71,6 +72,24 @@ class OrmLiteDatabase(var source: ConnectionSource): Database {
         TableUtils.createTableIfNotExists(source, OrmLitePlaylistFolder::class.java)
         TableUtils.createTableIfNotExists(source, OrmLitePlaylist::class.java)
         TableUtils.createTableIfNotExists(source, OrmLiteAudioInPlaylist::class.java)
+        val dao = DaoManager.createDao(source, OrmLiteAudio::class.java)
+        dao.executeRawNoArgs(
+            """
+                CREATE TABLE IF NOT EXISTS "rangpur_info" (
+                    "tag"	TEXT NOT NULL UNIQUE,
+                    "value"	TEXT
+                );
+            """
+        )
+        try {
+            dao.executeRawNoArgs(
+                """
+                    INSERT INTO "rangpur_info" ("tag","value") VALUES ('database_version','1');
+                """
+            )
+        } catch (e: Exception) {
+            // ignore
+        }
     }
 
     override fun getBuilder(): Database.Builder = builder
