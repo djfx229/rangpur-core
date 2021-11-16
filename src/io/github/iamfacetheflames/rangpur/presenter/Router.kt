@@ -14,5 +14,6 @@ interface Router {
         fileDescription: String,
         vararg fileExtensions: String
     ): File?
+    fun openFileManager(file: File)
     fun openM3uOnExternalApp(file: File)
 }

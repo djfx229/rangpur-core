@@ -11,7 +11,7 @@ import kotlinx.coroutines.launch
 const val DATE_ALL = "All"
 const val DIRECTORY_ALL = "All"
 
-class FilterPresenter(val scope: CoroutineScope, val models: Models) {
+class FilterPresenter(val scope: CoroutineScope, private val models: Models) {
 
     private val flowDateList = MutableStateFlow<List<String>>(emptyList())
     private val flowDirectories = MutableStateFlow<List<Directory>>(emptyList())

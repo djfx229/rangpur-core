@@ -43,7 +43,7 @@ class OrmLitePlaylists(val source: ConnectionSource) : Database.Playlists {
     override fun delete(playlist: Playlist) {
         val daoPlaylist = DaoManager.createDao(source, OrmLitePlaylist::class.java)
         val daoAudioInPlaylist = DaoManager.createDao(source, OrmLiteAudioInPlaylist::class.java)
-        val request = "DELETE FROM audio_in_playlist WHERE playlist_id = ?;"
+        val request = "DELETE FROM audio_in_playlist WHERE playlist_uuid = ?;"
         daoAudioInPlaylist.executeRaw(request, playlist.uuid)
         daoPlaylist.delete(playlist as OrmLitePlaylist)
     }

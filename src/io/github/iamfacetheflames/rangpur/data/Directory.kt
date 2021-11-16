@@ -1,6 +1,7 @@
 package io.github.iamfacetheflames.rangpur.data
 
-import java.io.Serializable
+import io.github.iamfacetheflames.rangpur.repository.Configuration
+import java.io.File
 
 interface Directory : WithId {
     var parent: Directory?
@@ -8,3 +9,9 @@ interface Directory : WithId {
     var name: String?
 }
 
+fun Directory.getJavaFile(config: Configuration): File {
+    val libraryLocation = config.getMusicDirectoryLocation()
+    val fullPath = libraryLocation + this.locationInMusicDirectory
+    val file = File(fullPath)
+    return file
+}

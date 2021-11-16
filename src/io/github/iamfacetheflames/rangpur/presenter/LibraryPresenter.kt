@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import java.io.File
 
-class LibraryPresenter(val scope: CoroutineScope, val models: Models, val router: Router) {
+class LibraryPresenter(val scope: CoroutineScope, private val models: Models, val router: Router) {
 
     private val filter = Filter()
     private val flowAudioList = MutableStateFlow<Result<List<Audio>>>(Result(emptyList<List<Audio>>()))
@@ -154,9 +154,46 @@ class LibraryPresenter(val scope: CoroutineScope, val models: Models, val router
 
     fun getAudioLocation(audio: Audio): File {
         val cachedDirs = CachedDirectories(models.database, models.config)
-        val fileLocation = cachedDirs.getFullPath(audio.directoryUUID) + "/" + audio.fileName
+        val fileLocation = cachedDirs.getFullPath(audio.directoryUUID) + File.separator + audio.fileName
         cachedDirs.release()
         return File(fileLocation)
+    }
+
+    fun openDirectoryContainsSelectedAudio() {
+        if (selectedAudios.isNotEmpty()) {
+            val item = selectedAudios.first()
+            val directory = models.database.getDirectory(item.directoryUUID)
+            if (directory != null) {
+                val file = File(directory.getJavaFile(models.config).path + File.separator + item.fileName)
+                router.openFileManager(file)
+            }
+        }
+    }
+
+    fun getSelectedAudios(
+        selectedRows: IntArray,
+        audios: List<AudioInPlaylist>
+    ): Pair<
+        MutableList<AudioInPlaylist>,
+        MutableList<File>
+    > {
+        val selectedList = mutableListOf<AudioInPlaylist>()
+        val cachedDirs = CachedDirectories(models.database, models.config)
+        val files: MutableList<File> = mutableListOf<File>()
+        for(selIndex in selectedRows) {
+            audios.getOrNull(selIndex)?.let {
+                it.audio?.apply {
+                    try {
+                        files.add(File(getFullPath(cachedDirs)))
+                        selectedList.add(it)
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
+                }
+            }
+        }
+        cachedDirs.release()
+        return Pair(selectedList, files)
     }
 
 }

@@ -14,7 +14,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.*
 
-class PlaylistPresenter(val scope: CoroutineScope, val models: Models, val router: Router) {
+class PlaylistPresenter(val scope: CoroutineScope, private val models: Models, val router: Router) {
 
     var selectedAudios = mutableListOf<AudioInPlaylist>()
     var currentPlaylist: Playlist? = null
@@ -97,18 +97,24 @@ class PlaylistPresenter(val scope: CoroutineScope, val models: Models, val route
 
     fun deletePlaylistFolder(folder: PlaylistFolder) {
         scope.launch(Dispatchers.IO) {
-            withContext(Dispatchers.IO) {
+            try {
                 models.playlistLibrary.removePlaylistFolder(folder)
                 requestPlaylistFolders()
+            } catch (e: Exception) {
+                e.printStackTrace()
+                router.showErrorMessage(e.message.toString())
             }
         }
     }
 
     fun deletePlaylist(playlist: Playlist) {
         scope.launch(Dispatchers.IO) {
-            withContext(Dispatchers.IO) {
+            try {
                 models.playlistLibrary.removePlaylist(playlist)
                 requestPlaylists(currentFolder)
+            } catch (e: Exception) {
+                e.printStackTrace()
+                router.showErrorMessage(e.message.toString())
             }
         }
     }
@@ -134,35 +140,40 @@ class PlaylistPresenter(val scope: CoroutineScope, val models: Models, val route
 
     fun moveAudiosInPlaylistToNewPosition(selectedList: List<AudioInPlaylist>, movePosition: Int) {
         scope.launch(Dispatchers.IO) {
-            val fullList = flowAudioListFromPlaylist.value
-            if (
-                selectedList.isEmpty() ||
+            try {
+                val fullList = flowAudioListFromPlaylist.value
+                if (
+                    selectedList.isEmpty() ||
                     selectedList.containsAll(fullList)
-            ) {
-                return@launch
-            }
-            val isUp = movePosition < selectedList.first().position
-            val nullableResultList = LinkedList<AudioInPlaylist?>()
-            nullableResultList.addAll(
-                fullList
-            )
-            selectedList.forEach {
-                nullableResultList.set(
-                    nullableResultList.indexOf(it),
-                    null
+                ) {
+                    return@launch
+                }
+                val isUp = movePosition < selectedList.first().position
+                val nullableResultList = LinkedList<AudioInPlaylist?>()
+                nullableResultList.addAll(
+                    fullList
                 )
+                selectedList.forEach {
+                    nullableResultList.set(
+                        nullableResultList.indexOf(it),
+                        null
+                    )
+                }
+                nullableResultList.addAll(
+                    if (isUp) {
+                        movePosition
+                    } else {
+                        movePosition + 1
+                    },
+                    selectedList
+                )
+                val finalList = nullableResultList.filterNotNull()
+                models.database.moveAudiosInPlaylistToNewPosition(finalList)
+                flowAudioListFromPlaylist.value = finalList
+            } catch (e: Exception) {
+                e.printStackTrace()
+                router.showErrorMessage(e.message.toString())
             }
-            nullableResultList.addAll(
-                if (isUp) {
-                    movePosition
-                } else {
-                    movePosition + 1
-                },
-                selectedList
-            )
-            val finalList = nullableResultList.filterNotNull()
-            models.database.moveAudiosInPlaylistToNewPosition(finalList)
-            flowAudioListFromPlaylist.value = finalList
         }
     }
 
@@ -171,8 +182,13 @@ class PlaylistPresenter(val scope: CoroutineScope, val models: Models, val route
             withContext(Dispatchers.Main) {
                 val file = router.openSaveFileDialog("Куда сохранить:", "${playlist.name}.txt", "text file","txt") ?: return@withContext
                 withContext(Dispatchers.IO) {
-                    val audios = models.database.getPlaylistAudios(playlist)
-                    PlaylistToFile.exportPlaylistTxt(file.name, file.parentFile.absolutePath, audios)
+                    try {
+                        val audios = models.database.getPlaylistAudios(playlist)
+                        PlaylistToFile.exportPlaylistTxt(file.name, file.parentFile.absolutePath, audios)
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                        router.showErrorMessage(e.message.toString())
+                    }
                 }
             }
         }

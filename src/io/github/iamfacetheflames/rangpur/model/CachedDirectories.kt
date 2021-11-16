@@ -47,7 +47,7 @@ class CachedDirectories(val database: Database, val config: Configuration) {
         }
     }
 
-    private fun findDirectory(directoryUUID: String): Directory? {
+    fun findDirectory(directoryUUID: String): Directory? {
         val directory = cache[directoryUUID] ?: database.directories.getItem(directoryUUID)
         if (directory != null) {
             cache[directory.uuid] = directory
