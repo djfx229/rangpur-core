@@ -1,6 +1,7 @@
 package io.github.iamfacetheflames.rangpur.ormlite
 
 import com.j256.ormlite.dao.DaoManager
+import com.j256.ormlite.dao.GenericRawResults
 import com.j256.ormlite.support.ConnectionSource
 import io.github.iamfacetheflames.rangpur.data.Directory
 import io.github.iamfacetheflames.rangpur.repository.database.Database
@@ -75,6 +76,13 @@ class OrmLiteDirectories(var source: ConnectionSource) : Database.Directories {
         queryBuilder.where().eq("uuid", uuid)
         val preparedQuery = queryBuilder.prepare()
         return dao.query(preparedQuery).first()
+    }
+
+    override fun getItemByLocation(location: String): Directory? {
+        val dao = DaoManager.createDao(source, OrmLiteDirectory::class.java)
+        val request = "SELECT * FROM directory WHERE location = ? LIMIT 1;"
+        val queryResult: GenericRawResults<OrmLiteDirectory> = dao.queryRaw(request, dao.rawRowMapper, location)
+        return queryResult.results.firstOrNull()
     }
 
 }

@@ -15,6 +15,7 @@ interface Database {
     interface Directories: MultipleCRUD<Directory>, ItemGetter<Directory> {
         fun getOnlyRoot(): List<Directory>
         fun getFrom(parent: Directory): List<Directory>
+        fun getItemByLocation(location: String): Directory?
     }
 
     interface Audios: MultipleCRUD<Audio> {
