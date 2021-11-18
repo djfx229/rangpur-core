@@ -196,4 +196,8 @@ class LibraryPresenter(val scope: CoroutineScope, private val models: Models, va
         return Pair(selectedList, files)
     }
 
+    val onPlaylistClicked: (Playlist) -> Unit = { playlist ->
+        setPlaylist(playlist.uuid)
+    }
+
 }

@@ -1,6 +1,6 @@
 package io.github.iamfacetheflames.rangpur.presenter
 
-import io.github.iamfacetheflames.rangpur.data.Directory
+import io.github.iamfacetheflames.rangpur.data.*
 import io.github.iamfacetheflames.rangpur.model.Models
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -15,9 +15,12 @@ class FilterPresenter(val scope: CoroutineScope, private val models: Models) {
 
     private val flowDateList = MutableStateFlow<List<String>>(emptyList())
     private val flowDirectories = MutableStateFlow<List<Directory>>(emptyList())
+    private val flowPlaylists = MutableStateFlow<List<Playlist>>(emptyList())
+    private var currentFolder: PlaylistFolder? = null
 
     fun observableDateList(): StateFlow<List<String>> = flowDateList
     fun observableDirectories(): StateFlow<List<Directory>> = flowDirectories
+    fun observablePlaylists(): StateFlow<List<Playlist>> = flowPlaylists
 
     fun requestData(isDateOnlyYears: Boolean = false) {
         if (isDateOnlyYears) {
@@ -26,6 +29,7 @@ class FilterPresenter(val scope: CoroutineScope, private val models: Models) {
             requestFilterFullDateList()
         }
         requestFilterDirectories()
+        requestPlaylists()
     }
 
     private fun requestFilterDateList(year: String? = null)  {
@@ -53,6 +57,23 @@ class FilterPresenter(val scope: CoroutineScope, private val models: Models) {
             models.filterLibrary.getDirectories(root)
         }
         flowDirectories.value = list
+    }
+
+    private fun requestPlaylists(playlistFolder: PlaylistFolder? = null) {
+        scope.launch(Dispatchers.IO) {
+            val playlists = models.playlistLibrary.getPlaylists(playlistFolder)
+            flowPlaylists.value = playlists
+        }
+    }
+
+    val onFolderClicked: (PlaylistFolder) -> Unit = { folder ->
+        if (folder is RootPlaylistFolder) {
+            currentFolder = null
+            requestPlaylists()
+        } else {
+            currentFolder = folder
+            requestPlaylists(folder)
+        }
     }
 
 }

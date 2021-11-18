@@ -1,9 +1,6 @@
 package io.github.iamfacetheflames.rangpur.presenter
 
-import io.github.iamfacetheflames.rangpur.data.Audio
-import io.github.iamfacetheflames.rangpur.data.AudioInPlaylist
-import io.github.iamfacetheflames.rangpur.data.Playlist
-import io.github.iamfacetheflames.rangpur.data.PlaylistFolder
+import io.github.iamfacetheflames.rangpur.data.*
 import io.github.iamfacetheflames.rangpur.model.Models
 import io.github.iamfacetheflames.rangpur.model.PlaylistToFile
 import kotlinx.coroutines.CoroutineScope
@@ -71,9 +68,14 @@ class PlaylistPresenter(val scope: CoroutineScope, private val models: Models, v
             withContext(Dispatchers.Main) {
                 val name = router.openInputDialog("Название будущего плейлиста:")
                 withContext(Dispatchers.IO) {
-                    if (name != null) {
-                        models.playlistLibrary.createPlaylist(name, currentFolder)
-                        requestPlaylists(currentFolder)
+                    try {
+                        if (name != null) {
+                            models.playlistLibrary.createPlaylist(name, currentFolder)
+                            requestPlaylists(currentFolder)
+                        }
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                        router.showErrorMessage(e.message.toString())
                     }
                 }
             }
@@ -192,6 +194,21 @@ class PlaylistPresenter(val scope: CoroutineScope, private val models: Models, v
                 }
             }
         }
+    }
+
+    val onFolderClicked: (PlaylistFolder) -> Unit = { folder ->
+        if (folder is RootPlaylistFolder) {
+            currentFolder = null
+            requestPlaylists()
+        } else {
+            currentFolder = folder
+            requestPlaylists(folder)
+        }
+    }
+
+    val onPlaylistClicked: (Playlist) -> Unit = { playlist ->
+        currentPlaylist = playlist
+        requestAudioListForPlaylist(playlist)
     }
 
 }
