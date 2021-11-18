@@ -21,7 +21,13 @@ class OrmLitePlaylist : Playlist {
 
     override var folder: PlaylistFolder?
         get() = ormFolder
-        set(value) { ormFolder = value as OrmLitePlaylistFolder }
+        set(value) {
+            if (value != null) {
+                ormFolder = value as OrmLitePlaylistFolder
+            } else {
+                ormFolder = null
+            }
+        }
 
     @DatabaseField(columnName = "folder_uuid", foreign = true, canBeNull = true)
     private var ormFolder: OrmLitePlaylistFolder? = null
