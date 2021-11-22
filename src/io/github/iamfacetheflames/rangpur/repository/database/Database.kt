@@ -59,34 +59,52 @@ interface Database {
     }
 
     val directories: Directories
+
+    @Deprecated("Please use directories.update(items) instead.")
     fun saveDirectories(directories: List<Directory>)
+    @Deprecated("Please use directories.getOnlyRoot() instead.")
     fun getRootDirectories(): List<Directory>
+    @Deprecated("Please use directories.getAll() instead.")
     fun getDirectories(): List<Directory>
+    @Deprecated("Please use directories.getItem(directoryUUID) instead.")
     fun getDirectory(directoryUUID: String): Directory?
+    @Deprecated("Please use directories.getFrom(parent) instead.")
     fun getDirectories(parent: Directory): List<Directory>
 
     val calendar: Calendar
 
     val audios: Audios
+    @Deprecated("Please use audios.update(items) instead.")
     fun updateAudios(audios: List<Audio>)
+    @Deprecated("Please use audios.create(items) instead.")
     fun saveAudios(audios: List<Audio>)
     @Deprecated("Please use audios.getAll() instead.")
     fun getAudios(): List<Audio>
     @Deprecated("Please use audios.getFiltered(filter) instead.")
     fun getAudios(filter: Filter): List<Audio>
+    @Deprecated("Please use audios.delete(items) instead.")
     fun deleteAudios(audios: List<Audio>)
 
     val playlistFolders: PlaylistFolders
+    @Deprecated("Please use playlistFolders.getAll() instead.")
     fun getPlaylistFolders(): List<PlaylistFolder>
+    @Deprecated("Please use playlistFolders.update(playlistFolder) instead.")
     fun createOrUpdatePlaylistFolder(playlistFolder: PlaylistFolder)
+    @Deprecated("Please use playlistFolders.create(folders) instead.")
     fun savePlaylistFolders(folders: List<PlaylistFolder>)
+    @Deprecated("Please use playlistFolders.delete(playlistFolder) instead.")
     fun removePlaylistFolder(playlistFolder: PlaylistFolder)
 
     val playlists: Playlists
+    @Deprecated("Please use playlists.update(playlist) instead.")
     fun createOrUpdatePlaylist(playlist: Playlist)
+    @Deprecated("Please use playlists.create(items) instead.")
     fun savePlaylists(playlists: List<Playlist>)
+    @Deprecated("Please use playlists.delete(playlist) instead.")
     fun removePlaylist(playlist: Playlist)
+    @Deprecated("Please use playlists.getAll() instead.")
     fun getPlaylists(): List<Playlist>
+    @Deprecated("Please use playlists.getFrom(playlistFolder) instead.")
     fun getPlaylists(playlistFolder: PlaylistFolder?): List<Playlist>
 
     val playlistWithAudios: PlaylistWithAudios
