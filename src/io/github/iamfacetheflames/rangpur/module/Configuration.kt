@@ -1,4 +1,4 @@
-package io.github.iamfacetheflames.rangpur.repository
+package io.github.iamfacetheflames.rangpur.module
 
 interface Configuration {
 

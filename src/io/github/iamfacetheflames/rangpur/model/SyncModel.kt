@@ -1,8 +1,8 @@
 package io.github.iamfacetheflames.rangpur.model
 
 import io.github.iamfacetheflames.rangpur.data.*
-import io.github.iamfacetheflames.rangpur.repository.Configuration
-import io.github.iamfacetheflames.rangpur.repository.database.Database
+import io.github.iamfacetheflames.rangpur.module.Configuration
+import io.github.iamfacetheflames.rangpur.module.database.Database
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext

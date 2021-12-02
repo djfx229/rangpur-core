@@ -1,4 +1,4 @@
-package io.github.iamfacetheflames.rangpur.repository.database
+package io.github.iamfacetheflames.rangpur.module.database
 
 import io.github.iamfacetheflames.rangpur.data.WithId
 

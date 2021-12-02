@@ -1,8 +1,8 @@
 package io.github.iamfacetheflames.rangpur.model
 
 import io.github.iamfacetheflames.rangpur.data.Directory
-import io.github.iamfacetheflames.rangpur.repository.Configuration
-import io.github.iamfacetheflames.rangpur.repository.database.Database
+import io.github.iamfacetheflames.rangpur.module.Configuration
+import io.github.iamfacetheflames.rangpur.module.database.Database
 import java.io.File
 import java.util.*
 import kotlin.collections.HashMap

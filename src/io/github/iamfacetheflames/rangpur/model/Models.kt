@@ -1,7 +1,7 @@
 package io.github.iamfacetheflames.rangpur.model
 
-import io.github.iamfacetheflames.rangpur.repository.Configuration
-import io.github.iamfacetheflames.rangpur.repository.database.Database
+import io.github.iamfacetheflames.rangpur.module.Configuration
+import io.github.iamfacetheflames.rangpur.module.database.Database
 
 class Models(val database: Database, val config: Configuration) {
 

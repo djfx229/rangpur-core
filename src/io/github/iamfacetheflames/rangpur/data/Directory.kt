@@ -1,6 +1,6 @@
 package io.github.iamfacetheflames.rangpur.data
 
-import io.github.iamfacetheflames.rangpur.repository.Configuration
+import io.github.iamfacetheflames.rangpur.module.Configuration
 import java.io.File
 
 interface Directory : WithId {
