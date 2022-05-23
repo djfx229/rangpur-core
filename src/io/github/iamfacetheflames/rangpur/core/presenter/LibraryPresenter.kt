@@ -9,9 +9,9 @@ import kotlinx.coroutines.flow.StateFlow
 import java.io.File
 
 class LibraryPresenter(
-    val scope: CoroutineScope,
-    val audioLibraryModel: AudioLibraryModel,
-    val libraryRouter: LibraryRouter
+    private val scope: CoroutineScope,
+    private val audioLibraryModel: AudioLibraryModel,
+    private val libraryRouter: LibraryRouter
 ) {
 
     private val filter = Filter()

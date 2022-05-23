@@ -7,7 +7,10 @@ import java.io.File
 import java.util.*
 import kotlin.collections.HashMap
 
-class CachedDirectories(val database: Database, val config: Configuration) {
+class CachedDirectories(
+    private val database: Database,
+    private val config: Configuration
+) {
 
     private var deque: Deque<String> =
         LinkedList()

@@ -13,9 +13,9 @@ const val DATE_ALL = "All"
 const val DIRECTORY_ALL = "All"
 
 class FilterPresenter(
-    val uiScope: CoroutineScope,
-    val filterLibraryModel: FilterLibraryModel,
-    val playlistLibraryModel: PlaylistLibraryModel
+    private val uiScope: CoroutineScope,
+    private val filterLibraryModel: FilterLibraryModel,
+    private val playlistLibraryModel: PlaylistLibraryModel
 ) {
 
     private val flowDateList = MutableStateFlow<List<String>>(emptyList())

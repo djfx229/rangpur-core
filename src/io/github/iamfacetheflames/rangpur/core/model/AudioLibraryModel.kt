@@ -6,8 +6,8 @@ import io.github.iamfacetheflames.rangpur.core.repository.Configuration
 import java.io.File
 
 class AudioLibraryModel(
-    val database: Database,
-    val config: Configuration
+    private val database: Database,
+    private val config: Configuration
 ) {
 
     fun getAllAudios() = database.getAudios()

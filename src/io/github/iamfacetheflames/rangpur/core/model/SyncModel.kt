@@ -31,7 +31,10 @@ object Command {
     const val ERROR = "COMMAND_ERROR"
 }
 
-class SyncModel(val database: Database, val config: Configuration) {
+class SyncModel(
+    private val database: Database,
+    private val config: Configuration
+) {
 
     val PORT: Int = 54286
 

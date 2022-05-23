@@ -8,7 +8,7 @@ import io.github.iamfacetheflames.rangpur.core.data.PlaylistFolder
 import java.io.File
 import java.util.*
 
-class PlaylistLibraryModel(val database: Database) {
+class PlaylistLibraryModel(private val database: Database) {
 
     fun createPlaylistFolder(name: String): PlaylistFolder {
         val playlist = database.getBuilder().createPlaylistFolder(name, null)
