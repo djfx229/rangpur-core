@@ -4,8 +4,9 @@ import com.j256.ormlite.jdbc.JdbcConnectionSource
 import com.j256.ormlite.logger.Log
 import com.j256.ormlite.logger.Logger
 import com.j256.ormlite.support.ConnectionSource
-import io.github.iamfacetheflames.rangpur.data.Filter
-import io.github.iamfacetheflames.rangpur.repository.database.Database
+import io.github.iamfacetheflames.rangpur.core.data.Filter
+import io.github.iamfacetheflames.rangpur.core.repository.database.Database
+import io.github.iamfacetheflames.rangpur.ormlite.repository.database.OrmLiteDatabase
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import java.io.File
@@ -35,7 +36,7 @@ internal class OrmLiteAudiosTest {
 
     @Test
     fun createAndGetAll() {
-        database.saveDirectories(
+        database.directories.update(
             mutableListOf(
                 database.getBuilder().createDirectory(
                     "dir 1",
@@ -44,7 +45,7 @@ internal class OrmLiteAudiosTest {
                 )
             )
         )
-        val directory = database.getDirectories().first()
+        val directory = database.directories.getAll().first()
         val audioBeforeCreate = mutableListOf(
             database.getBuilder().createAudio(
                 directory,
@@ -82,7 +83,7 @@ internal class OrmLiteAudiosTest {
 
     @Test
     fun getFiltered() {
-        database.saveDirectories(
+        database.directories.update(
             mutableListOf(
                 database.getBuilder().createDirectory(
                     "dir 1",
@@ -96,8 +97,8 @@ internal class OrmLiteAudiosTest {
                 )
             )
         )
-        val directoryFirst = database.getDirectories().first()
-        val directoryLast = database.getDirectories().last()
+        val directoryFirst = database.directories.getAll().first()
+        val directoryLast = database.directories.getAll().last()
         val audio2010 = mutableListOf(
             database.getBuilder().createAudio(
                 directoryFirst,

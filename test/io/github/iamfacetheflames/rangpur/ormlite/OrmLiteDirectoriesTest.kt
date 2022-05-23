@@ -4,7 +4,8 @@ import com.j256.ormlite.jdbc.JdbcConnectionSource
 import com.j256.ormlite.logger.Log
 import com.j256.ormlite.logger.Logger
 import com.j256.ormlite.support.ConnectionSource
-import io.github.iamfacetheflames.rangpur.repository.database.Database
+import io.github.iamfacetheflames.rangpur.core.repository.database.Database
+import io.github.iamfacetheflames.rangpur.ormlite.repository.database.OrmLiteDatabase
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import java.io.File
@@ -55,10 +56,10 @@ internal class OrmLiteDirectoriesTest {
                 directoryWithChilds
             )
         )
-        database.saveDirectories(
+        database.directories.update(
             directoriesForTest
         )
-        assertEquals(directoriesForTest.size, database.getDirectories().size, "test directories list size")
+        assertEquals(directoriesForTest.size, database.directories.getAll().size, "test directories list size")
         assertEquals(2, database.directories.getOnlyRoot().size, "test root directories list size")
     }
 
