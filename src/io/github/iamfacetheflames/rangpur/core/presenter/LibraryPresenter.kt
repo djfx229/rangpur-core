@@ -131,9 +131,9 @@ class LibraryPresenter(
         }
     }
 
-    fun openFilteredAudiosInExternalPlayer() {
+    fun openFilteredAudiosInExternalPlayer(outputDirectory: File = File(File(".").canonicalPath)) {
         scope.launch(Dispatchers.IO) {
-            val file = audioLibraryModel.createM3u8PlaylistWithFilteredAudios("RangExternalPlaylist.m3u8", filter)
+            val file = audioLibraryModel.createM3u8PlaylistWithFilteredAudios(outputDirectory, "RangExternalPlaylist.m3u8", filter)
             libraryRouter.openM3uOnExternalApp(file)
         }
     }
@@ -168,5 +168,32 @@ class LibraryPresenter(
     val onPlaylistClicked: (Playlist) -> Unit = { playlist ->
         setPlaylist(playlist.uuid)
     }
+
+    val directoriesCheckState = CheckItemInAdapter<Directory>(
+        onSelect = { items ->
+            setFilterDirectories(items)
+        },
+        onAll = {
+            clearFilterDirectory()
+        }
+    )
+
+    val dateCheckState = CheckItemInAdapter<String>(
+        onSelect = { items ->
+            setFilterDate(items)
+        },
+        onAll = {
+            setFilterDate(DATE_ALL)
+        }
+    )
+
+    val audiosCheckState = CheckItemInAdapter<Audio>(
+        onSelect = { items ->
+            selectedAudios = items.toMutableList()
+        },
+        onAll = {
+            selectedAudios = emptyList<Audio>().toMutableList()
+        }
+    )
 
 }

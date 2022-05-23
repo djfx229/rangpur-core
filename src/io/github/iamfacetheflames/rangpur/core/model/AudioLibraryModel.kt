@@ -37,15 +37,6 @@ class AudioLibraryModel(
         return file
     }
 
-    suspend fun createM3u8PlaylistWithFilteredAudios(
-        fileName: String,
-        filter: Filter
-    ): File = createM3u8PlaylistWithFilteredAudios(
-        File(File(".").canonicalPath),
-        fileName,
-        filter
-    )
-
     suspend fun getFullPath(audio: Audio): File? {
         val directory = database.getDirectory(audio.directoryUUID)
         return if (directory != null) {
