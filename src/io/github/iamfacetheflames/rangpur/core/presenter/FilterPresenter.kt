@@ -13,7 +13,7 @@ const val DATE_ALL = "All"
 const val DIRECTORY_ALL = "All"
 
 class FilterPresenter(
-    private val uiScope: CoroutineScope,
+    private val scope: CoroutineScope,
     private val filterLibraryModel: FilterLibraryModel,
     private val playlistLibraryModel: PlaylistLibraryModel
 ) {
@@ -47,7 +47,7 @@ class FilterPresenter(
     }
 
     private fun requestFilterFullDateList()  {
-        uiScope.launch(Dispatchers.IO) {
+        scope.launch(Dispatchers.IO) {
             val dates = mutableListOf<String>().apply {
                 addAll(filterLibraryModel.getDateList())
             }
@@ -65,7 +65,7 @@ class FilterPresenter(
     }
 
     private fun requestPlaylists(playlistFolder: PlaylistFolder? = null) {
-        uiScope.launch(Dispatchers.IO) {
+        scope.launch(Dispatchers.IO) {
             val playlists = playlistLibraryModel.getPlaylists(playlistFolder)
             flowPlaylists.value = playlists
         }
