@@ -4,13 +4,11 @@ import com.j256.ormlite.jdbc.JdbcConnectionSource
 import com.j256.ormlite.logger.Log
 import com.j256.ormlite.logger.Logger
 import com.j256.ormlite.support.ConnectionSource
-import io.github.iamfacetheflames.rangpur.data.Filter
-import io.github.iamfacetheflames.rangpur.repository.database.Database
+import io.github.iamfacetheflames.rangpur.core.repository.database.Database
+import io.github.iamfacetheflames.rangpur.ormlite.repository.database.OrmLiteDatabase
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import java.io.File
-import java.sql.Date
-import java.util.*
 
 internal class OrmLiteDirectoriesTest {
 
