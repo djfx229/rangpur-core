@@ -5,7 +5,7 @@ import com.j256.ormlite.dao.GenericRawResults
 import com.j256.ormlite.support.ConnectionSource
 import io.github.iamfacetheflames.rangpur.data.Playlist
 import io.github.iamfacetheflames.rangpur.data.PlaylistFolder
-import io.github.iamfacetheflames.rangpur.module.database.Database
+import io.github.iamfacetheflames.rangpur.repository.database.Database
 import java.sql.SQLException
 
 class OrmLitePlaylists(val source: ConnectionSource) : Database.Playlists {

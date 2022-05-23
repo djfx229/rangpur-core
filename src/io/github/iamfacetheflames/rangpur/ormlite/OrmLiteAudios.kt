@@ -5,7 +5,7 @@ import com.j256.ormlite.dao.DaoManager
 import com.j256.ormlite.dao.GenericRawResults
 import com.j256.ormlite.support.ConnectionSource
 import io.github.iamfacetheflames.rangpur.data.*
-import io.github.iamfacetheflames.rangpur.module.database.Database
+import io.github.iamfacetheflames.rangpur.repository.database.Database
 import java.lang.StringBuilder
 import java.sql.SQLException
 

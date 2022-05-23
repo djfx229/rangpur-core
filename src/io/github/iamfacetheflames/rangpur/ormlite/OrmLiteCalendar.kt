@@ -3,7 +3,7 @@ package io.github.iamfacetheflames.rangpur.ormlite
 import com.j256.ormlite.dao.DaoManager
 import com.j256.ormlite.support.ConnectionSource
 import io.github.iamfacetheflames.rangpur.data.AudioField
-import io.github.iamfacetheflames.rangpur.module.database.Database
+import io.github.iamfacetheflames.rangpur.repository.database.Database
 
 class OrmLiteCalendar(var source: ConnectionSource) : Database.Calendar {
 

@@ -1,6 +1,6 @@
 package io.github.iamfacetheflames.rangpur.model
 
-import io.github.iamfacetheflames.rangpur.module.database.Database
+import io.github.iamfacetheflames.rangpur.repository.database.Database
 import io.github.iamfacetheflames.rangpur.data.Directory
 
 class FilterLibraryModel(val database: Database) {
