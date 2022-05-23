@@ -10,14 +10,14 @@ class AudioLibraryModel(
     private val config: Configuration
 ) {
 
-    fun getAllAudios() = database.getAudios()
+    fun getAllAudios() = database.audios.getAll()
 
     fun getAudios(filter: Filter): List<Audio> {
-        return database.getAudios(filter)
+        return database.audios.getFiltered(filter)
     }
 
     fun getAudios(playlist: Playlist): List<AudioInPlaylist> {
-        return database.getPlaylistAudios(playlist)
+        return database.playlistWithAudios.getFrom(playlist)
     }
 
     suspend fun createM3u8PlaylistWithFilteredAudios(
@@ -38,7 +38,7 @@ class AudioLibraryModel(
     }
 
     suspend fun getFullPath(audio: Audio): File? {
-        val directory = database.getDirectory(audio.directoryUUID)
+        val directory = database.directories.getItem(audio.directoryUUID)
         return if (directory != null) {
             File(directory.getJavaFile(config).path + File.separator + audio.fileName)
         } else {

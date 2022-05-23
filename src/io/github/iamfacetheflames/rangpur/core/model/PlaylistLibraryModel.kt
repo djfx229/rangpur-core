@@ -12,32 +12,32 @@ class PlaylistLibraryModel(private val database: Database) {
 
     fun createPlaylistFolder(name: String): PlaylistFolder {
         val playlist = database.getBuilder().createPlaylistFolder(name, null)
-        database.createOrUpdatePlaylistFolder(playlist)
+        database.playlistFolders.update(playlist)
         return playlist
     }
 
-    fun getPlaylistFolders(): List<PlaylistFolder> = database.getPlaylistFolders()
+    fun getPlaylistFolders(): List<PlaylistFolder> = database.playlistFolders.getAll()
 
     fun createPlaylist(name: String, folder: PlaylistFolder?): Playlist {
         val playlist = database.getBuilder().createPlaylist(name, folder)
-        database.createOrUpdatePlaylist(playlist)
+        database.playlists.update(playlist)
         return playlist
     }
 
     fun renamePlaylist(name: String, playlist: Playlist) {
         playlist.name = name
-        database.createOrUpdatePlaylist(playlist)
+        database.playlists.update(playlist)
     }
 
     fun removePlaylist(playlist: Playlist) {
-        database.removePlaylist(playlist)
+        database.playlists.delete(playlist)
     }
 
     fun removePlaylistFolder(folder: PlaylistFolder) {
-        database.removePlaylistFolder(folder)
+        database.playlistFolders.delete(folder)
     }
 
-    fun getPlaylists(playlistFolder: PlaylistFolder? = null): List<Playlist> = database.getPlaylists(playlistFolder)
+    fun getPlaylists(playlistFolder: PlaylistFolder? = null): List<Playlist> = database.playlists.getFrom(playlistFolder)
 
     fun addAudiosInPlaylist(audios: List<Audio>, playlist: Playlist) {
         database.playlistWithAudios.create(audios, playlist.uuid)
@@ -80,7 +80,7 @@ class PlaylistLibraryModel(private val database: Database) {
         file: File,
         playlist: Playlist
     ) {
-        val audios = database.getPlaylistAudios(playlist)
+        val audios = database.playlistWithAudios.getFrom(playlist)
         PlaylistToFile.exportPlaylistTxt(file.name, file.parentFile.absolutePath, audios)
     }
 

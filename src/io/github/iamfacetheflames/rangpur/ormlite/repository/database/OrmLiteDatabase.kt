@@ -95,48 +95,15 @@ class OrmLiteDatabase(var source: ConnectionSource): Database {
 
     override val directories: Database.Directories = OrmLiteDirectories(source)
 
-    override fun saveDirectories(items: List<Directory>) = directories.update(items)
-    override fun getRootDirectories(): List<Directory> = directories.getOnlyRoot()
-    override fun getDirectories(): List<Directory> = directories.getAll()
-    override fun getDirectories(parent: Directory): List<Directory> = directories.getFrom(parent)
-    override fun getDirectory(directoryUUID: String): Directory? = directories.getItem(directoryUUID)
-
     override val calendar: Database.Calendar = OrmLiteCalendar(source)
 
     override val audios: Database.Audios = OrmLiteAudios(source)
 
-    override fun updateAudios(items: List<Audio>) = audios.update(items)
-    override fun saveAudios(items: List<Audio>) = audios.create(items)
-    override fun getAudios(): List<Audio> = audios.getAll()
-    override fun getAudios(filter: Filter): List<Audio> = audios.getFiltered(filter)
-    override fun deleteAudios(items: List<Audio>) = audios.delete(items)
-
     override val playlistFolders: Database.PlaylistFolders = OrmLitePlaylistFolders(source)
-
-    override fun getPlaylistFolders(): List<PlaylistFolder> = playlistFolders.getAll()
-    override fun createOrUpdatePlaylistFolder(playlistFolder: PlaylistFolder) = playlistFolders.update(playlistFolder)
-    override fun savePlaylistFolders(folders: List<PlaylistFolder>) = playlistFolders.create(folders)
-    override fun removePlaylistFolder(playlistFolder: PlaylistFolder) = playlistFolders.delete(playlistFolder)
 
     override val playlists: Database.Playlists = OrmLitePlaylists(source)
 
-    override fun createOrUpdatePlaylist(playlist: Playlist) = playlists.update(playlist)
-    override fun removePlaylist(playlist: Playlist) = playlists.delete(playlist)
-    override fun getPlaylists(): List<Playlist> = playlists.getAll()
-    override fun getPlaylists(playlistFolder: PlaylistFolder?): List<Playlist> = playlists.getFrom(playlistFolder)
-    override fun savePlaylists(items: List<Playlist>) = playlists.create(items)
-
     override val playlistWithAudios: Database.PlaylistWithAudios = OrmLitePlaylistWithAudios(source)
-
-    override fun getPlaylistAudios(): List<AudioInPlaylist> = playlistWithAudios.getAll()
-    override fun getPlaylistAudios(playlist: Playlist?): List<AudioInPlaylist> = playlistWithAudios.getFrom(playlist)
-    override fun addAudiosInPlaylist(audios: List<Audio>, playlistUUID: String) =
-        playlistWithAudios.create(audios, playlistUUID)
-    override fun deleteAudiosFromPlaylist(audios: List<AudioInPlaylist>, playlistUUID: String) =
-        playlistWithAudios.delete(audios, playlistUUID)
-    override fun moveAudiosInPlaylistToNewPosition(audios: List<AudioInPlaylist>) =
-        playlistWithAudios.changePosition(audios)
-    override fun savePlaylistAudios(audios: List<AudioInPlaylist>) = playlistWithAudios.create(audios)
 
 }
 

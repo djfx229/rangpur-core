@@ -59,49 +59,11 @@ interface Database {
     }
 
     val directories: Directories
-    fun saveDirectories(directories: List<Directory>)
-    fun getRootDirectories(): List<Directory>
-    fun getDirectories(): List<Directory>
-    fun getDirectory(directoryUUID: String): Directory?
-    fun getDirectories(parent: Directory): List<Directory>
-
     val calendar: Calendar
-
     val audios: Audios
-    fun updateAudios(audios: List<Audio>)
-    fun saveAudios(audios: List<Audio>)
-    @Deprecated("Please use audios.getAll() instead.")
-    fun getAudios(): List<Audio>
-    @Deprecated("Please use audios.getFiltered(filter) instead.")
-    fun getAudios(filter: Filter): List<Audio>
-    fun deleteAudios(audios: List<Audio>)
-
     val playlistFolders: PlaylistFolders
-    fun getPlaylistFolders(): List<PlaylistFolder>
-    fun createOrUpdatePlaylistFolder(playlistFolder: PlaylistFolder)
-    fun savePlaylistFolders(folders: List<PlaylistFolder>)
-    fun removePlaylistFolder(playlistFolder: PlaylistFolder)
-
     val playlists: Playlists
-    fun createOrUpdatePlaylist(playlist: Playlist)
-    fun savePlaylists(playlists: List<Playlist>)
-    fun removePlaylist(playlist: Playlist)
-    fun getPlaylists(): List<Playlist>
-    fun getPlaylists(playlistFolder: PlaylistFolder?): List<Playlist>
-
     val playlistWithAudios: PlaylistWithAudios
-    @Deprecated("Please use playlistWithAudios.getAll() instead.")
-    fun getPlaylistAudios(): List<AudioInPlaylist>
-    @Deprecated("Please use playlistWithAudios.getFrom(playlist) instead.")
-    fun getPlaylistAudios(playlist: Playlist?): List<AudioInPlaylist>
-    @Deprecated("Please use playlistWithAudios.create(audios, playlistUUID) instead.")
-    fun addAudiosInPlaylist(audios: List<Audio>, playlistUUID: String)
-    @Deprecated("Please use deleteAudiosFromPlaylist(audios: List<AudioInPlaylist>, playlistUUID: String) instead.")
-    fun deleteAudiosFromPlaylist(items: List<AudioInPlaylist>, playlistUUID: String)
-    @Deprecated("Please use playlistWithAudios.changePosition(audios) instead.")
-    fun moveAudiosInPlaylistToNewPosition(audios: List<AudioInPlaylist>)
-    @Deprecated("Please use playlistWithAudios.create(audios) instead.")
-    fun savePlaylistAudios(audios: List<AudioInPlaylist>)
 
     fun getBuilder(): Builder
 

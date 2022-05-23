@@ -36,7 +36,7 @@ internal class OrmLiteAudiosTest {
 
     @Test
     fun createAndGetAll() {
-        database.saveDirectories(
+        database.directories.update(
             mutableListOf(
                 database.getBuilder().createDirectory(
                     "dir 1",
@@ -45,7 +45,7 @@ internal class OrmLiteAudiosTest {
                 )
             )
         )
-        val directory = database.getDirectories().first()
+        val directory = database.directories.getAll().first()
         val audioBeforeCreate = mutableListOf(
             database.getBuilder().createAudio(
                 directory,
@@ -83,7 +83,7 @@ internal class OrmLiteAudiosTest {
 
     @Test
     fun getFiltered() {
-        database.saveDirectories(
+        database.directories.update(
             mutableListOf(
                 database.getBuilder().createDirectory(
                     "dir 1",
@@ -97,8 +97,8 @@ internal class OrmLiteAudiosTest {
                 )
             )
         )
-        val directoryFirst = database.getDirectories().first()
-        val directoryLast = database.getDirectories().last()
+        val directoryFirst = database.directories.getAll().first()
+        val directoryLast = database.directories.getAll().last()
         val audio2010 = mutableListOf(
             database.getBuilder().createAudio(
                 directoryFirst,

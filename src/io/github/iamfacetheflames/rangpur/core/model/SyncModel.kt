@@ -53,14 +53,14 @@ class SyncModel(
                 println("client send command: ${fromClient.readObject() as String}")
                 val toClient = ObjectOutputStream(client.socket().getOutputStream())
                 toClient.writeObject(Command.REQUEST_DIRECTORIES)
-                val serverDirectories = database.getDirectories()
+                val serverDirectories = database.directories.getAll()
                 val clientDirectories = fromClient.readObject() as Set<String>
                 val newDirectories = serverDirectories.filter { it.uuid !in clientDirectories }
                 toClient.writeObject(Command.SEND_DIRECTORIES)
                 toClient.writeObject(newDirectories)
                 val cachedDirs = CachedDirectories(database, config)
                 toClient.writeObject(Command.REQUEST_AUDIOS)
-                val serverAudios = database.getAudios().sortedBy { it.uuid }
+                val serverAudios = database.audios.getAll().sortedBy { it.uuid }
                 val clientDataIds = fromClient.readObject() as Set<String>
                 val newAudios = serverAudios.filter { it.uuid !in clientDataIds }
                 toClient.writeObject(Command.NEW_AUDIOS_AMOUNT)
@@ -78,21 +78,21 @@ class SyncModel(
                     fromClient,
                     Command.REQUEST_PLAYLIST_FOLDERS,
                     Command.SEND_PLAYLIST_FOLDERS,
-                    database.getPlaylistFolders()
+                    database.playlistFolders.getAll()
                 )
                 syncDataWithClient(
                     toClient,
                     fromClient,
                     Command.REQUEST_PLAYLISTS,
                     Command.SEND_PLAYLISTS,
-                    database.getPlaylists()
+                    database.playlists.getAll()
                 )
                 syncDataWithClient(
                     toClient,
                     fromClient,
                     Command.REQUEST_PLAYLIST_AUDIOS,
                     Command.SEND_PLAYLIST_AUDIOS,
-                    database.getPlaylistAudios()
+                    database.playlistWithAudios.getAll()
                 )
                 toClient.writeObject(Command.DONE)
                 cachedDirs.release()
@@ -126,47 +126,47 @@ class SyncModel(
                 println("server send command: $command")
                 when (command) {
                     Command.REQUEST_DIRECTORIES -> {
-                        val directories = database.getDirectories()
+                        val directories = database.directories.getAll()
                         val set = mutableSetOf<String>()
                         directories.forEach { set.add(it.uuid) }
                         toServer.writeObject(set)
                     }
                     Command.SEND_DIRECTORIES -> {
                         val newDirectories = fromServer.readObject<List<Directory>>().sortedBy { it.uuid }
-                        database.saveDirectories(newDirectories)
+                        database.directories.update(newDirectories)
                     }
                     Command.REQUEST_PLAYLIST_FOLDERS -> {
-                        val data = database.getPlaylistFolders()
+                        val data = database.playlistFolders.getAll()
                         val set = mutableSetOf<String>()
                         data.forEach { set.add(it.uuid) }
                         toServer.writeObject(set)
                     }
                     Command.SEND_PLAYLIST_FOLDERS -> {
                         val data = fromServer.readObject<List<PlaylistFolder>>().sortedBy { it.uuid }
-                        database.savePlaylistFolders(data)
+                        database.playlistFolders.create(data)
                     }
                     Command.REQUEST_PLAYLISTS -> {
-                        val data = database.getPlaylists()
+                        val data = database.playlists.getAll()
                         val set = mutableSetOf<String>()
                         data.forEach { set.add(it.uuid) }
                         toServer.writeObject(set)
                     }
                     Command.SEND_PLAYLISTS -> {
                         val data = fromServer.readObject<List<Playlist>>().sortedBy { it.uuid }
-                        database.savePlaylists(data)
+                        database.playlists.create(data)
                     }
                     Command.REQUEST_PLAYLIST_AUDIOS -> {
-                        val data = database.getPlaylistAudios()
+                        val data = database.playlistWithAudios.getAll()
                         val set = mutableSetOf<String>()
                         data.forEach { set.add(it.uuid) }
                         toServer.writeObject(set)
                     }
                     Command.SEND_PLAYLIST_AUDIOS -> {
                         val data = fromServer.readObject<List<AudioInPlaylist>>().sortedBy { it.uuid }
-                        database.savePlaylistAudios(data)
+                        database.playlistWithAudios.create(data)
                     }
                     Command.REQUEST_AUDIOS -> {
-                        val data = database.getAudios()
+                        val data = database.audios.getAll()
                         val set = mutableSetOf<String>()
                         data.forEach { set.add(it.uuid) }
                         toServer.writeObject(set)
@@ -186,7 +186,7 @@ class SyncModel(
                             val size = server.transferFileTo(toServer, fromServer, path)
                             val file = File(path)
                             if (file.exists() && size == file.length()) {
-                                database.saveAudios(mutableListOf(audio))
+                                database.audios.create(mutableListOf(audio))
                                 println("server send file")
                                 toServer.writeObject(Command.DONE)
                             } else {

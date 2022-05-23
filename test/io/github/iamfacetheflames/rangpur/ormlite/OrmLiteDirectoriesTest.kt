@@ -56,10 +56,10 @@ internal class OrmLiteDirectoriesTest {
                 directoryWithChilds
             )
         )
-        database.saveDirectories(
+        database.directories.update(
             directoriesForTest
         )
-        assertEquals(directoriesForTest.size, database.getDirectories().size, "test directories list size")
+        assertEquals(directoriesForTest.size, database.directories.getAll().size, "test directories list size")
         assertEquals(2, database.directories.getOnlyRoot().size, "test root directories list size")
     }
 
