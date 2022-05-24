@@ -41,6 +41,20 @@ class SyncModel(
     suspend fun runServer(
         host: String = "localhost",
         port: Int = PORT
+    ) = runServer(
+        host = host,
+        port = port,
+        println = ::println,
+        listener = {
+            // ignore
+        },
+    )
+
+    suspend fun runServer(
+        println: (String) -> Unit,
+        listener: (ClientSyncInfo) -> Unit,
+        host: String = config.getSyncHost(),
+        port: Int = config.getSyncPort(),
     ) = withContext(Dispatchers.IO) {
         try {
             println("runServer() start $host : $port")
@@ -64,8 +78,16 @@ class SyncModel(
                 val clientDataIds = fromClient.readObject() as Set<String>
                 val newAudios = serverAudios.filter { it.uuid !in clientDataIds }
                 toClient.writeObject(Command.NEW_AUDIOS_AMOUNT)
-                toClient.writeObject(newAudios.size)
+                val audiosAmount = newAudios.size
+                toClient.writeObject(audiosAmount)
                 for ((index, audio) in newAudios.withIndex()) {
+                    listener.invoke(
+                        ReceivingAudio(
+                            audio,
+                            index,
+                            audiosAmount
+                        )
+                    )
                     toClient.writeObject(Command.SEND_AUDIO)
                     toClient.writeObject(audio)
                     client.sendFile(fromClient, toClient, audio.getFullPath(cachedDirs))
@@ -98,7 +120,7 @@ class SyncModel(
                 cachedDirs.release()
             }
         } catch (e: Exception) {
-            e.printStackTrace()
+            println(e.stackTraceToString())
         }
     }
 
