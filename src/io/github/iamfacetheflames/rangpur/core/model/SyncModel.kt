@@ -37,6 +37,7 @@ class SyncModel(
 ) {
 
     val PORT: Int = 54286
+    private var currentSocket: ServerSocketChannel? = null
 
     suspend fun runServer(
         host: String = "localhost",
@@ -50,6 +51,10 @@ class SyncModel(
         },
     )
 
+    fun stopServer() {
+        currentSocket?.close()
+    }
+
     suspend fun runServer(
         println: (String) -> Unit,
         listener: (ClientSyncInfo) -> Unit,
@@ -59,6 +64,7 @@ class SyncModel(
         try {
             println("runServer() start $host : $port")
             val socket = ServerSocketChannel.open()
+            currentSocket = socket
             socket.bind(InetSocketAddress(host, port))
             println("server sync: server running on port ${socket.socket().localPort}")
             socket.accept().use { client ->
@@ -121,6 +127,8 @@ class SyncModel(
             }
         } catch (e: Exception) {
             println(e.stackTraceToString())
+        } finally {
+            currentSocket = null
         }
     }
 
