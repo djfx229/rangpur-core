@@ -9,6 +9,8 @@ interface Directory : WithId {
     var name: String?
 }
 
+const val universalSeparator = "/"
+
 fun Directory.getJavaFile(config: Configuration): File {
     val libraryLocation = config.getMusicDirectoryLocation()
     val fullPath = libraryLocation + this.locationInMusicDirectory

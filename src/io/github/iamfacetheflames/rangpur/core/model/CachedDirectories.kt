@@ -1,6 +1,7 @@
 package io.github.iamfacetheflames.rangpur.core.model
 
 import io.github.iamfacetheflames.rangpur.core.data.Directory
+import io.github.iamfacetheflames.rangpur.core.data.universalSeparator
 import io.github.iamfacetheflames.rangpur.core.repository.Configuration
 import io.github.iamfacetheflames.rangpur.core.repository.database.Database
 import java.io.File
@@ -31,7 +32,7 @@ class CachedDirectories(
         stringBuffer.append(File.separator)
         while (deque.isNotEmpty()) {
             stringBuffer.append(deque.pop())
-            stringBuffer.append(File.separator)
+            stringBuffer.append(universalSeparator)
         }
 
         return stringBuffer.toString()

@@ -40,7 +40,7 @@ class AudioLibraryModel(
     suspend fun getFullPath(audio: Audio): File? {
         val directory = database.directories.getItem(audio.directoryUUID)
         return if (directory != null) {
-            File(directory.getJavaFile(config).path + File.separator + audio.fileName)
+            File(directory.getJavaFile(config).path + universalSeparator + audio.fileName)
         } else {
             null
         }

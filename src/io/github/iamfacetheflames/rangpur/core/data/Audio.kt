@@ -27,5 +27,5 @@ fun Audio.getFullPath(cachedDirs: CachedDirectories): String {
     val path = cachedDirs.getFullPath(
         this.directoryUUID
     )
-    return path + File.separator + this.fileName
+    return path + universalSeparator + this.fileName
 }
