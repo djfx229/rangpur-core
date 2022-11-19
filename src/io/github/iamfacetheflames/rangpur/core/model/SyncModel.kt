@@ -1,6 +1,8 @@
 package io.github.iamfacetheflames.rangpur.core.model
 
 import io.github.iamfacetheflames.rangpur.core.data.*
+import io.github.iamfacetheflames.rangpur.core.model.sync.Command
+import io.github.iamfacetheflames.rangpur.core.model.sync.PORT
 import io.github.iamfacetheflames.rangpur.core.repository.Configuration
 import io.github.iamfacetheflames.rangpur.core.repository.database.Database
 import kotlinx.coroutines.Dispatchers
@@ -14,29 +16,11 @@ import java.nio.channels.SocketChannel
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 
-object Command {
-    const val START_SYNC = "COMMAND_START_SYNC"
-    const val REQUEST_DIRECTORIES = "COMMAND_REQUEST_DIRECTORIES"
-    const val SEND_DIRECTORIES = "COMMAND_SEND_DIRECTORIES"
-    const val REQUEST_AUDIOS = "COMMAND_REQUEST_AUDIOS"
-    const val SEND_AUDIO = "COMMAND_SEND_AUDIO"
-    const val REQUEST_PLAYLIST_FOLDERS = "COMMAND_REQUEST_PLAYLIST_FOLDERS"
-    const val SEND_PLAYLIST_FOLDERS = "COMMAND_SEND_PLAYLIST_FOLDERS"
-    const val REQUEST_PLAYLISTS = "COMMAND_REQUEST_PLAYLISTS"
-    const val SEND_PLAYLISTS = "COMMAND_SEND_PLAYLISTS"
-    const val REQUEST_PLAYLIST_AUDIOS = "COMMAND_REQUEST_PLAYLIST_AUDIOS"
-    const val SEND_PLAYLIST_AUDIOS = "COMMAND_SEND_PLAYLIST_AUDIOS"
-    const val NEW_AUDIOS_AMOUNT = "COMMAND_NEW_AUDIOS_AMOUNT"
-    const val DONE = "COMMAND_DONE"
-    const val ERROR = "COMMAND_ERROR"
-}
-
 class SyncModel(
     private val database: Database,
     private val config: Configuration
 ) {
 
-    val PORT: Int = 54286
     private var currentSocket: ServerSocketChannel? = null
 
     suspend fun runServer(
