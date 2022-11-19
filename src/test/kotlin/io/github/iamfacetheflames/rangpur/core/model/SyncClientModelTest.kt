@@ -1,4 +1,4 @@
-package io.github.iamfacetheflames.rangpur.core.model
+package test.kotlin.io.github.iamfacetheflames.rangpur.core.model
 import io.github.iamfacetheflames.rangpur.core.model.sync.ClientHandler
 import io.github.iamfacetheflames.rangpur.core.model.sync.ServerHandler
 import io.github.iamfacetheflames.rangpur.core.module.sync.SyncClient

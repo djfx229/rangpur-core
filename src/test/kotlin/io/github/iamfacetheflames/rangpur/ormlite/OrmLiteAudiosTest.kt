@@ -1,4 +1,4 @@
-package io.github.iamfacetheflames.rangpur.ormlite
+package test.kotlin.io.github.iamfacetheflames.rangpur.ormlite
 
 import com.j256.ormlite.jdbc.JdbcConnectionSource
 import com.j256.ormlite.logger.Log

@@ -25,3 +25,10 @@ hs_err_pid*
 /build/
 /rangpur-core/build/
 /out/
+
+#gradle
+/gradle/wrapper/gradle-wrapper.jar
+/gradle.properties
+
+#idea
+/.idea/
