@@ -49,18 +49,18 @@ class SyncBridgeToServer(
                     }
                     toServer.writeObject(true)
                     // https://stackoverflow.com/questions/28088408/filechannel-transferfrom-fails-for-larger-files-with-out-of-memory-error
-                    val blockSize = Math.min(4096, size)
+                    val blockSize = size
                     FileOutputStream(filePath).channel.use { destinationChannel ->
                         var transferedSize = 0L
                         val expectedSize = size
                         while (transferedSize < expectedSize) {
-                            println("SyncBridgeToServer:receiveFile() запуск destinationChannel.transferFrom для новой порции данных")
+                            println("SyncBridgeToServer:receiveFile() [$transferedSize/$size] запуск destinationChannel.transferFrom для новой порции данных")
                             transferedSize += destinationChannel.transferFrom(
                                 serverSocket,
                                 transferedSize,
-                                blockSize
+                                if ((size - transferedSize) <= blockSize) size - transferedSize else blockSize
                             )
-                            println("SyncBridgeToServer:receiveFile() destinationChannel.transferFrom успешно выполнен $transferedSize байтов принято")
+                            println("SyncBridgeToServer:receiveFile() [$transferedSize/$size] destinationChannel.transferFrom успешно выполнен")
                         }
                         println("SyncBridgeToServer:receiveFile() работа с каналом завершена")
                     }
