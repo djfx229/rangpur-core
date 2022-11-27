@@ -58,9 +58,9 @@ class AudioLibraryModel(
         val files: MutableList<File> = mutableListOf<File>()
         for(selIndex in selectedRows) {
             audios.getOrNull(selIndex)?.let {
-                it.audio?.apply {
+                it.audio?.let { audio ->
                     try {
-                        files.add(File(getFullPath(cachedDirs)))
+                        files.add(File(cachedDirs.getFullAudioPath(audio)))
                         selectedList.add(it)
                     } catch (e: Exception) {
                         e.printStackTrace()

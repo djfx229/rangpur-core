@@ -15,7 +15,7 @@ object PlaylistToFile {
         val lines = ArrayList<String>()
         lines.add("#EXTM3U\n")
         audios.forEach {
-            val directoryPath = cachedDirs.getFullPath(it.directoryUUID)
+            val directoryPath = cachedDirs.getFullDirectoryPath(it.directoryUUID)
             lines.add(directoryPath + it.fileName + "\n")
         }
 

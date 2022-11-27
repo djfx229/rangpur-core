@@ -1,7 +1,7 @@
 package io.github.iamfacetheflames.rangpur.core.data
 
 import io.github.iamfacetheflames.rangpur.core.model.CachedDirectories
-import java.io.File
+import java.sql.Date
 
 interface Audio : WithId {
     var directoryUUID: String
@@ -23,9 +23,48 @@ interface Audio : WithId {
     var timestampCreated: Long
 }
 
-fun Audio.getFullPath(cachedDirs: CachedDirectories): String {
-    val path = cachedDirs.getFullPath(
-        this.directoryUUID
-    )
-    return path + universalSeparator + this.fileName
+fun Audio.equalsAllFields(other: Any?): Boolean {
+    return if (other is Audio) {
+        other.uuid == this.uuid &&
+        other.directoryUUID == this.directoryUUID &&
+        other.fileName == this.fileName &&
+        other.albumTrackNumber == this.albumTrackNumber &&
+        other.artist == this.artist &&
+        other.title == this.title &&
+        other.album == this.album &&
+        other.comment == this.comment &&
+        other.url == this.url &&
+        other.encoder == this.encoder &&
+        other.bitrate == this.bitrate &&
+        other.samplerate == this.samplerate &&
+        other.key == this.key &&
+        other.keySortPosition == this.keySortPosition &&
+        other.bpm == this.bpm &&
+        other.duration == this.duration &&
+        other.dateCreated == this.dateCreated &&
+        other.timestampCreated == this.timestampCreated
+    } else {
+        false
+    }
 }
+
+class TestAudio(
+    override var fileName: String?,
+    override var artist: String?,
+    override var title: String?,
+    override var directoryUUID: String = "",
+    override var albumTrackNumber: Int? = 0,
+    override var album: String? = "",
+    override var comment: String? = "",
+    override var url: String? = "",
+    override var encoder: String? = "",
+    override var bitrate: Int? = null,
+    override var samplerate: Int? = null,
+    override var key: Int? = null,
+    override var keySortPosition: Int = 0,
+    override var bpm: Float? = 128f,
+    override var duration: Long? = 10L,
+    override var dateCreated: String? = "2016-09-01",
+    override var timestampCreated: Long = Date.valueOf("2016-09-01").time,
+    override var uuid: String = generateUuid(),
+) : TestItem(), Audio

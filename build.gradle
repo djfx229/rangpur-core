@@ -1,6 +1,7 @@
-/// При конфигурации модуля использовались следующие материалы
-/// https://docs.gradle.org/current/samples/sample_building_java_libraries.html
-
+/**
+ * При конфигурации модуля использовались следующие материалы
+ * https://docs.gradle.org/current/samples/sample_building_java_libraries.html
+ */
 plugins {
     id 'org.jetbrains.kotlin.jvm' version '1.6.10'
     id 'java-library'
@@ -14,6 +15,7 @@ repositories {
 }
 
 dependencies {
+    implementation group: 'commons-io', name: 'commons-io', version: '2.11.0'
     implementation 'com.j256.ormlite:ormlite-core:5.2'
     implementation 'com.j256.ormlite:ormlite-jdbc:5.2'
     implementation 'org.xerial:sqlite-jdbc:3.34.0'

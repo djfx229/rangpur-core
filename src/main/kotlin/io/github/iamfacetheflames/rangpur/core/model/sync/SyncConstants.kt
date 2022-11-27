@@ -1,9 +1,11 @@
 package io.github.iamfacetheflames.rangpur.core.model.sync
 
 const val PORT: Int = 54286
+const val SYNC_VERSION: Int = 1
 
 object Command {
     const val START_SYNC = "COMMAND_START_SYNC"
+    const val GREETING = "COMMAND_GREETING"
     const val REQUEST_DIRECTORIES = "COMMAND_REQUEST_DIRECTORIES"
     const val SEND_DIRECTORIES = "COMMAND_SEND_DIRECTORIES"
     const val REQUEST_AUDIOS = "COMMAND_REQUEST_AUDIOS"
@@ -15,6 +17,10 @@ object Command {
     const val REQUEST_PLAYLIST_AUDIOS = "COMMAND_REQUEST_PLAYLIST_AUDIOS"
     const val SEND_PLAYLIST_AUDIOS = "COMMAND_SEND_PLAYLIST_AUDIOS"
     const val NEW_AUDIOS_AMOUNT = "COMMAND_NEW_AUDIOS_AMOUNT"
-    const val DONE = "COMMAND_DONE"
+    const val DONE = "COMMAND_DONE" // todo а может это только в статусе оставить
     const val ERROR = "COMMAND_ERROR"
+}
+
+object Status {
+    const val OK = "STATUS_OK"
 }

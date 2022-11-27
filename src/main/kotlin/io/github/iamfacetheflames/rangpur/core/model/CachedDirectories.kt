@@ -1,5 +1,6 @@
 package io.github.iamfacetheflames.rangpur.core.model
 
+import io.github.iamfacetheflames.rangpur.core.data.Audio
 import io.github.iamfacetheflames.rangpur.core.data.Directory
 import io.github.iamfacetheflames.rangpur.core.data.universalSeparator
 import io.github.iamfacetheflames.rangpur.core.repository.Configuration
@@ -18,7 +19,7 @@ class CachedDirectories(
     private val cache: HashMap<String, Directory> =
         HashMap()
 
-    fun getFullPath(directoryUUID: String): String {
+    fun getFullDirectoryPath(directoryUUID: String): String {
         deque = LinkedList()
 
         var current: Directory? = findDirectory(directoryUUID)
@@ -36,6 +37,13 @@ class CachedDirectories(
         }
 
         return stringBuffer.toString()
+    }
+
+    fun getFullAudioPath(audio: Audio): String {
+        val path = getFullDirectoryPath(
+            audio.directoryUUID
+        )
+        return path + universalSeparator + audio.fileName
     }
 
     fun release() {
