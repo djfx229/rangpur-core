@@ -43,8 +43,6 @@ internal class SyncHandlersTest {
      */
     @Test
     fun syncForEmptyClient() {
-        val clientListener = mockk<(SyncInfo) -> Unit>(relaxed = true)
-        val serverListener = mockk<(SyncInfo) -> Unit>(relaxed = true)
         val cachedDirectoriesServer = mockk<CachedDirectories>(relaxed = true)
         val cachedDirectoriesClient = mockk<CachedDirectories>(relaxed = true)
         val databaseServer = mockk<Database>(relaxed = true)
@@ -121,12 +119,10 @@ internal class SyncHandlersTest {
         val serverHandler = ServerHandlerImpl(
             databaseServer,
             cachedDirectoriesFactory = {cachedDirectoriesServer},
-            listener = serverListener,
         )
         val clientHandler = ClientHandlerImpl(
             databaseClient,
             cachedDirectoriesFactory = {cachedDirectoriesClient},
-            listener = clientListener,
         )
         val server = SyncServerModel(serverHandler)
         val client = SyncClientModel(clientHandler)
@@ -145,8 +141,6 @@ internal class SyncHandlersTest {
      */
     @Test
     fun syncForNotEmptyClient() {
-        val serverListener = mockk<(SyncInfo) -> Unit>(relaxed = true)
-        val clientListener = mockk<(SyncInfo) -> Unit>(relaxed = true)
         val cachedDirectoriesServer = mockk<CachedDirectories>(relaxed = true)
         val cachedDirectoriesClient = mockk<CachedDirectories>(relaxed = true)
         val databaseServer = mockk<Database>(relaxed = true)
@@ -291,12 +285,10 @@ internal class SyncHandlersTest {
                 val serverHandler = ServerHandlerImpl(
                     databaseServer,
                     cachedDirectoriesFactory = {cachedDirectoriesServer},
-                    listener = serverListener,
                 )
                 val clientHandler = ClientHandlerImpl(
                     databaseClient,
                     cachedDirectoriesFactory = {cachedDirectoriesClient},
-                    listener = clientListener,
                 )
                 val server = SyncServerModel(serverHandler)
                 val client = SyncClientModel(clientHandler)

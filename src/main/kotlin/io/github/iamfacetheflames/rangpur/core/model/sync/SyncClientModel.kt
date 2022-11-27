@@ -1,13 +1,14 @@
 package io.github.iamfacetheflames.rangpur.core.model.sync
 
 import io.github.iamfacetheflames.rangpur.core.data.*
+import io.github.iamfacetheflames.rangpur.core.repository.Configuration
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.net.InetSocketAddress
 import java.nio.channels.SocketChannel
 
 class SyncClientModel(
-    private val handler: ClientHandler
+    private val handler: ClientHandler,
 ) {
 
     private var serverSocket: SocketChannel? = null
@@ -29,9 +30,8 @@ class SyncClientModel(
             val serverStreams = SyncBridgeToServer(
                 serverSocket = server,
             )
-            handler.connected(serverStreams)
+            handler.connected(serverStreams, listener)
             server.close()
-            listener(SyncInfoFinished)
         }
     }
 

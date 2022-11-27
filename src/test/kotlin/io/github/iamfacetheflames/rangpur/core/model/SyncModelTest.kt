@@ -28,14 +28,12 @@ internal class SyncModelTest {
      */
     @Test
     fun connection() {
-        val clientListener = mockk<(SyncInfo) -> Unit>(relaxed = true)
         val cachedDirectoriesClient = mockk<CachedDirectories>(relaxed = true)
         val database = mockk<Database>(relaxed = true)
         val clientHandler = spyk(
             ClientHandlerImpl(
                 database,
                 cachedDirectoriesFactory = {cachedDirectoriesClient},
-                listener = clientListener,
             )
         )
         coEvery { clientHandler.receiveCommand(any(), any()) } coAnswers {
@@ -45,7 +43,7 @@ internal class SyncModelTest {
             bridge.write(0)
         }
         val serverHandler = object : ServerHandler {
-            override suspend fun connected(client: SyncBridge) {
+            override suspend fun connected(client: SyncBridge, listener: (SyncInfo) -> Unit) {
                 // получаем с клиента Command.START_SYNC
                 val startCommand = client.read<String>()
                 assertEquals(Command.START_SYNC, startCommand)
@@ -76,7 +74,6 @@ internal class SyncModelTest {
      */
     @Test
     fun receiveFiles() {
-        val clientListener = mockk<(SyncInfo) -> Unit>(relaxed = true)
         val cachedDirectoriesClient = mockk<CachedDirectories>(relaxed = true)
         val commandSendFile = "COMMAND_SEND_FILE"
         val fileContent: ByteArray = Random.nextBytes(1024 * 1024 * 10) // 10 MB
@@ -85,7 +82,6 @@ internal class SyncModelTest {
             ClientHandlerImpl(
                 database,
                 cachedDirectoriesFactory = {cachedDirectoriesClient},
-                listener = clientListener,
             )
         )
         coEvery { clientHandler.receiveCommand(commandSendFile, any()) } coAnswers {
@@ -105,7 +101,7 @@ internal class SyncModelTest {
             fileForReceive.delete()
         }
         val serverHandler = object : ServerHandler {
-            override suspend fun connected(bridge: SyncBridge) {
+            override suspend fun connected(bridge: SyncBridge, listener: (SyncInfo) -> Unit) {
                 val startCommand = bridge.read<String>()
                 assertEquals(Command.START_SYNC, startCommand)
 

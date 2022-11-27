@@ -12,7 +12,15 @@ import java.io.File
 
 internal class OrmLiteDirectoriesTest {
 
-    val dbPath = "${File(".").canonicalPath}/RangDatabaseTest.sqlite3"
+    val tempDirectory = System.getProperty("java.io.tmpdir")
+    val testDirectory = File(tempDirectory, "rangpur").also {
+        if (it.exists()) {
+            it.deleteRecursively()
+        }
+        it.mkdirs()
+    }
+    val sep = File.separatorChar
+    val dbPath = "$testDirectory${sep}RangDatabaseTest.sqlite3"
     lateinit var database: Database
 
     @org.junit.jupiter.api.BeforeEach

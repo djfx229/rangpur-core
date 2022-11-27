@@ -1,5 +1,8 @@
 package io.github.iamfacetheflames.rangpur.core.model.sync
 
+import io.github.iamfacetheflames.rangpur.core.data.SyncInfo
+import io.github.iamfacetheflames.rangpur.core.data.SyncInfoFinished
+import io.github.iamfacetheflames.rangpur.core.repository.Configuration
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.ObjectInputStream
@@ -9,7 +12,7 @@ import java.nio.channels.ServerSocketChannel
 import java.nio.channels.SocketChannel
 
 class SyncServerModel(
-    private val handler: ServerHandler
+    private val handler: ServerHandler,
 ) {
 
     private var currentSocket: SocketChannel? = null
@@ -18,6 +21,7 @@ class SyncServerModel(
         host: String,
         port: Int = PORT,
         println: (String) -> Unit = ::println,
+        listener: (SyncInfo) -> Unit = {}
     ) = withContext(Dispatchers.IO) {
         try {
             println("runServer() start $host : $port")
@@ -32,7 +36,8 @@ class SyncServerModel(
                         clientSocket = client,
                         toClient = ObjectOutputStream(client.socket().getOutputStream()),
                         fromClient = ObjectInputStream(client.socket().getInputStream()),
-                    )
+                    ),
+                    listener
                 )
                 client.close()
             }
@@ -43,7 +48,7 @@ class SyncServerModel(
         }
     }
 
-    fun stopServer() {
+    fun stop() {
         currentSocket?.finishConnect()
     }
 

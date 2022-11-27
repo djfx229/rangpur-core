@@ -7,16 +7,16 @@ import java.io.File
 
 interface ClientHandler {
     suspend fun receiveCommand(command: String, server: SyncBridge)
-    suspend fun connected(server: SyncBridge)
+    suspend fun connected(server: SyncBridge, listener: (SyncInfo) -> Unit)
 }
 
 class ClientHandlerImpl(
     private val database: Database,
     private val cachedDirectoriesFactory: () -> CachedDirectories,
-    private val listener: (SyncInfo) -> Unit
 ) : ClientHandler {
 
     private var audiosProgress: Int = 0
+    lateinit var listener: (SyncInfo) -> Unit
 
     private suspend fun greeting(server: SyncBridge) {
         server.write(SYNC_VERSION)
@@ -113,7 +113,11 @@ class ClientHandlerImpl(
         audiosAmount(server.read<Int>())
     }
 
-    override suspend fun connected(server: SyncBridge) {
+    override suspend fun connected(
+        server: SyncBridge,
+        listener: (SyncInfo) -> Unit,
+    ) {
+        this.listener = listener
         server.write(Command.START_SYNC)
         var command: String
         do {

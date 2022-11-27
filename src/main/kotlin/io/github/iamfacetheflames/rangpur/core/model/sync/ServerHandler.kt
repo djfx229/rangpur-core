@@ -2,19 +2,21 @@ package io.github.iamfacetheflames.rangpur.core.model.sync
 
 import io.github.iamfacetheflames.rangpur.core.data.SyncInfoReceivingAudio
 import io.github.iamfacetheflames.rangpur.core.data.SyncInfo
+import io.github.iamfacetheflames.rangpur.core.data.SyncInfoFinished
 import io.github.iamfacetheflames.rangpur.core.data.WithId
 import io.github.iamfacetheflames.rangpur.core.model.CachedDirectories
 import io.github.iamfacetheflames.rangpur.core.repository.database.Database
 
 interface ServerHandler {
-    suspend fun connected(client: SyncBridge)
+    suspend fun connected(client: SyncBridge, listener: (SyncInfo) -> Unit)
 }
 
 class ServerHandlerImpl(
     private val database: Database,
     private val cachedDirectoriesFactory: () -> CachedDirectories,
-    private val listener: (SyncInfo) -> Unit,
 ) : ServerHandler {
+
+    lateinit var listener: (SyncInfo) -> Unit
 
     private suspend fun syncDataWithClient(
         client: SyncBridge,
@@ -113,7 +115,8 @@ class ServerHandlerImpl(
         )
     }
 
-    override suspend fun connected(client: SyncBridge) {
+    override suspend fun connected(client: SyncBridge, listener: (SyncInfo) -> Unit) {
+        this.listener = listener
         val waitingStartCommand = client.read<String>()
         if (waitingStartCommand == Command.START_SYNC && greeting(client)) {
             directories(client)
@@ -125,6 +128,7 @@ class ServerHandlerImpl(
 //            playlistWithAudios(client)
         }
         client.done()
+        listener(SyncInfoFinished)
     }
 
 }
