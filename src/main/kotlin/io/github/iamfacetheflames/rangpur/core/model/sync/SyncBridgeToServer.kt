@@ -5,7 +5,6 @@ import java.io.File
 import java.io.FileOutputStream
 import java.io.ObjectInputStream
 import java.io.ObjectOutputStream
-import java.lang.IllegalStateException
 import java.nio.channels.SocketChannel
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
@@ -49,10 +48,23 @@ class SyncBridgeToServer(
                         }
                     }
                     toServer.writeObject(true)
-                    FileOutputStream(filePath).channel.use { fileFromServer ->
-                        fileFromServer.transferFrom(serverSocket, 0, size)
-                        continuation.resume(size)
+                    // https://stackoverflow.com/questions/28088408/filechannel-transferfrom-fails-for-larger-files-with-out-of-memory-error
+                    val blockSize = Math.min(4096, size)
+                    FileOutputStream(filePath).channel.use { destinationChannel ->
+                        var transferedSize = 0L
+                        val expectedSize = size
+                        while (transferedSize < expectedSize) {
+                            println("SyncBridgeToServer:receiveFile() запуск destinationChannel.transferFrom для новой порции данных")
+                            transferedSize += destinationChannel.transferFrom(
+                                serverSocket,
+                                transferedSize,
+                                blockSize
+                            )
+                            println("SyncBridgeToServer:receiveFile() destinationChannel.transferFrom успешно выполнен $transferedSize байтов принято")
+                        }
+                        println("SyncBridgeToServer:receiveFile() работа с каналом завершена")
                     }
+                    continuation.resume(size)
                 } else {
                     toServer.writeObject(false)
                     continuation.resume(size)

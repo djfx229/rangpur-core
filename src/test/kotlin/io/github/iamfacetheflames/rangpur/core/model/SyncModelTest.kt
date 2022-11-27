@@ -10,9 +10,12 @@ import io.mockk.mockk
 import io.mockk.spyk
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
+import org.apache.commons.io.FileUtils
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import java.io.File
+import kotlin.random.Random
+import kotlin.test.assertContentEquals
 
 /**
  * Набор тестов для проверки работы клиент-серверного взаимодействия (обмен данными и файлами).
@@ -76,10 +79,7 @@ internal class SyncModelTest {
         val clientListener = mockk<(SyncInfo) -> Unit>(relaxed = true)
         val cachedDirectoriesClient = mockk<CachedDirectories>(relaxed = true)
         val commandSendFile = "COMMAND_SEND_FILE"
-        val fileContent = """
-            Съешь ещё этих мягких французских булок да выпей чаю.
-            Широкая электрификация южных губерний даст мощный толчок подъёму сельского хозяйства.
-        """
+        val fileContent: ByteArray = Random.nextBytes(1024 * 1024 * 10) // 10 MB
         val database = mockk<Database>(relaxed = true)
         val clientHandler = spyk(
             ClientHandlerImpl(
@@ -99,10 +99,9 @@ internal class SyncModelTest {
             val size = bridge.receiveFile(path)
             val file = File(path)
             assert(file.exists() && size == file.length())
-            fileForReceive.inputStream().bufferedReader().use {
-                assertEquals(it.readText(), fileContent)
-            }
             bridge.write(Status.OK)
+            val resultArray = FileUtils.readFileToByteArray(fileForReceive)
+            assertContentEquals(fileContent, resultArray)
             fileForReceive.delete()
         }
         val serverHandler = object : ServerHandler {
@@ -114,9 +113,7 @@ internal class SyncModelTest {
                     "rangpur",
                     ".tmp"
                 )
-                fileForSend.bufferedWriter().use { out ->
-                    out.write(fileContent)
-                }
+                FileUtils.writeByteArrayToFile(fileForSend, fileContent)
                 val path = fileForSend.absolutePath
                 println("отправка файла $path")
                 bridge.write(commandSendFile)

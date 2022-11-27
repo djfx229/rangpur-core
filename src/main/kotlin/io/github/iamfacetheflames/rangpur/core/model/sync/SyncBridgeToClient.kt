@@ -22,13 +22,26 @@ class SyncBridgeToClient(
         val file = File(filePath)
         val size = file.length()
         toClient.writeObject(size)
+        // https://stackoverflow.com/questions/7379469/filechannel-transferto-for-large-file-in-windows
+        val blockSize = Math.min(4096, size)
         val isRequestedFile = fromClient.readObject() as Boolean
         return suspendCancellableCoroutine { continuation ->
             try {
                 val file = File(filePath)
                 if (isRequestedFile) {
-                    FileInputStream(filePath).channel.use { stream ->
-                        stream.transferTo(0, size, clientSocket)
+                    FileInputStream(filePath).channel.use { channel ->
+                        var position: Long = 0
+                        fun transferTo(): Boolean {
+                            println("SyncBridgeToClient:sendFile() запуск channel.transferTo для передачи новой порции данных")
+                            val data = channel.transferTo(position, blockSize, clientSocket)
+                            println("SyncBridgeToClient:sendFile() destinationChannel.transferFrom успешно выполнен data: $data")
+                            return data > 0
+                        }
+                        while (transferTo()) {
+                            position += blockSize
+                            println("SyncBridgeToClient:sendFile() текущая позиция: $position")
+                        }
+                        println("SyncBridgeToClient:sendFile() работа с каналом завершена")
                         continuation.resume(file)
                     }
                 } else {
