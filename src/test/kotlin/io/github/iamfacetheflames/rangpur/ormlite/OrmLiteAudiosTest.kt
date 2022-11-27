@@ -7,7 +7,9 @@ import com.j256.ormlite.support.ConnectionSource
 import io.github.iamfacetheflames.rangpur.core.data.Filter
 import io.github.iamfacetheflames.rangpur.core.repository.database.Database
 import io.github.iamfacetheflames.rangpur.ormlite.repository.database.OrmLiteDatabase
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.io.File
 import java.sql.Date
@@ -15,23 +17,37 @@ import java.util.*
 
 internal class OrmLiteAudiosTest {
 
-    val dbPath = "${File(".").canonicalPath}/RangDatabaseTest.sqlite3"
+    val tempDirectory = System.getProperty("java.io.tmpdir")
+    val testDirectory = File(tempDirectory, "rangpur")
+    val sep = File.separatorChar
+    val dbPath = "$testDirectory${sep}RangDatabaseTest.sqlite3"
     lateinit var database: Database
+    lateinit var source: ConnectionSource
 
-    @org.junit.jupiter.api.BeforeEach
+    @BeforeEach
     fun setUp() {
+        if (tempDirectory.isBlank()) {
+            throw IllegalAccessError("Отсутствует путь до временной директории")
+        }
+        testDirectory.let {
+            if (it.exists()) {
+                it.deleteRecursively()
+            }
+            it.mkdirs()
+        }
         Logger.setGlobalLogLevel(Log.Level.ERROR)
         val url = "jdbc:sqlite:$dbPath"
-        val source: ConnectionSource = JdbcConnectionSource(url, "", "")
+        source = JdbcConnectionSource(url, "", "")
         database = OrmLiteDatabase(source)
         assertTrue(
             File(dbPath).exists()
         )
     }
 
-    @org.junit.jupiter.api.AfterEach
+    @AfterEach
     fun tearDown() {
-        File(dbPath).delete()
+        source.close()
+        testDirectory.deleteRecursively()
     }
 
     @Test
@@ -87,12 +103,12 @@ internal class OrmLiteAudiosTest {
             mutableListOf(
                 database.getBuilder().createDirectory(
                     "dir 1",
-                    "/root/dir/1",
+                    "/root/dir 1",
                     null
                 ),
                 database.getBuilder().createDirectory(
                     "dir 2",
-                    "/root/dir/2",
+                    "/root/dir 2",
                     null
                 )
             )

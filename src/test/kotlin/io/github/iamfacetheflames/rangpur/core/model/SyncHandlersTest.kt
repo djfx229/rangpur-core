@@ -133,9 +133,9 @@ internal class SyncHandlersTest {
         runTest {
             val host = "localhost"
             launch {
-                server.start(host, 54287)
+                server.start(host, 54289)
             }
-            client.start(host, 54287)
+            client.start(host, 54289)
         }
     }
 
@@ -303,9 +303,9 @@ internal class SyncHandlersTest {
 
                 val host = "localhost"
                 launch {
-                    server.start(host, 54288)
+                    server.start(host, 54290)
                 }
-                client.start(host, 54288)
+                client.start(host, 54290)
                 compareFilesInDirectories(libraryDirServer, libraryDirClient)
             } finally {
                 libraryDirServer.deleteRecursively()

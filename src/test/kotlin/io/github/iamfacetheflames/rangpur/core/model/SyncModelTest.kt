@@ -81,7 +81,6 @@ internal class SyncModelTest {
             Широкая электрификация южных губерний даст мощный толчок подъёму сельского хозяйства.
         """
         val database = mockk<Database>(relaxed = true)
-        val config = mockk<Configuration>(relaxed = true)
         val clientHandler = spyk(
             ClientHandlerImpl(
                 database,
