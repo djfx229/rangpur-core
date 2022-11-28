@@ -16,6 +16,7 @@ class ClientHandlerImpl(
 ) : ClientHandler {
 
     private var audiosProgress: Int = 0
+    private var audiosAmount: Int = 0
     lateinit var listener: (SyncInfo) -> Unit
 
     private suspend fun greeting(server: SyncBridge) {
@@ -130,7 +131,6 @@ class ClientHandlerImpl(
 
     override suspend fun receiveCommand(command: String, server: SyncBridge) {
         println("ClientHandlerImpl: принята команда от сервера: $command")
-        var audiosAmount = 0
         when (command) {
             Command.GREETING -> greeting(server)
             Command.REQUEST_DIRECTORIES ->  requestDirectories(server)
@@ -148,6 +148,7 @@ class ClientHandlerImpl(
             Command.REQUEST_AUDIOS ->  requestAudios(server)
             Command.SEND_AUDIO -> sendAudios(server, audiosAmount)
             Command.NEW_AUDIOS_AMOUNT -> newAudiosAmount(server) {amount ->
+                audiosProgress = 0
                 audiosAmount = amount
             }
             Command.DONE -> return
