@@ -146,6 +146,7 @@ class LibraryPresenter(
         }
     }
 
+    @Deprecated(message = "Будет удалено после отказа от router")
     fun openDirectoryContainsSelectedAudio() {
         scope.launch(Dispatchers.IO) {
             val item = selectedAudios.first()
