@@ -10,61 +10,40 @@ import java.util.*
 import kotlin.collections.HashMap
 
 class CachedDirectories(
-    private val database: Database,
+    private val databaseDirectories: Database.Directories,
     private val config: Configuration
 ) {
 
-    private var deque: Deque<String> =
-        LinkedList()
     private val cache: HashMap<String, Directory> =
         HashMap()
 
     fun getFullDirectoryPath(directoryUUID: String): String {
-        deque = LinkedList()
-
-        var current: Directory? = findDirectory(directoryUUID)
-        while (current != null) {
-            deque.push(current.name)
-            current = getDirectory(current.parent)
-        }
-
-        val stringBuffer = StringBuffer()
-        stringBuffer.append(config.getMusicDirectoryLocation())
-        stringBuffer.append(File.separator)
-        while (deque.isNotEmpty()) {
-            stringBuffer.append(deque.pop())
-            stringBuffer.append(universalSeparator)
-        }
-
-        return stringBuffer.toString()
+        val directory = getDirectory(directoryUUID)
+        // не нужно добавлять разделитель - locationInMusicDirectory всегда начинается со слэша
+        return config.getMusicDirectoryLocation() + directory.locationInMusicDirectory
     }
 
     fun getFullAudioPath(audio: Audio): String {
         val path = getFullDirectoryPath(
             audio.directoryUUID
         )
-        return path + universalSeparator + audio.fileName
+        // не нужно добавлять разделитель - locationInMusicDirectory всегда заканчивается со слэшем
+        return path + audio.fileName
     }
 
     fun release() {
         cache.clear()
-        deque.clear()
     }
 
-    private fun getDirectory(directoryOnlyId: Directory?): Directory? {
-        return if (directoryOnlyId == null) {
-            null
+    private fun getDirectory(directoryUUID: String): Directory {
+        val cachedDirectory = cache[directoryUUID]
+        return if (cachedDirectory == null) {
+            val directoryFromDB = databaseDirectories.getItem(directoryUUID)
+            cache[directoryUUID] = directoryFromDB
+            directoryFromDB
         } else {
-            return findDirectory(directoryOnlyId.uuid)
+            cachedDirectory
         }
-    }
-
-    fun findDirectory(directoryUUID: String): Directory? {
-        val directory = cache[directoryUUID] ?: database.directories.getItem(directoryUUID)
-        if (directory != null) {
-            cache[directory.uuid] = directory
-        }
-        return directory
     }
 
 }

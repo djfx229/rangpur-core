@@ -26,7 +26,7 @@ class AudioLibraryModel(
         filter: Filter
     ): File {
         val audios = getAudios(filter)
-        val cachedDirectories = CachedDirectories(database, config)
+        val cachedDirectories = CachedDirectories(database.directories, config)
         val file = PlaylistToFile.exportPlaylistM3u8(
             fileName,
             directoryForM3u.absolutePath,
@@ -54,7 +54,7 @@ class AudioLibraryModel(
             MutableList<File>
             > {
         val selectedList = mutableListOf<AudioInPlaylist>()
-        val cachedDirs = CachedDirectories(database, config)
+        val cachedDirs = CachedDirectories(database.directories, config)
         val files: MutableList<File> = mutableListOf<File>()
         for(selIndex in selectedRows) {
             audios.getOrNull(selIndex)?.let {
