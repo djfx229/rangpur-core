@@ -3,8 +3,8 @@
  * https://docs.gradle.org/current/samples/sample_building_java_libraries.html
  */
 plugins {
-    id 'org.jetbrains.kotlin.jvm' version '1.6.10'
     id 'java-library'
+    id 'org.jetbrains.kotlin.jvm' version '1.9.20-Beta2'
 }
 
 group = 'io.github.iamfacetheflames.rangpur'
@@ -18,12 +18,13 @@ dependencies {
     implementation group: 'commons-io', name: 'commons-io', version: '2.11.0'
     implementation 'com.j256.ormlite:ormlite-core:5.2'
     implementation 'com.j256.ormlite:ormlite-jdbc:5.2'
-    implementation 'org.xerial:sqlite-jdbc:3.34.0'
+    implementation 'org.xerial:sqlite-jdbc:3.43.0.0'
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4'
     testImplementation 'org.jetbrains.kotlin:kotlin-test'
     testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.4"
     testImplementation "io.mockk:mockk:1.13.2"
     testImplementation 'org.junit.jupiter:junit-jupiter:5.9.0'
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
 }
 
 test {
@@ -36,4 +37,7 @@ compileKotlin {
 
 compileTestKotlin {
     kotlinOptions.jvmTarget = '1.8'
+}
+kotlin {
+    jvmToolchain(11)
 }
