@@ -27,13 +27,13 @@ class FilterPresenter(
     fun observableDirectories(): StateFlow<List<Directory>> = flowDirectories
     fun observablePlaylists(): StateFlow<List<Playlist>> = flowPlaylists
 
-    fun requestData(isDateOnlyYears: Boolean = false) {
+    fun requestData(isDateOnlyYears: Boolean = false, onlyRootDirectories: Boolean = true) {
         if (isDateOnlyYears) {
             requestFilterDateList()
         } else {
             requestFilterFullDateList()
         }
-        requestFilterDirectories()
+        requestFilterDirectories(onlyRootDirectories)
         requestPlaylists()
     }
 
@@ -55,12 +55,8 @@ class FilterPresenter(
         }
     }
 
-    private fun requestFilterDirectories(root: Directory? = null) {
-        val list = if (root == null) {
-            filterLibraryModel.getDirectories()
-        } else {
-            filterLibraryModel.getDirectories(root)
-        }
+    private fun requestFilterDirectories(onlyRootDirectories: Boolean) {
+        val list = filterLibraryModel.getDirectories(onlyRootDirectories)
         flowDirectories.value = list
     }
 
