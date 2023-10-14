@@ -4,11 +4,11 @@
  */
 plugins {
     id 'java-library'
-    id 'org.jetbrains.kotlin.jvm' version '1.9.20-Beta2'
+    id 'org.jetbrains.kotlin.jvm' version '1.8.20'
 }
 
 group = 'io.github.iamfacetheflames.rangpur'
-version = '5.3'
+version = '6.0'
 
 repositories {
     mavenCentral()
@@ -25,6 +25,7 @@ dependencies {
     testImplementation "io.mockk:mockk:1.13.2"
     testImplementation 'org.junit.jupiter:junit-jupiter:5.9.0'
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+    testImplementation 'io.mockk:mockk:1.13.5'
 }
 
 test {
@@ -37,7 +38,4 @@ compileKotlin {
 
 compileTestKotlin {
     kotlinOptions.jvmTarget = '1.8'
-}
-kotlin {
-    jvmToolchain(11)
 }
