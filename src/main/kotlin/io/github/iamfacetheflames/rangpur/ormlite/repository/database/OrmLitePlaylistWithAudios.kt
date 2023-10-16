@@ -10,12 +10,10 @@ import java.util.*
 
 class OrmLitePlaylistWithAudios(val source: ConnectionSource): Database.PlaylistWithAudios {
 
-    override fun getFrom(playlist: Playlist?): List<AudioInPlaylist> {
+    override fun getFrom(playlistUUID: String): List<AudioInPlaylist> {
         val dao = DaoManager.createDao(source, OrmLiteAudioInPlaylist::class.java)
         val queryBuilder = dao.queryBuilder()
-        if (playlist != null) {
-            queryBuilder.where().eq("playlist_uuid", playlist)
-        }
+        queryBuilder.where().eq("playlist_uuid", playlistUUID)
         queryBuilder.orderByRaw("position ASC")
         val preparedQuery = queryBuilder.prepare()
         return dao.query(preparedQuery)
@@ -69,6 +67,12 @@ class OrmLitePlaylistWithAudios(val source: ConnectionSource): Database.Playlist
         }
     }
 
-    override fun getAll(): List<AudioInPlaylist> = getFrom(null)
+    override fun getAll(): List<AudioInPlaylist> {
+        val dao = DaoManager.createDao(source, OrmLiteAudioInPlaylist::class.java)
+        val queryBuilder = dao.queryBuilder()
+        queryBuilder.orderByRaw("position ASC")
+        val preparedQuery = queryBuilder.prepare()
+        return dao.query(preparedQuery)
+    }
 
 }

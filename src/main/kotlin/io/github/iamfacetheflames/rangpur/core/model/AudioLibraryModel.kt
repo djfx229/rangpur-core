@@ -17,7 +17,7 @@ class AudioLibraryModel(
     }
 
     fun getAudios(playlist: Playlist): List<AudioInPlaylist> {
-        return database.playlistWithAudios.getFrom(playlist)
+        return database.playlistWithAudios.getFrom(playlist.uuid)
     }
 
     suspend fun createM3u8PlaylistWithFilteredAudios(

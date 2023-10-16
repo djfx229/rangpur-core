@@ -80,7 +80,7 @@ class PlaylistLibraryModel(private val database: Database) {
         file: File,
         playlist: Playlist
     ) {
-        val audios = database.playlistWithAudios.getFrom(playlist)
+        val audios = database.playlistWithAudios.getFrom(playlist.uuid)
         PlaylistToFile.exportPlaylistTxt(file.name, file.parentFile.absolutePath, audios)
     }
 
