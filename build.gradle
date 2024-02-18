@@ -8,7 +8,7 @@ plugins {
 }
 
 group = 'io.github.iamfacetheflames.rangpur'
-version = '6.1'
+version = '7.0'
 
 repositories {
     mavenCentral()
