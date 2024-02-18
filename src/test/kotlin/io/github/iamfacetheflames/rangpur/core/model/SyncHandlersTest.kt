@@ -1,7 +1,6 @@
-package test.kotlin.io.github.iamfacetheflames.rangpur.core.model
+package io.github.iamfacetheflames.rangpur.core.model
 
 import io.github.iamfacetheflames.rangpur.core.data.*
-import io.github.iamfacetheflames.rangpur.core.model.CachedDirectories
 import io.github.iamfacetheflames.rangpur.core.model.sync.*
 import io.github.iamfacetheflames.rangpur.core.repository.database.Database
 import io.mockk.*
@@ -131,7 +130,9 @@ internal class SyncHandlersTest {
             launch {
                 server.start(host, 54289)
             }
-            client.start(host, 54289)
+            launch {
+                client.start(host, 54289)
+            }
         }
     }
 

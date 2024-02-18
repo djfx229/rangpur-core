@@ -2,7 +2,6 @@ package test.kotlin.io.github.iamfacetheflames.rangpur.core.model
 import io.github.iamfacetheflames.rangpur.core.data.SyncInfo
 import io.github.iamfacetheflames.rangpur.core.model.CachedDirectories
 import io.github.iamfacetheflames.rangpur.core.model.sync.*
-import io.github.iamfacetheflames.rangpur.core.repository.Configuration
 import io.github.iamfacetheflames.rangpur.core.repository.database.Database
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -61,10 +60,12 @@ internal class SyncModelTest {
             launch {
                 server.start(host, 54287)
             }
-            client.start(host, 54287)
-            coVerify {
-                clientHandler.receiveCommand(Command.GREETING, any())
-                clientHandler.receiveCommand(Command.DONE, any())
+            launch {
+                client.start(host, 54287)
+                coVerify {
+                    clientHandler.receiveCommand(Command.GREETING, any())
+                    clientHandler.receiveCommand(Command.DONE, any())
+                }
             }
         }
     }
