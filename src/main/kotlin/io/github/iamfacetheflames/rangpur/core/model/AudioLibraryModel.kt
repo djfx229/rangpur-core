@@ -46,30 +46,20 @@ class AudioLibraryModel(
         }
     }
 
-    fun getSelectedAudios(
-        selectedRows: IntArray,
-        audios: List<AudioInPlaylist>
-    ): Pair<
-            MutableList<AudioInPlaylist>,
-            MutableList<File>
-            > {
-        val selectedList = mutableListOf<AudioInPlaylist>()
+    fun getFilesForAudios(
+        audios: List<Audio>
+    ): List<File> {
         val cachedDirs = CachedDirectories(database.directories, config)
-        val files: MutableList<File> = mutableListOf<File>()
-        for(selIndex in selectedRows) {
-            audios.getOrNull(selIndex)?.let {
-                it.audio?.let { audio ->
-                    try {
-                        files.add(File(cachedDirs.getFullAudioPath(audio)))
-                        selectedList.add(it)
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                    }
-                }
+        val files: MutableList<File> = mutableListOf()
+        for (audio in audios) {
+            try {
+                files.add(File(cachedDirs.getFullAudioPath(audio)))
+            } catch (e: Exception) {
+                e.printStackTrace()
             }
         }
         cachedDirs.release()
-        return Pair(selectedList, files)
+        return files
     }
 
 }

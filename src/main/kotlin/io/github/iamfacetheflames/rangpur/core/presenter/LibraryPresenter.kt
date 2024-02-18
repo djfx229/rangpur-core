@@ -156,14 +156,10 @@ class LibraryPresenter(
         }
     }
 
-    fun getSelectedAudios(
-        selectedRows: IntArray,
-        audios: List<AudioInPlaylist>
-    ): Pair<
-        MutableList<AudioInPlaylist>,
-        MutableList<File>
-    > {
-        return audioLibraryModel.getSelectedAudios(selectedRows, audios)
+    fun getFilesForAudios(
+        audios: List<Audio>
+    ): List<File> {
+        return audioLibraryModel.getFilesForAudios(audios)
     }
 
     val onPlaylistClicked: (Playlist) -> Unit = { playlist ->
