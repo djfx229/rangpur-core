@@ -52,7 +52,6 @@ class PlaylistLibraryModel(private val database: Database) {
         selectedList: List<AudioInPlaylist>,
         movePosition: Int
     ): List<AudioInPlaylist> {
-        val isUp = movePosition < selectedList.first().position
         val nullableResultList = LinkedList<AudioInPlaylist?>()
         nullableResultList.addAll(
             fullList
@@ -64,11 +63,7 @@ class PlaylistLibraryModel(private val database: Database) {
             )
         }
         nullableResultList.addAll(
-            if (isUp) {
-                movePosition
-            } else {
-                movePosition + 1
-            },
+            movePosition,
             selectedList
         )
         val finalList = nullableResultList.filterNotNull()
