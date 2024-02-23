@@ -53,6 +53,7 @@ interface Database {
             artist: String,
             title: String,
             dateCreated: Date): Audio
+        fun createEmptyAudio(): Audio
         fun createPlaylist(name: String, folder: PlaylistFolder?): Playlist
         fun createPlaylistFolder(name: String, parent: PlaylistFolder?): PlaylistFolder
         fun audioInPlaylist(audio: Audio, playlist: Playlist): AudioInPlaylist

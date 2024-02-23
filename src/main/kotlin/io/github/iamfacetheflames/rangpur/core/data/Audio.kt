@@ -1,6 +1,6 @@
 package io.github.iamfacetheflames.rangpur.core.data
 
-import io.github.iamfacetheflames.rangpur.core.model.CachedDirectories
+import io.github.iamfacetheflames.rangpur.core.repository.database.Database
 import java.sql.Date
 
 interface Audio : WithId {
@@ -21,6 +21,33 @@ interface Audio : WithId {
     var duration: Long?
     var dateCreated: String?
     var timestampCreated: Long
+}
+
+fun Audio.copy(builder: Database.Builder): Audio {
+    val copiedAudio = builder.createEmptyAudio()
+    copyTo(copiedAudio)
+    return copiedAudio
+}
+
+fun Audio.copyTo(saveToAudio: Audio) {
+    saveToAudio.uuid = this.uuid
+    saveToAudio.directoryUUID = this.directoryUUID
+    saveToAudio.fileName = this.fileName
+    saveToAudio.albumTrackNumber = this.albumTrackNumber
+    saveToAudio.artist = this.artist
+    saveToAudio.title = this.title
+    saveToAudio.album = this.album
+    saveToAudio.comment = this.comment
+    saveToAudio.url = this.url
+    saveToAudio.encoder = this.encoder
+    saveToAudio.bitrate = this.bitrate
+    saveToAudio.samplerate = this.samplerate
+    saveToAudio.key = this.key
+    saveToAudio.keySortPosition = this.keySortPosition
+    saveToAudio.bpm = this.bpm
+    saveToAudio.duration = this.duration
+    saveToAudio.dateCreated = this.dateCreated
+    saveToAudio.timestampCreated = this.timestampCreated
 }
 
 fun Audio.equalsAllFields(other: Any?): Boolean {

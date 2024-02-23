@@ -30,6 +30,10 @@ class OrmLiteDatabase(var source: ConnectionSource): Database {
             }
         }
 
+        override fun createEmptyAudio(): Audio {
+            return OrmLiteAudio()
+        }
+
         override fun createPlaylist(name: String, folder: PlaylistFolder?): Playlist {
             return OrmLitePlaylist().apply {
                 this.name = name
