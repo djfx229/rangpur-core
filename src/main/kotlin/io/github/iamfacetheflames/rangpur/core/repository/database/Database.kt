@@ -40,7 +40,12 @@ interface Database {
     interface PlaylistWithAudios : AllGetter<AudioInPlaylist> {
         fun getFrom(playlistUUID: String): List<AudioInPlaylist>
         fun create(items: List<Audio>, playlistUUID: String)
-        fun create(items: List<AudioInPlaylist>)
+        fun createWithCustomPosition(
+            items: List<Audio>,
+            playlistUUID: String,
+            position: Int,
+        )
+        fun createOrUpdate(items: List<AudioInPlaylist>)
         fun delete(items: List<AudioInPlaylist>, playlistUUID: String)
         fun changePosition(items: List<AudioInPlaylist>)
     }

@@ -30,7 +30,41 @@ class OrmLitePlaylistWithAudios(val source: ConnectionSource): Database.Playlist
         }
     }
 
-    override fun create(items: List<AudioInPlaylist>) {
+    override fun createWithCustomPosition(
+        items: List<Audio>,
+        playlistUUID: String,
+        position: Int,
+    ) {
+        val innerPosition = position + 1
+        val dao = DaoManager.createDao(source, OrmLiteAudioInPlaylist::class.java)
+
+        // делаем всё в рамках единой транзакции, если что-то пойдёт не так, то не получим ситуации с не консистентными данными
+        dao.callBatchTasks {
+            // смещаем треки находящиеся после позиции вставки на количество добавленных аудио
+            val updatePositionsRequest = "UPDATE audio_in_playlist SET position = position + ? WHERE position > ? AND playlist_uuid = ?;"
+            dao.updateRaw(
+                updatePositionsRequest,
+                (items.size).toString(),
+                position.toString(),
+                playlistUUID,
+            )
+
+            // добавляем новые треки в плейлист в пределах освободившегося окна
+            val createRequest = "INSERT INTO audio_in_playlist (uuid, audio_uuid, playlist_uuid, position) \n" +
+                    "VALUES (?, ?, ?, ?);"
+            items.forEachIndexed { index, audio ->
+                dao.executeRaw(
+                    createRequest,
+                    UUID.randomUUID().toString(),
+                    audio.uuid,
+                    playlistUUID,
+                    (innerPosition + index).toString()
+                )
+            }
+        }
+    }
+
+    override fun createOrUpdate(items: List<AudioInPlaylist>) {
         val dao = DaoManager.createDao(source, OrmLiteAudioInPlaylist::class.java)
         dao.callBatchTasks {
             for (audio in items) {

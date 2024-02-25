@@ -68,7 +68,7 @@ class ClientHandlerImpl(
 
     suspend fun sendPlaylistAudios(server: SyncBridge) {
         val data = server.read<List<AudioInPlaylist>>().sortedBy { it.uuid }
-        database.playlistWithAudios.create(data)
+        database.playlistWithAudios.createOrUpdate(data)
     }
 
     suspend fun requestAudios(server: SyncBridge) {
