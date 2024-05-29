@@ -6,7 +6,14 @@ import java.sql.Date
 
 interface Directory : WithId {
     var parent: Directory?
+
+    /**
+     * Относительный путь до директории (внутри директории фонотеки)
+     *
+     * Должен начинаться со слэша.
+      */
     var locationInMusicDirectory: String?
+
     var name: String?
 }
 

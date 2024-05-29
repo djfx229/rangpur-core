@@ -1,8 +1,6 @@
 package io.github.iamfacetheflames.rangpur.core.model.sync
 
 import io.github.iamfacetheflames.rangpur.core.data.SyncInfo
-import io.github.iamfacetheflames.rangpur.core.data.SyncInfoFinished
-import io.github.iamfacetheflames.rangpur.core.repository.Configuration
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.ObjectInputStream

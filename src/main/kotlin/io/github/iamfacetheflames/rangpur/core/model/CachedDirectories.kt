@@ -2,11 +2,8 @@ package io.github.iamfacetheflames.rangpur.core.model
 
 import io.github.iamfacetheflames.rangpur.core.data.Audio
 import io.github.iamfacetheflames.rangpur.core.data.Directory
-import io.github.iamfacetheflames.rangpur.core.data.universalSeparator
 import io.github.iamfacetheflames.rangpur.core.repository.Configuration
 import io.github.iamfacetheflames.rangpur.core.repository.database.Database
-import java.io.File
-import java.util.*
 import kotlin.collections.HashMap
 
 class CachedDirectories(

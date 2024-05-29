@@ -1,7 +1,7 @@
 package io.github.iamfacetheflames.rangpur.core.common.domain.di
 
-import io.github.iamfacetheflames.rangpur.core.common.domain.repository.config.ConfigRepository
-import io.github.iamfacetheflames.rangpur.core.common.model.Config
+import io.github.iamfacetheflames.rangpur.core.common.domain.repository.ConfigRepository
+import io.github.iamfacetheflames.rangpur.core.common.domain.model.Config
 import kotlin.reflect.KClass
 
 @Suppress("UNCHECKED_CAST")
