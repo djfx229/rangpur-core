@@ -1,8 +1,8 @@
-package io.github.iamfacetheflames.rangpur.core.common.domain.repository.config
+package io.github.iamfacetheflames.rangpur.core.common.domain.repository
 
-import io.github.iamfacetheflames.rangpur.core.common.model.Config
+import io.github.iamfacetheflames.rangpur.core.common.domain.model.Config
 
-/***
+/**
  * Его реализоации хранят в приватных полях объект T конфигурации, его поля mutable
  */
 abstract class ConfigRepository<T : Config> {

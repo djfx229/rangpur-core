@@ -5,20 +5,22 @@ import java.lang.Exception
 abstract class Logger {
 
     enum class Level {
-        debug, warning, error
+        Debug,
+        Warning,
+        Error,
     }
 
     abstract fun log(level: Level, parentObject: Any, message: String)
 
-    fun d(parentObject: Any, message: String) = log(Level.debug, parentObject, message)
+    fun d(parentObject: Any, message: String) = log(Level.Debug, parentObject, message)
 
-    fun w(parentObject: Any, message: String) = log(Level.warning, parentObject, message)
+    fun w(parentObject: Any, message: String) = log(Level.Warning, parentObject, message)
 
-    fun e(parentObject: Any, message: String) = log(Level.error, parentObject, message)
+    fun e(parentObject: Any, message: String) = log(Level.Error, parentObject, message)
 
     fun e(parentObject: Any, exception: Exception) {
         exception.printStackTrace()
-        log(Level.error, parentObject, exception.message ?: exception.toString())
+        log(Level.Error, parentObject, exception.message ?: exception.toString())
     }
 
 }
