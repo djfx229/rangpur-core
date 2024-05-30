@@ -2,7 +2,7 @@ package io.github.iamfacetheflames.rangpur.core.router
 
 import java.io.File
 
-
+@Deprecated(message = "Будет удалено после отказа от router")
 interface PlaylistRouter {
     fun showErrorMessage(
         message: String,

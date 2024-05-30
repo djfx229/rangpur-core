@@ -1,8 +1,8 @@
 package io.github.iamfacetheflames.rangpur.core.common.domain.model
 
 /**
- * Интерфейс конфига с общими полями для всех приложений базирующихся на core.
+ * Модель конфига с общими полями для всех приложений базирующихся на core.
  */
-interface CoreConfig : Config {
+data class CoreConfig(
     var musicLibraryPath: String?
-}
+) : Config
