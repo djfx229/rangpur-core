@@ -8,7 +8,6 @@ package io.github.iamfacetheflames.rangpur.core.common.domain.model
 interface ApplicationConfig : Config {
 
     val version: String
-    val appTitle: String
 
     /**
      * Путь до директории с хранилищем данных приложения (конфигами и базой данных).
@@ -18,11 +17,15 @@ interface ApplicationConfig : Config {
      */
     val appStoragePath: String
 
+    val appTitle: String
+        get() = "Rangpur $version"
+
     /**
      * Путь до директории с конфигами rangpur внутри [appStoragePath].
      *
      * Без слэша на конце.
      */
     val configsPath: String
+        get() = "$appStoragePath/configs"
 
 }
