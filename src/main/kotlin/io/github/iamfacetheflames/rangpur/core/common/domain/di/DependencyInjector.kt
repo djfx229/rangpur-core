@@ -5,12 +5,22 @@ import kotlin.reflect.KClass
 abstract class DependencyInjector<TypeDependency : Any> {
     private val dependencies = mutableMapOf<String, () -> TypeDependency>()
 
+    @Deprecated("Используй inline версию данной функции")
     fun <T : TypeDependency> get(
         classType: KClass<T>,
         dependencyName: String? = null,
     ): T {
         val key = classType.simpleName!! + (dependencyName ?: "")
         return dependencies.get(key)!!.invoke() as T
+    }
+
+    inline fun <reified T : TypeDependency> get(
+        dependencyName: String? = null,
+    ): T {
+        return get(
+            classType = T::class,
+            dependencyName,
+        )
     }
 
     fun <T : TypeDependency> add(

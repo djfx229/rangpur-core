@@ -11,11 +11,11 @@ class DirectoryInteractor(
 ) {
 
     private val configRepository: ConfigRepository<CoreConfig> by lazy {
-        domainDi.getConfigRepository(CoreConfig::class)
+        domainDi.getConfigRepository()
     }
 
     private val databaseDirectories by lazy {
-        domainDi.get(Database::class).directories
+        domainDi.get<Database>().directories
     }
 
     fun getFullPath(directory: Directory): String {

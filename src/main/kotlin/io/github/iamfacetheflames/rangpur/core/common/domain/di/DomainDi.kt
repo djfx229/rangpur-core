@@ -6,7 +6,12 @@ import kotlin.reflect.KClass
 
 @Suppress("UNCHECKED_CAST")
 abstract class DomainDi : DependencyInjector<Any>() {
+    @Deprecated("Используй inline версию данной функции")
     fun <T : Config> getConfigRepository(clazz: KClass<T>): ConfigRepository<T> {
-        return get(ConfigRepository::class, dependencyName = clazz.qualifiedName) as ConfigRepository<T>
+        return get<ConfigRepository<T>>(dependencyName = clazz.qualifiedName)
+    }
+
+    inline fun <reified T : Config> getConfigRepository(): ConfigRepository<T> {
+        return get<ConfigRepository<T>>(dependencyName = T::class.qualifiedName)
     }
 }

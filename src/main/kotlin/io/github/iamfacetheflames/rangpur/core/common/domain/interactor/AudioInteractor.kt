@@ -9,7 +9,7 @@ class AudioInteractor(
 ) {
 
     private val directoryInteractor by lazy {
-        domainDi.get(DirectoryInteractor::class)
+        domainDi.get<DirectoryInteractor>()
     }
 
     fun getFullPath(audio: Audio, cacheDirectories: HashMap<String, Directory>? = null): String {
