@@ -86,9 +86,7 @@ class OrmLiteAudios(var source: ConnectionSource) : Database.Audios {
                     if (filter.isDirectoriesFiltered()) {
                         val locationDirs = mutableListOf<String>()
                         filter.directories.forEach {
-                            it.locationInMusicDirectory?.let { location ->
-                                locationDirs.add(location)
-                            }
+                            it.locationInMusicDirectory?.let(locationDirs::add)
                         }
                         add(
                             likeOrExpression("p.location", locationDirs, true)
