@@ -1,15 +1,15 @@
 package io.github.iamfacetheflames.rangpur.core.common.domain.interactor
 
-import io.github.iamfacetheflames.rangpur.core.common.domain.di.DomainDi
+import io.github.iamfacetheflames.rangpur.core.common.domain.di.DependencyInjector
 import io.github.iamfacetheflames.rangpur.core.data.Audio
 import io.github.iamfacetheflames.rangpur.core.data.Directory
 
 class AudioInteractor(
-    private val domainDi: DomainDi,
+    private val di: DependencyInjector,
 ) {
 
     private val directoryInteractor by lazy {
-        domainDi.get<DirectoryInteractor>()
+        di.get<DirectoryInteractor>()
     }
 
     fun getFullPath(audio: Audio, cacheDirectories: HashMap<String, Directory>? = null): String {

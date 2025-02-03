@@ -3,14 +3,15 @@ package io.github.iamfacetheflames.rangpur.core.common.domain.di
 import kotlin.reflect.KClass
 
 /**
- * Proxy для DependencyInjector реализующее кеширование получаемых из него зависимостей.
+ * Обёртка для DependencyInjector, реализующая кеширование получаемых из DI зависимостей.
  *
  * Позволяет гарантировано получать одни и те же объекты для зависимостей, не прибегая к регистрации singleton.
- * Важно осуществлять очистку кэша [release], когда в текущем скоупе больше нет необходимости.
+ * Важно осуществлять очистку кэша [release], когда в текущем объекте CachedDi больше нет необходимости.
  */
-class DiScope<InjectorType : DependencyInjector<Any>> (
-    private val injectorForScope: InjectorType,
+class CachedDependencyInjector(
+    private val di: DependencyInjector,
 ) {
+
     private val cachedDependencies: MutableMap<String, Any> = mutableMapOf()
     private var isReleased = false
 
@@ -45,7 +46,7 @@ class DiScope<InjectorType : DependencyInjector<Any>> (
         return cachedDependencies.getOrPut(
             key = classType.simpleName!! + (dependencyName ?: ""),
             defaultValue = {
-                injectorForScope.get(classType, dependencyName)
+                di.get(classType, dependencyName)
             },
         ) as T
     }

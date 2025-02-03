@@ -1,12 +1,20 @@
 package io.github.iamfacetheflames.rangpur.core.common.domain.di
 
+import io.github.iamfacetheflames.rangpur.core.common.domain.model.Config
+import io.github.iamfacetheflames.rangpur.core.common.domain.repository.ConfigRepository
 import kotlin.reflect.KClass
 
-abstract class DependencyInjector<TypeDependency : Any> {
-    private val dependencies = mutableMapOf<String, () -> TypeDependency>()
+abstract class DependencyInjector {
 
-    @Deprecated("Используй inline версию данной функции")
-    fun <T : TypeDependency> get(
+    private val dependencies = mutableMapOf<String, () -> Any>()
+
+    /**
+     * Предпочтительнее использовать inline метод для получения зависимости.
+     *
+     * Данный же метод с публичным доступом останется, потому что у inline функции нет доступа к приватным методам, но
+     * даже если бы он был - inline функции адекватно не проверить из unit-тестов.
+     */
+    fun <T : Any> get(
         classType: KClass<T>,
         dependencyName: String? = null,
     ): T {
@@ -14,7 +22,7 @@ abstract class DependencyInjector<TypeDependency : Any> {
         return dependencies.get(key)!!.invoke() as T
     }
 
-    inline fun <reified T : TypeDependency> get(
+    inline fun <reified T : Any> get(
         dependencyName: String? = null,
     ): T {
         return get(
@@ -23,7 +31,7 @@ abstract class DependencyInjector<TypeDependency : Any> {
         )
     }
 
-    fun <T : TypeDependency> add(
+    fun <T : Any> add(
         classType: KClass<T>,
         dependencyName: String? = null,
         callbackForBuild: () -> T
@@ -31,7 +39,7 @@ abstract class DependencyInjector<TypeDependency : Any> {
         saveDependency(classType, dependencyName, callbackForBuild = callbackForBuild)
     }
 
-    fun <T : TypeDependency> addSingleton(
+    fun <T : Any> addSingleton(
         classType: KClass<T>,
         dependency: T,
         dependencyName: String? = null,
@@ -39,7 +47,7 @@ abstract class DependencyInjector<TypeDependency : Any> {
         saveDependency(classType, dependencyName) { dependency }
     }
 
-    private fun <T : TypeDependency> saveDependency(
+    private fun <T : Any> saveDependency(
         classType: KClass<T>,
         dependencyName: String? = null,
         callbackForBuild: () -> T,
@@ -51,5 +59,9 @@ abstract class DependencyInjector<TypeDependency : Any> {
             value = callbackForBuild
         )
     }
+
 }
 
+inline fun <reified T : Config> DependencyInjector.getConfigRepository(): ConfigRepository<T> {
+    return get<ConfigRepository<T>>(dependencyName = T::class.qualifiedName)
+}

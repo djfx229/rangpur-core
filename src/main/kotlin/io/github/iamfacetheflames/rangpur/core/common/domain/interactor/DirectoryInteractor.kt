@@ -1,21 +1,20 @@
 package io.github.iamfacetheflames.rangpur.core.common.domain.interactor
 
-import io.github.iamfacetheflames.rangpur.core.common.domain.di.DomainDi
+import io.github.iamfacetheflames.rangpur.core.common.domain.di.DependencyInjector
 import io.github.iamfacetheflames.rangpur.core.common.domain.model.CoreConfig
 import io.github.iamfacetheflames.rangpur.core.common.domain.repository.ConfigRepository
 import io.github.iamfacetheflames.rangpur.core.data.Directory
 import io.github.iamfacetheflames.rangpur.core.repository.database.Database
+import io.github.iamfacetheflames.rangpur.core.common.domain.di.getConfigRepository
 
 class DirectoryInteractor(
-    private val domainDi: DomainDi,
+    private val di: DependencyInjector,
 ) {
 
-    private val configRepository: ConfigRepository<CoreConfig> by lazy {
-        domainDi.getConfigRepository()
-    }
+    private val configRepository: ConfigRepository<CoreConfig> by lazy { di.getConfigRepository() }
 
     private val databaseDirectories by lazy {
-        domainDi.get<Database>().directories
+        di.get<Database>().directories
     }
 
     fun getFullPath(directory: Directory): String {
