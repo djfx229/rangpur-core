@@ -4,6 +4,8 @@ import com.j256.ormlite.dao.DaoManager
 import com.j256.ormlite.support.ConnectionSource
 import com.j256.ormlite.table.TableUtils
 import io.github.iamfacetheflames.rangpur.core.data.*
+import io.github.iamfacetheflames.rangpur.core.feature.library.data.repository.LibraryRepositoryImpl
+import io.github.iamfacetheflames.rangpur.core.feature.library.domain.repository.LibraryRepository
 import io.github.iamfacetheflames.rangpur.core.repository.database.Database
 import io.github.iamfacetheflames.rangpur.ormlite.data.*
 import java.sql.Date
@@ -108,6 +110,8 @@ class OrmLiteDatabase(var source: ConnectionSource): Database {
     override val playlists: Database.Playlists = OrmLitePlaylists(source)
 
     override val playlistWithAudios: Database.PlaylistWithAudios = OrmLitePlaylistWithAudios(source)
+
+    override val library: LibraryRepository = LibraryRepositoryImpl(source)
 
 }
 

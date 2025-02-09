@@ -5,6 +5,7 @@ import io.github.iamfacetheflames.rangpur.core.common.domain.interactor.Director
 import io.github.iamfacetheflames.rangpur.core.data.Audio
 import io.github.iamfacetheflames.rangpur.core.data.Directory
 import io.github.iamfacetheflames.rangpur.core.feature.library.domain.model.Filter
+import io.github.iamfacetheflames.rangpur.core.feature.library.domain.model.Sort
 import io.github.iamfacetheflames.rangpur.core.feature.library.domain.repository.LibraryRepository
 
 class LibraryInteractor(
@@ -28,8 +29,8 @@ class LibraryInteractor(
         return path + audio.fileName
     }
 
-    fun getAudios(filter: Filter): List<Audio> {
-        return repository.getAudios(filter)
+    fun getAudios(filter: Filter, sort: Sort): List<Audio> {
+        return repository.getAudios(filter, sort)
     }
 
 }
