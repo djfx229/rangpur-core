@@ -1,6 +1,7 @@
 package io.github.iamfacetheflames.rangpur.core.repository.database
 
 import io.github.iamfacetheflames.rangpur.core.data.*
+import io.github.iamfacetheflames.rangpur.core.feature.library.domain.repository.LibraryRepository
 import java.sql.Date
 
 interface Database {
@@ -70,6 +71,7 @@ interface Database {
     val playlistFolders: PlaylistFolders
     val playlists: Playlists
     val playlistWithAudios: PlaylistWithAudios
+    val library: LibraryRepository
 
     fun getBuilder(): Builder
 
