@@ -2,7 +2,7 @@ package io.github.iamfacetheflames.rangpur.core.data
 
 object Keys {
 
-    class Key (
+    data class Key (
         val lancelot: String,
         val traditional: String,
         val sortPosition: Int
@@ -10,7 +10,17 @@ object Keys {
         override fun toString(): String = lancelot
     }
 
-    val keyMap = mutableMapOf(
+    /**
+     * Странный порядок достался нам в наследство от Mixxx
+     *
+     * Lancelot Wheel:
+     * A - минорные
+     * B - мажорные
+     *
+     * sortPosition располагает тональности в следущем порядке: 1А, 1B, 2A, 2B, ... 12A, 12B.
+     * Отсчёт sortPosition начинается с 1.
+     */
+    val keyMap: Map<Int, Key> = mapOf(
         0 to emptyValue(),
         1 to Key ("8B",      "C",      16),
         2 to Key ("3B",      "D♭",      6),
@@ -38,7 +48,80 @@ object Keys {
         24 to Key("10A",     "Bm",     19)
     )
 
+    val lancelotMap: Map<String, Key> by lazy {
+        val resultMap = mutableMapOf<String, Key>()
+        keyMap.forEach { _, value ->
+            resultMap[value.lancelot] = value
+        }
+        resultMap
+    }
+
+    val positionMap: Map<Int, Key> by lazy {
+        val resultMap = mutableMapOf<Int, Key>()
+        keyMap.forEach { _, value ->
+            resultMap[value.sortPosition] = value
+        }
+        resultMap
+    }
+
+    /**
+     * В данный момент берём лишь 4ре варианта:
+     * - текущую
+     * - параллельную тональность
+     * - на кварту вниз
+     * - на квинту вверх
+     *
+     * https://habr.com/ru/articles/59261/comments/#comment_1606189
+     * в будущем можно будет попробовать и другие способы гармонического сведения — например, в одноименную
+     * тональность, через гармонические обороты типа 2-5-1, 1-6-2 или вообще по хроматической гамме.
+     */
+    fun Key.plusAllCompatible(): List<Key> {
+        val parallelKey = if (isMinor()) {
+            sortPositionPlus(1)
+        } else {
+            sortPositionMinus(1)
+        }
+        val quartDownKey = lancelotMinus(1)
+        val fifthUpKey = lancelotPlus(1)
+
+        return listOf(
+            this,
+            parallelKey,
+            quartDownKey,
+            fifthUpKey,
+        )
+    }
+
+    fun Key.sortPositionPlus(value: Int): Key {
+        val result = sortPosition + value
+        val position = if (result > 24) {
+            result - 24
+        } else {
+            result
+        }
+        return positionMap[position]!!
+    }
+
+    fun Key.sortPositionMinus(value: Int): Key {
+        val result = sortPosition - value
+        val position = if (result < 1) {
+            result + 24
+        } else {
+            result
+        }
+        return positionMap[position]!!
+    }
+
+    fun Key.lancelotPlus(value: Int): Key = sortPositionPlus(value * 2)
+
+    fun Key.lancelotMinus(value: Int): Key = sortPositionMinus(value * 2)
+
+    fun Key.isMinor(): Boolean = sortPosition % 2 != 0
+
+    fun Key.isMajor(): Boolean = !isMinor()
+
     fun get(index: Int) = keyMap.getOrDefault(index, emptyValue())
+
     fun emptyValue() = Key("", "", 0)
 
 }
