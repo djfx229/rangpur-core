@@ -41,6 +41,7 @@ class LibraryRepositoryImpl(
                     is FilterItem.Directories -> mapDirectoriesItemToCondition(item)
                     is FilterItem.DateList -> mapDateListItemToCondition(item)
                     is FilterItem.KeyList -> mapKeyListItemToCondition(item)
+                    is FilterItem.OnlyWithoutPlaylists -> mapOnlyWithoutPlaylistsItemToCondition(item)
                 }
                 append(condition)
             }
@@ -50,6 +51,14 @@ class LibraryRepositoryImpl(
         }.toString()
 
         return dao.queryRaw(request, dao.rawRowMapper, *args.toTypedArray()).results
+    }
+
+    private fun mapOnlyWithoutPlaylistsItemToCondition(item: FilterItem.OnlyWithoutPlaylists): String {
+        return if (item.isOnlyWithoutPlaylist) {
+            " (SELECT COUNT(*) FROM audio_in_playlist AS aip WHERE aip.audio_uuid = a.uuid) == 0 "
+        } else {
+            ""
+        }
     }
 
     private fun mapKeyListItemToCondition(item: FilterItem.KeyList): String {

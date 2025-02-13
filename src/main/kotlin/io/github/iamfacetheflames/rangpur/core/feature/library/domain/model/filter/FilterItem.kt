@@ -29,4 +29,8 @@ sealed class FilterItem {
     data class DateList(
         var dateList: List<String>,
     ) : FilterItem()
+
+    data class OnlyWithoutPlaylists(
+        var isOnlyWithoutPlaylist: Boolean,
+    ) : FilterItem()
 }
