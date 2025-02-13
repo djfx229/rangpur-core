@@ -4,6 +4,7 @@ import com.j256.ormlite.dao.Dao
 import com.j256.ormlite.dao.DaoManager
 import com.j256.ormlite.dao.GenericRawResults
 import com.j256.ormlite.support.ConnectionSource
+import io.github.iamfacetheflames.rangpur.core.common.data.database.SqliteRequestUtils
 import io.github.iamfacetheflames.rangpur.core.data.*
 import io.github.iamfacetheflames.rangpur.core.repository.database.Database
 import io.github.iamfacetheflames.rangpur.ormlite.data.OrmLiteAudio
@@ -51,7 +52,7 @@ class OrmLiteAudios(var source: ConnectionSource) : Database.Audios {
                         "p.playlist_uuid = '${filter.playlistUUID}' "
                     )
                 }
-                append(where(conditions))
+                append(SqliteRequestUtils.where(conditions))
                 if (filter.sort is DefaultSort) {
                     filter.sort.apply {
                         append("ORDER BY p.position $direction ")
@@ -89,19 +90,19 @@ class OrmLiteAudios(var source: ConnectionSource) : Database.Audios {
                             it.locationInMusicDirectory?.let(locationDirs::add)
                         }
                         add(
-                            likeOrExpression("p.location", locationDirs, true)
+                            SqliteRequestUtils.likeOrExpression("p.location", locationDirs, true)
                         )
                     }
                     if (filter.isDateFiltered()) {
                         add(
-                            likeOrExpression(DATE_CREATED, filter.dateList)
+                            SqliteRequestUtils.likeOrExpression(DATE_CREATED, filter.dateList)
                         )
                     }
                     if (filter.isOnlyWithoutPlaylist) {
                         add("(SELECT COUNT(*) FROM audio_in_playlist AS aip WHERE aip.audio_uuid = a.uuid) == 0 ")
                     }
                 }
-                append(where(conditions))
+                append(SqliteRequestUtils.where(conditions))
                 if (filter.sort is DefaultSort) {
                     filter.sort.apply {
                         append("ORDER BY $TIMESTAMP_CREATED $direction ")

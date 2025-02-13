@@ -1,6 +1,7 @@
 package io.github.iamfacetheflames.rangpur.core.feature.library.domain.model
 
 import io.github.iamfacetheflames.rangpur.core.data.Directory
+import io.github.iamfacetheflames.rangpur.core.data.Keys
 
 sealed class FilterItem {
     data class Text(
@@ -11,12 +12,15 @@ sealed class FilterItem {
     data class Numeric(
         val field: FilteredAudioField,
         val value: Number,
-    ) : FilterItem()
+        val max: Number? = null,
+    ) : FilterItem() {
+        val min: Number = value
+        val isRange: Boolean = max != null
+    }
 
-//    data class Objects(
-//        val field: AudioField,
-//        val objectsId: List<String>,
-//    ) : FilterItem()
+    data class KeyList(
+        val keys: List<Keys.Key>,
+    ) : FilterItem()
 
     data class Directories(
         val directories: List<Directory>

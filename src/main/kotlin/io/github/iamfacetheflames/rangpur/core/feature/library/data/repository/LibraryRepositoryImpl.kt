@@ -2,13 +2,13 @@ package io.github.iamfacetheflames.rangpur.core.feature.library.data.repository
 
 import com.j256.ormlite.dao.DaoManager
 import com.j256.ormlite.support.ConnectionSource
+import io.github.iamfacetheflames.rangpur.core.common.data.database.SqliteRequestUtils
 import io.github.iamfacetheflames.rangpur.core.data.Audio
 import io.github.iamfacetheflames.rangpur.core.data.AudioField
 import io.github.iamfacetheflames.rangpur.core.data.SortDirection
 import io.github.iamfacetheflames.rangpur.core.feature.library.domain.model.*
 import io.github.iamfacetheflames.rangpur.core.feature.library.domain.repository.LibraryRepository
 import io.github.iamfacetheflames.rangpur.ormlite.data.OrmLiteAudio
-import io.github.iamfacetheflames.rangpur.ormlite.repository.database.likeOrExpression
 import java.lang.StringBuilder
 
 class LibraryRepositoryImpl(
@@ -17,8 +17,9 @@ class LibraryRepositoryImpl(
     override fun getAudios(filter: Filter, sort: Sort): List<Audio> {
         val dao = DaoManager.createDao(source, OrmLiteAudio::class.java)
 
-        // Значения, которые нуждаются в экранировании (защите от sql инъекции) собираются здесь, а
-        // вместо них в request проставляются ?
+        // Значения, которые нуждаются в экранировании (защите от sql инъекции), собираются здесь, а вместо них в
+        // request проставляются вопросительные знаки. Метод dao.queryRaw() умеет принимать vararg из значений, которые
+        // заменяют вопросительные знаки на нужные значения.
         val args = mutableListOf<String>()
 
         // собираем sql запрос
@@ -38,6 +39,7 @@ class LibraryRepositoryImpl(
                     is FilterItem.Numeric -> mapNumericItemToCondition(item)
                     is FilterItem.Directories -> mapDirectoriesItemToCondition(item)
                     is FilterItem.DateList -> mapDateListItemToCondition(item)
+                    is FilterItem.KeyList -> mapKeyListItemToCondition(item)
                 }
                 append(condition)
             }
@@ -54,8 +56,12 @@ class LibraryRepositoryImpl(
         return dao.queryRaw(request, dao.rawRowMapper, *args.toTypedArray()).results
     }
 
+    private fun mapKeyListItemToCondition(item: FilterItem.KeyList): String {
+        return SqliteRequestUtils.inArray(FilteredAudioField.KEY.toDatabaseField(), item.keys.map { it.sortPosition.toString() })
+    }
+
     private fun mapDateListItemToCondition(item: FilterItem.DateList): String {
-        return likeOrExpression(FilteredAudioField.DATE_CREATED.toDatabaseField(), item.dateList)
+        return SqliteRequestUtils.likeOrExpression(FilteredAudioField.DATE_CREATED.toDatabaseField(), item.dateList)
     }
 
     private fun mapDirectoriesItemToCondition(item: FilterItem.Directories): String {
@@ -63,12 +69,16 @@ class LibraryRepositoryImpl(
         item.directories.forEach {
             it.locationInMusicDirectory?.let(locationDirs::add)
         }
-        return likeOrExpression("p.location", locationDirs, true)
+        return SqliteRequestUtils.likeOrExpression("p.location", locationDirs, true)
     }
 
     private fun mapNumericItemToCondition(item: FilterItem.Numeric): String {
         val fieldName = item.field.toDatabaseField()
-        return " $fieldName = ${item.value} "
+        return if (item.isRange) {
+            " $fieldName BETWEEN ${item.min} AND ${item.max} "
+        } else {
+            " $fieldName = ${item.value} "
+        }
     }
 
     private fun mapTextItemToCondition(item: FilterItem.Text, args: MutableList<String>): String {
@@ -79,10 +89,15 @@ class LibraryRepositoryImpl(
 
     private fun FilteredAudioField.toDatabaseField(): String {
         return when (this) {
-            FilteredAudioField.COMMENT -> "comment"
-            FilteredAudioField.BPM -> "bpm"
-            FilteredAudioField.DATE_CREATED -> "date_created"
-            FilteredAudioField.FILE_NAME -> "file_name"
+            FilteredAudioField.DATE_CREATED -> AudioField.DATE_CREATED
+            FilteredAudioField.ARTIST -> AudioField.ARTIST
+            FilteredAudioField.TITLE -> AudioField.TITLE
+            FilteredAudioField.ALBUM -> AudioField.ALBUM
+            FilteredAudioField.COMMENT -> AudioField.COMMENT
+            FilteredAudioField.FILE_NAME -> AudioField.FILE_NAME
+            FilteredAudioField.BITRATE -> AudioField.BITRATE
+            FilteredAudioField.KEY -> AudioField.KEY_SORT_POSITION
+            FilteredAudioField.BPM -> AudioField.BPM
         }
     }
 
