@@ -1,4 +1,4 @@
-package io.github.iamfacetheflames.rangpur.core.feature.library.domain.model
+package io.github.iamfacetheflames.rangpur.core.feature.library.domain.model.filter
 
 enum class FilteredAudioField {
     DATE_CREATED,

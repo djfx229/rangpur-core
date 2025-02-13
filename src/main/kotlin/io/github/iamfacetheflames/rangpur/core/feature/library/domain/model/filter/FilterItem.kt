@@ -1,4 +1,4 @@
-package io.github.iamfacetheflames.rangpur.core.feature.library.domain.model
+package io.github.iamfacetheflames.rangpur.core.feature.library.domain.model.filter
 
 import io.github.iamfacetheflames.rangpur.core.data.Directory
 import io.github.iamfacetheflames.rangpur.core.data.Keys
@@ -30,7 +30,3 @@ sealed class FilterItem {
         var dateList: List<String>,
     ) : FilterItem()
 }
-
-data class Filter(
-    val items: List<FilterItem>,
-)

@@ -1,5 +1,8 @@
 package io.github.iamfacetheflames.rangpur.core.data
 
+import io.github.iamfacetheflames.rangpur.core.common.domain.model.sort.Sort
+import io.github.iamfacetheflames.rangpur.core.common.domain.model.sort.SortDirection
+import io.github.iamfacetheflames.rangpur.core.common.domain.model.sort.SortedAudioField
 import java.util.*
 
 class Filter {
@@ -9,17 +12,15 @@ class Filter {
     var dateList: LinkedList<String> = LinkedList<String>()
     var searchRequest = ""
     var directories: LinkedList<Directory> = LinkedList<Directory>()
-    var sort: Sort = DefaultSort()
+    var sort: Sort = Sort(
+        field = SortedAudioField.TIMESTAMP_CREATED,
+        direction = SortDirection.DESC,
+    )
     var isOnlyWithoutPlaylist: Boolean = false
 
     fun isDateFiltered(): Boolean = dateList.isNotEmpty()
     fun isDirectoriesFiltered(): Boolean = directories.isNotEmpty()
     fun isSearchRequest(): Boolean = searchRequest.isNotEmpty()
-    fun clear() {
-        dateList.clear()
-        directories.clear()
-        searchRequest = ""
-    }
 
     enum class Mode(val uiName: String) {
         LIBRARY("Фильтры"),

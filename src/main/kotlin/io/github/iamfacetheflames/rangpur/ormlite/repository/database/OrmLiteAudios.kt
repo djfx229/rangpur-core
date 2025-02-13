@@ -53,15 +53,7 @@ class OrmLiteAudios(var source: ConnectionSource) : Database.Audios {
                     )
                 }
                 append(SqliteRequestUtils.where(conditions))
-                if (filter.sort is DefaultSort) {
-                    filter.sort.apply {
-                        append("ORDER BY p.position $direction ")
-                    }
-                } else {
-                    filter.sort.apply {
-                        append("ORDER BY $columnName $direction ")
-                    }
-                }
+                append(SqliteRequestUtils.sortedBy(filter.sort))
                 append(";")
             }
         }.toString()
@@ -103,15 +95,7 @@ class OrmLiteAudios(var source: ConnectionSource) : Database.Audios {
                     }
                 }
                 append(SqliteRequestUtils.where(conditions))
-                if (filter.sort is DefaultSort) {
-                    filter.sort.apply {
-                        append("ORDER BY $TIMESTAMP_CREATED $direction ")
-                    }
-                } else {
-                    filter.sort.apply {
-                        append("ORDER BY $columnName $direction ")
-                    }
-                }
+                append(SqliteRequestUtils.sortedBy(filter.sort))
                 append(";")
             }
         }.toString()

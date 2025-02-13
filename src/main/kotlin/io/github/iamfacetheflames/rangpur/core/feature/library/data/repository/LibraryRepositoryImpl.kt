@@ -3,13 +3,14 @@ package io.github.iamfacetheflames.rangpur.core.feature.library.data.repository
 import com.j256.ormlite.dao.DaoManager
 import com.j256.ormlite.support.ConnectionSource
 import io.github.iamfacetheflames.rangpur.core.common.data.database.SqliteRequestUtils
+import io.github.iamfacetheflames.rangpur.core.common.domain.model.sort.Sort
 import io.github.iamfacetheflames.rangpur.core.data.Audio
 import io.github.iamfacetheflames.rangpur.core.data.AudioField
-import io.github.iamfacetheflames.rangpur.core.data.SortDirection
-import io.github.iamfacetheflames.rangpur.core.feature.library.domain.model.*
+import io.github.iamfacetheflames.rangpur.core.feature.library.domain.model.filter.Filter
+import io.github.iamfacetheflames.rangpur.core.feature.library.domain.model.filter.FilterItem
+import io.github.iamfacetheflames.rangpur.core.feature.library.domain.model.filter.FilteredAudioField
 import io.github.iamfacetheflames.rangpur.core.feature.library.domain.repository.LibraryRepository
 import io.github.iamfacetheflames.rangpur.ormlite.data.OrmLiteAudio
-import java.lang.StringBuilder
 
 class LibraryRepositoryImpl(
     private var source: ConnectionSource,
@@ -44,13 +45,8 @@ class LibraryRepositoryImpl(
                 append(condition)
             }
 
-            // применяем сортировку
-            val sqlDirection = when (sort.direction) {
-                SortDirection.DESC -> "DESC"
-                SortDirection.ASC -> "ASC"
-            }
-            val fieldName = sort.field.toDatabaseField()
-            append("ORDER BY $fieldName $sqlDirection ")
+            append(SqliteRequestUtils.sortedBy(sort))
+            append(";")
         }.toString()
 
         return dao.queryRaw(request, dao.rawRowMapper, *args.toTypedArray()).results
@@ -101,10 +97,4 @@ class LibraryRepositoryImpl(
         }
     }
 
-    private fun SortedAudioField.toDatabaseField(): String {
-        return when (this) {
-            SortedAudioField.KEY_SORT_POSITION -> AudioField.KEY_SORT_POSITION
-            SortedAudioField.TIMESTAMP_CREATED -> AudioField.TIMESTAMP_CREATED
-        }
-    }
 }

@@ -1,5 +1,10 @@
 package io.github.iamfacetheflames.rangpur.core.common.data.database
 
+import io.github.iamfacetheflames.rangpur.core.data.AudioField
+import io.github.iamfacetheflames.rangpur.core.common.domain.model.sort.Sort
+import io.github.iamfacetheflames.rangpur.core.common.domain.model.sort.SortDirection
+import io.github.iamfacetheflames.rangpur.core.common.domain.model.sort.SortedAudioField
+
 object SqliteRequestUtils {
 
     fun where(conditions: List<String>): String =
@@ -65,6 +70,31 @@ object SqliteRequestUtils {
             "$field IN $arrayString "
         } else {
             " "
+        }
+    }
+
+    fun sortedBy(sort: Sort): String {
+        // применяем сортировку
+        val sqlDirection = when (sort.direction) {
+            SortDirection.DESC -> "DESC"
+            SortDirection.ASC -> "ASC"
+        }
+        val fieldName = sort.field.toDatabaseField()
+        return " ORDER BY $fieldName $sqlDirection "
+    }
+
+    private fun SortedAudioField.toDatabaseField(): String {
+        return when (this) {
+            SortedAudioField.KEY_SORT_POSITION -> AudioField.KEY_SORT_POSITION
+            SortedAudioField.TIMESTAMP_CREATED -> AudioField.TIMESTAMP_CREATED
+            SortedAudioField.ARTIST -> AudioField.ARTIST
+            SortedAudioField.TITLE -> AudioField.TITLE
+            SortedAudioField.ALBUM -> AudioField.ALBUM
+            SortedAudioField.COMMENT -> AudioField.COMMENT
+            SortedAudioField.FILE_NAME -> AudioField.FILE_NAME
+            SortedAudioField.BITRATE -> AudioField.BITRATE
+            SortedAudioField.KEY -> AudioField.KEY_SORT_POSITION
+            SortedAudioField.BPM -> AudioField.BPM
         }
     }
 
