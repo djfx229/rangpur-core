@@ -24,6 +24,7 @@ class PlayerInteractor(
         fun onChangePosition(info: PlayerPosition)
         fun onChangeState(state: PlaybackState) {}
         fun onChangeMetadata(state: MetadataState) {}
+        fun onChangeCurrentIndex(index: Int, item: Any) {}
     }
 
     private val player by lazy {
@@ -95,6 +96,11 @@ class PlayerInteractor(
 
     private fun tryPlayCurrentItem() {
         val item = currentItem ?: return
+
+        externalPlaybackListeners.forEach { listener ->
+            listener.onChangeCurrentIndex(currentIndex, item)
+        }
+
         val source = when (item) {
             is Audio -> {
                 setMetadataState(MetadataState.AudioItem(item))
