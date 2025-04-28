@@ -48,4 +48,6 @@ sealed class PlayerCommand {
      */
     object Release : PlayerCommand()
 
+    object ToggleRepeatMode : PlayerCommand()
+
 }

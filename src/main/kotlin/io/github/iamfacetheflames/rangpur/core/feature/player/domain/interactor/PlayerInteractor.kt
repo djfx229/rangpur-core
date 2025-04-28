@@ -1,11 +1,14 @@
 package io.github.iamfacetheflames.rangpur.core.feature.player.domain.interactor
 
+import io.github.iamfacetheflames.rangpur.core.common.domain.Logger
 import io.github.iamfacetheflames.rangpur.core.feature.player.domain.controller.PlayerController
 import io.github.iamfacetheflames.rangpur.core.feature.player.domain.model.state.MetadataState
 import io.github.iamfacetheflames.rangpur.core.feature.player.domain.model.state.PlaybackState
 import io.github.iamfacetheflames.rangpur.core.feature.radio.domain.model.StreamMetadata
 import io.github.iamfacetheflames.rangpur.core.common.domain.di.DependencyInjector
+import io.github.iamfacetheflames.rangpur.core.common.domain.di.getConfigRepository
 import io.github.iamfacetheflames.rangpur.core.common.domain.interactor.AudioInteractor
+import io.github.iamfacetheflames.rangpur.core.common.domain.repository.ConfigRepository
 import io.github.iamfacetheflames.rangpur.core.data.Audio
 import io.github.iamfacetheflames.rangpur.core.data.AudioInPlaylist
 import io.github.iamfacetheflames.rangpur.core.feature.player.domain.model.PlayerSource
@@ -19,6 +22,7 @@ import kotlin.math.max
 
 class PlayerInteractor(
     private val di: DependencyInjector,
+    private val ioScope: CoroutineScope = CoroutineScope(Dispatchers.IO),
 ) {
 
     interface Listener {
@@ -26,7 +30,10 @@ class PlayerInteractor(
         fun onChangeState(state: PlaybackState) {}
         fun onChangeMetadata(state: MetadataState) {}
         fun onChangeCurrentIndex(index: Int, item: Any) {}
+        fun onChangeRepeatMode(mode: PlayerRepeatMode)
     }
+
+    private val log: Logger by lazy { di.get() }
 
     private val player by lazy {
         di.get(PlayerController::class)
@@ -36,11 +43,16 @@ class PlayerInteractor(
         di.get(AudioInteractor::class)
     }
 
+    private val configRepository: ConfigRepository<PlayerConfig> by lazy {
+        di.getConfigRepository()
+    }
+
     private var playlist: List<Any>? = null
     private var currentIndex: Int = -1
     private var currentPlaybackState: PlaybackState = PlaybackState.Stopped
     private var currentMetadataState: MetadataState = MetadataState.EmptyMetadataState
     private var externalPlaybackListeners = emptyList<Listener>().toMutableList()
+    private var repeatMode: PlayerRepeatMode = PlayerRepeatMode.NONE
 
     private var job = SupervisorJob()
     private var playbackScope = CoroutineScope(Dispatchers.Default + job)
@@ -69,13 +81,22 @@ class PlayerInteractor(
         }
     }
 
-    var repeatMode: PlayerRepeatMode = PlayerRepeatMode.NONE
-
     var currentItem: Any? = null
         private set
 
+    init {
+        ioScope.launch(Dispatchers.IO) {
+            configRepository.load()
+            withContext(Dispatchers.Main) {
+                val config = configRepository.get()
+                changeRepeatMode(config.repeatMode)
+            }
+        }
+    }
+
     fun addListener(listener: Listener) {
         externalPlaybackListeners.add(listener)
+        listener.onChangeRepeatMode(repeatMode)
         listener.onChangeState(currentPlaybackState)
         listener.onChangeMetadata(currentMetadataState)
     }
@@ -225,6 +246,15 @@ class PlayerInteractor(
                 stopTimer()
                 player.release()
             }
+
+            PlayerCommand.ToggleRepeatMode -> {
+                val newMode = when (repeatMode) {
+                    PlayerRepeatMode.NONE -> PlayerRepeatMode.PLAYLIST
+                    PlayerRepeatMode.PLAYLIST -> PlayerRepeatMode.ONE_TRACK
+                    PlayerRepeatMode.ONE_TRACK -> PlayerRepeatMode.NONE
+                }
+                changeRepeatMode(newMode)
+            }
         }
     }
 
@@ -270,6 +300,24 @@ class PlayerInteractor(
                 } else {
                     handleCommand(PlayerCommand.Next)
                 }
+            }
+        }
+    }
+
+    private fun changeRepeatMode(mode: PlayerRepeatMode) {
+        log.d(this, "change repeat mode to $mode")
+        repeatMode = mode
+        saveConfig()
+        externalPlaybackListeners.forEach { listener ->
+            listener.onChangeRepeatMode(repeatMode)
+        }
+    }
+
+    private fun saveConfig() {
+        ioScope.launch {
+            configRepository.apply {
+                get().repeatMode = repeatMode
+                save()
             }
         }
     }
