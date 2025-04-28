@@ -1,11 +1,8 @@
 package io.github.iamfacetheflames.rangpur.core.feature.player.domain.interactor
 
 import io.github.iamfacetheflames.rangpur.core.feature.player.domain.controller.PlayerController
-import io.github.iamfacetheflames.rangpur.core.feature.player.domain.model.state.AudioMetadataState
-import io.github.iamfacetheflames.rangpur.core.feature.player.domain.model.state.EmptyMetadataState
 import io.github.iamfacetheflames.rangpur.core.feature.player.domain.model.state.MetadataState
 import io.github.iamfacetheflames.rangpur.core.feature.player.domain.model.state.PlaybackState
-import io.github.iamfacetheflames.rangpur.core.feature.player.domain.model.state.StreamMetadataState
 import io.github.iamfacetheflames.rangpur.core.feature.radio.domain.model.StreamMetadata
 import io.github.iamfacetheflames.rangpur.core.common.domain.di.DependencyInjector
 import io.github.iamfacetheflames.rangpur.core.common.domain.interactor.AudioInteractor
@@ -40,7 +37,7 @@ class PlayerInteractor(
     private var playlist: List<Any>? = null
     private var currentIndex: Int = -1
     private var currentPlaybackState: PlaybackState = PlaybackState.Stopped
-    private var currentMetadataState: MetadataState = EmptyMetadataState
+    private var currentMetadataState: MetadataState = MetadataState.EmptyMetadataState
     private var externalPlaybackListeners = emptyList<Listener>().toMutableList()
 
     private var job = SupervisorJob()
@@ -63,7 +60,7 @@ class PlayerInteractor(
             currentItem?.let { item ->
                 if (item is RadioStation) {
                     setMetadataState(
-                        StreamMetadataState(item, metadata)
+                        MetadataState.Stream(item, metadata)
                     )
                 }
             }
@@ -100,20 +97,23 @@ class PlayerInteractor(
         val item = currentItem ?: return
         val source = when (item) {
             is Audio -> {
-                setMetadataState(AudioMetadataState(item))
+                setMetadataState(MetadataState.AudioItem(item))
                 PlayerSource.File(audioInteractor.getFullPath(item))
             }
 
             is AudioInPlaylist -> {
                 val audio = item.audio ?: return
-                setMetadataState(AudioMetadataState(audio))
+                setMetadataState(MetadataState.AudioItem(audio))
                 PlayerSource.File(audioInteractor.getFullPath(audio))
             }
 
-            is File -> PlayerSource.File(item.absolutePath)
+            is File -> {
+                setMetadataState(MetadataState.File(item.name))
+                PlayerSource.File(item.absolutePath)
+            }
 
             is RadioStation -> {
-                setMetadataState(StreamMetadataState(item))
+                setMetadataState(MetadataState.Stream(item))
                 PlayerSource.Stream(item.streamUrl)
             }
 
@@ -181,7 +181,7 @@ class PlayerInteractor(
             }
 
             is PlayerCommand.SeekTo -> {
-                if (currentItem is Audio || currentItem is AudioInPlaylist) {
+                if (currentItem is Audio || currentItem is AudioInPlaylist || currentItem is File) {
                     player.seekTo(command.positionSeconds)
                 }
             }
