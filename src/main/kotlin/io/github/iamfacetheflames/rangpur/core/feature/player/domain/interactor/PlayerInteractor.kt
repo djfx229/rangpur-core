@@ -14,6 +14,7 @@ import io.github.iamfacetheflames.rangpur.core.feature.radio.domain.model.RadioS
 import kotlinx.coroutines.*
 import java.io.File
 import java.lang.Double.min
+import kotlin.math.max
 
 
 class PlayerInteractor(
@@ -194,21 +195,29 @@ class PlayerInteractor(
 
             is PlayerCommand.RelativeSeek -> {
                 val positionInfo = player.getPosition()
-                val newPosition = min(
-                    positionInfo.position + command.relativePositionSeconds,
-                    if (command.relativePositionSeconds > 0) positionInfo.duration else 0.0
-                )
+                val newPosition = if (command.relativePositionSeconds > 0) {
+                    min(
+                        positionInfo.position + command.relativePositionSeconds,
+                        positionInfo.duration,
+                    )
+                } else {
+                    max(
+                        positionInfo.position + command.relativePositionSeconds,
+                        0.0,
+                    )
+                }
                 handleCommand(PlayerCommand.SeekTo(newPosition))
             }
 
             is PlayerCommand.BeatsSeek -> {
+                if (command.beats == 0) return
                 val item = currentItem
                 val bpm = when (item) {
                     is Audio -> item.bpm
                     is AudioInPlaylist -> item.audio?.bpm
                     else -> null
                 } ?: return
-                val beatsToSeconds = (bpm / 60.0) * command.beats
+                val beatsToSeconds = 1.0 / command.beats * bpm
                 handleCommand(PlayerCommand.RelativeSeek(beatsToSeconds))
             }
 
