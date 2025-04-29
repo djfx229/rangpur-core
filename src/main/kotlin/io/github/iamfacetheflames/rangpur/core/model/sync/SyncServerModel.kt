@@ -1,6 +1,7 @@
 package io.github.iamfacetheflames.rangpur.core.model.sync
 
 import io.github.iamfacetheflames.rangpur.core.data.SyncInfo
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.ObjectInputStream
@@ -14,6 +15,7 @@ class SyncServerModel(
 ) {
 
     private var currentSocket: SocketChannel? = null
+    private var serverSocketChannel: ServerSocketChannel? = null
 
     suspend fun start(
         host: String,
@@ -26,6 +28,7 @@ class SyncServerModel(
             val socket = ServerSocketChannel.open()
             socket.bind(InetSocketAddress(host, port))
             println("server sync: server running on port ${socket.socket().localPort}")
+            serverSocketChannel = socket
             socket.accept().use { client ->
                 currentSocket = client
                 println("server sync: client connected : ${client.socket().inetAddress.hostAddress}")
@@ -39,6 +42,10 @@ class SyncServerModel(
                 )
                 client.close()
             }
+        } catch (e: CancellationException) {
+            serverSocketChannel?.close()
+            currentSocket?.finishConnect()
+            println(e.stackTraceToString())
         } catch (e: Exception) {
             println(e.stackTraceToString())
         } finally {
@@ -48,6 +55,7 @@ class SyncServerModel(
 
     fun stop() {
         currentSocket?.finishConnect()
+        serverSocketChannel?.close()
     }
 
 }
