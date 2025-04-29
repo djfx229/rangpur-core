@@ -15,6 +15,8 @@ import io.github.iamfacetheflames.rangpur.core.feature.player.domain.model.Playe
 import io.github.iamfacetheflames.rangpur.core.feature.player.domain.model.*
 import io.github.iamfacetheflames.rangpur.core.feature.radio.domain.model.RadioStation
 import kotlinx.coroutines.*
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import java.io.File
 import java.lang.Double.min
 import kotlin.math.max
@@ -31,6 +33,7 @@ class PlayerInteractor(
         fun onChangeMetadata(state: MetadataState) {}
         fun onChangeCurrentIndex(index: Int, item: Any) {}
         fun onChangeRepeatMode(mode: PlayerRepeatMode)
+        fun onChangeShuffleMode(isShuffleMode: Boolean)
     }
 
     private val log: Logger by lazy { di.get() }
@@ -48,11 +51,16 @@ class PlayerInteractor(
     }
 
     private var playlist: List<Any>? = null
+    private var randomQueue: List<Int>? = null
+    private var mapToRealIndex: Map<Int, Int>? = null
+
     private var currentIndex: Int = -1
     private var currentPlaybackState: PlaybackState = PlaybackState.Stopped
     private var currentMetadataState: MetadataState = MetadataState.EmptyMetadataState
     private var externalPlaybackListeners = emptyList<Listener>().toMutableList()
     private var repeatMode: PlayerRepeatMode = PlayerRepeatMode.NONE
+    private var isShuffleMode = false
+    private val handleCommandMutex = Mutex()
 
     private var job = SupervisorJob()
     private var playbackScope = CoroutineScope(Dispatchers.Default + job)
@@ -89,13 +97,19 @@ class PlayerInteractor(
             configRepository.load()
             withContext(Dispatchers.Main) {
                 val config = configRepository.get()
-                changeRepeatMode(config.repeatMode)
+                repeatMode = config.repeatMode
+                isShuffleMode = config.isShuffleMode
+                externalPlaybackListeners.forEach { listener ->
+                    listener.onChangeShuffleMode(isShuffleMode)
+                    listener.onChangeRepeatMode(repeatMode)
+                }
             }
         }
     }
 
     fun addListener(listener: Listener) {
         externalPlaybackListeners.add(listener)
+        listener.onChangeShuffleMode(isShuffleMode)
         listener.onChangeRepeatMode(repeatMode)
         listener.onChangeState(currentPlaybackState)
         listener.onChangeMetadata(currentMetadataState)
@@ -107,20 +121,36 @@ class PlayerInteractor(
 
     fun getPlayerPosition(): PlayerPosition = player.getPosition()
 
-    private fun tryChangeIndexAndPlayAudio(newIndex: Int) {
+    private fun tryChangeIndexAndPlayAudio(requestIndex: Int) {
         val size = playlist?.size ?: return
-        if (newIndex in 0 until size) {
-            currentItem = playlist?.getOrNull(newIndex) ?: return
-            currentIndex = newIndex
-            tryPlayCurrentItem()
+
+        val index = if (requestIndex < 0) {
+            if (repeatMode == PlayerRepeatMode.PLAYLIST) {
+                size - 1
+            } else {
+                return
+            }
+        } else if (requestIndex >= size) {
+            if (repeatMode == PlayerRepeatMode.PLAYLIST) {
+                0
+            } else {
+                return
+            }
+        } else {
+            requestIndex
         }
+
+        val newIndex = shuffleNewIndexIfNeed(index)
+        currentItem = playlist?.getOrNull(newIndex) ?: return
+        currentIndex = index
+        tryPlayCurrentItem()
     }
 
     private fun tryPlayCurrentItem() {
         val item = currentItem ?: return
 
         externalPlaybackListeners.forEach { listener ->
-            listener.onChangeCurrentIndex(currentIndex, item)
+            listener.onChangeCurrentIndex(shuffleNewIndexIfNeed(currentIndex), item)
         }
 
         val source = when (item) {
@@ -167,94 +197,138 @@ class PlayerInteractor(
         currentMetadataState = state
     }
 
-    fun handleCommand(command: PlayerCommand) {
-        when (command) {
-            is PlayerCommand.Open<*> -> {
-                playlist = command.items.filterNotNull()
-                currentIndex = command.index
-                this.currentItem = command.currentItem
+    suspend fun handleCommand(command: PlayerCommand) {
+        log.d(this, "handleCommand(command=${command.javaClass}) waiting mutex")
+        handleCommandMutex.withLock {
+            log.d(this, "handleCommand(command=${command.javaClass}) start handling")
+            when (command) {
+                is PlayerCommand.Open<*> -> handleCommandOpen(command)
+                PlayerCommand.Play -> handleCommandPlay()
+                PlayerCommand.Pause -> handleCommandPause()
+                PlayerCommand.Stop -> handleCommandStop()
 
-                player.setListener(playerListener)
-                tryPlayCurrentItem()
-            }
+                PlayerCommand.Next -> handleCommandNext()
+                PlayerCommand.Previous -> handleCommandPrevious()
 
-            PlayerCommand.Play -> {
-                if (player.state == PlaybackState.Paused) {
-                    player.play()
-                } else {
-                    tryPlayCurrentItem()
-                }
-            }
+                is PlayerCommand.SeekTo -> handleCommandSeekTo(command)
+                is PlayerCommand.RelativeSeek -> handleCommandRelativeSeek(command)
+                is PlayerCommand.BeatsSeek -> handleCommandBeatsSeek(command)
 
-            PlayerCommand.Pause -> {
-                if (player.state == PlaybackState.Paused) {
-                    player.play()
-                } else {
-                    player.pause()
-                }
-            }
+                PlayerCommand.Release -> handleCommandRelease()
 
-            PlayerCommand.Stop -> {
-                player.stop()
-                stopTimer()
-                setPlaybackState(PlaybackState.Stopped)
+                PlayerCommand.ToggleRepeatMode -> handleCommandToggleRepeatMode()
+                PlayerCommand.ToggleShuffleMode -> handleCommandToggleShuffleMode()
             }
+        }
+    }
 
-            PlayerCommand.Next -> {
-                tryChangeIndexAndPlayAudio(currentIndex + 1)
+    private fun handleCommandOpen(command: PlayerCommand.Open<*>) {
+        this.currentItem = command.currentItem
+        if (playlist != command.items) {
+            playlist = command.items
+            if (isShuffleMode) {
+                generateShuffleData()
             }
+        }
+        currentIndex = getRealPlaylistIndex(command.index)
 
-            PlayerCommand.Previous -> {
-                tryChangeIndexAndPlayAudio(currentIndex - 1)
-            }
+        player.setListener(playerListener)
+        tryPlayCurrentItem()
+    }
 
-            is PlayerCommand.SeekTo -> {
-                if (currentItem is Audio || currentItem is AudioInPlaylist || currentItem is File) {
-                    player.seekTo(command.positionSeconds)
-                }
-            }
+    private fun handleCommandPlay() {
+        if (player.state == PlaybackState.Paused) {
+            player.play()
+        } else {
+            tryPlayCurrentItem()
+        }
+    }
 
-            is PlayerCommand.RelativeSeek -> {
-                val positionInfo = player.getPosition()
-                val newPosition = if (command.relativePositionSeconds > 0) {
-                    min(
-                        positionInfo.position + command.relativePositionSeconds,
-                        positionInfo.duration,
-                    )
-                } else {
-                    max(
-                        positionInfo.position + command.relativePositionSeconds,
-                        0.0,
-                    )
-                }
-                handleCommand(PlayerCommand.SeekTo(newPosition))
-            }
+    private fun handleCommandPause() {
+        if (player.state == PlaybackState.Paused) {
+            player.play()
+        } else {
+            player.pause()
+        }
+    }
 
-            is PlayerCommand.BeatsSeek -> {
-                if (command.beats == 0) return
-                val item = currentItem
-                val bpm = when (item) {
-                    is Audio -> item.bpm
-                    is AudioInPlaylist -> item.audio?.bpm
-                    else -> null
-                } ?: return
-                val beatsToSeconds = 1.0 / command.beats * bpm
-                handleCommand(PlayerCommand.RelativeSeek(beatsToSeconds))
-            }
+    private fun handleCommandStop() {
+        player.stop()
+        stopTimer()
+        setPlaybackState(PlaybackState.Stopped)
+    }
 
-            PlayerCommand.Release -> {
-                stopTimer()
-                player.release()
-            }
+    private fun handleCommandNext() {
+        tryChangeIndexAndPlayAudio(currentIndex + 1)
+    }
 
-            PlayerCommand.ToggleRepeatMode -> {
-                val newMode = when (repeatMode) {
-                    PlayerRepeatMode.NONE -> PlayerRepeatMode.PLAYLIST
-                    PlayerRepeatMode.PLAYLIST -> PlayerRepeatMode.ONE_TRACK
-                    PlayerRepeatMode.ONE_TRACK -> PlayerRepeatMode.NONE
-                }
-                changeRepeatMode(newMode)
-            }
+    private fun handleCommandPrevious() {
+        tryChangeIndexAndPlayAudio(currentIndex - 1)
+    }
+
+    private fun handleCommandSeekTo(command: PlayerCommand.SeekTo) {
+        if (currentItem is Audio || currentItem is AudioInPlaylist || currentItem is File) {
+            player.seekTo(command.positionSeconds)
+        }
+    }
+
+    private fun handleCommandRelativeSeek(command: PlayerCommand.RelativeSeek) {
+        val positionInfo = player.getPosition()
+        val newPosition = if (command.relativePositionSeconds > 0) {
+            min(
+                positionInfo.position + command.relativePositionSeconds,
+                positionInfo.duration,
+            )
+        } else {
+            max(
+                positionInfo.position + command.relativePositionSeconds,
+                0.0,
+            )
+        }
+        handleCommandSeekTo(PlayerCommand.SeekTo(newPosition))
+    }
+
+    private fun handleCommandBeatsSeek(command: PlayerCommand.BeatsSeek) {
+        if (command.beats == 0) return
+        val item = currentItem
+        val bpm = when (item) {
+            is Audio -> item.bpm
+            is AudioInPlaylist -> item.audio?.bpm
+            else -> null
+        } ?: return
+        val beatsToSeconds = 1.0 / command.beats * bpm
+        handleCommandRelativeSeek(PlayerCommand.RelativeSeek(beatsToSeconds))
+    }
+
+    private fun handleCommandRelease() {
+        stopTimer()
+        player.release()
+    }
+
+    private fun handleCommandToggleRepeatMode() {
+        val newMode = when (repeatMode) {
+            PlayerRepeatMode.NONE -> PlayerRepeatMode.PLAYLIST
+            PlayerRepeatMode.PLAYLIST -> PlayerRepeatMode.ONE_TRACK
+            PlayerRepeatMode.ONE_TRACK -> PlayerRepeatMode.NONE
+        }
+        changeRepeatMode(newMode)
+    }
+
+    private fun handleCommandToggleShuffleMode() {
+        isShuffleMode = !isShuffleMode
+        log.d(this, "change shuffle mode to $isShuffleMode")
+
+        if (isShuffleMode) {
+            generateShuffleData()
+            currentIndex = 0
+        } else {
+            currentIndex = randomQueue.orEmpty().getOrNull(currentIndex) ?: 0
+            releaseShuffleData()
+        }
+
+        saveConfig()
+        externalPlaybackListeners.forEach { listener ->
+            listener.onChangeShuffleMode(isShuffleMode)
         }
     }
 
@@ -290,7 +364,7 @@ class PlayerInteractor(
         job.cancel()
     }
 
-    private fun onWaitingNextTrack() {
+    private suspend fun onWaitingNextTrack() {
         when (repeatMode) {
             PlayerRepeatMode.NONE -> handleCommand(PlayerCommand.Next)
             PlayerRepeatMode.ONE_TRACK -> tryPlayCurrentItem()
@@ -317,9 +391,50 @@ class PlayerInteractor(
         ioScope.launch {
             configRepository.apply {
                 get().repeatMode = repeatMode
+                get().isShuffleMode = isShuffleMode
                 save()
             }
         }
+    }
+
+    private fun getRealPlaylistIndex(index: Int): Int {
+        return if (isShuffleMode) {
+            if (mapToRealIndex == null || playlist?.size != mapToRealIndex?.size) {
+                generateShuffleData()
+            }
+            mapToRealIndex?.get(index) ?: -1
+        } else {
+            index
+        }
+    }
+
+    private fun shuffleNewIndexIfNeed(newIndex: Int): Int {
+        return if (isShuffleMode) {
+            randomQueue.orEmpty().getOrNull(newIndex) ?: -1
+        } else {
+            newIndex
+        }
+    }
+
+    private fun generateShuffleData() {
+        randomQueue = buildList {
+            playlist?.indexOf(currentItem)?.let { add(it) }
+            addAll(
+                playlist.orEmpty().mapIndexed { index, item ->
+                    if (item == currentItem) null else index
+                }.filterNotNull().shuffled()
+            )
+        }
+        mapToRealIndex = buildMap {
+            randomQueue?.forEachIndexed { index, item ->
+                put(item, index)
+            }
+        }
+    }
+
+    private fun releaseShuffleData() {
+        randomQueue = null
+        mapToRealIndex = null
     }
 
 }

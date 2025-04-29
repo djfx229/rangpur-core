@@ -2,7 +2,7 @@ package io.github.iamfacetheflames.rangpur.core.feature.player.domain.model
 
 sealed class PlayerCommand {
 
-    data class Open<T>(
+    data class Open<T : Any>(
         val index: Int,
         val currentItem: T,
         val items: List<T>,
@@ -49,5 +49,7 @@ sealed class PlayerCommand {
     object Release : PlayerCommand()
 
     object ToggleRepeatMode : PlayerCommand()
+
+    object ToggleShuffleMode : PlayerCommand()
 
 }
