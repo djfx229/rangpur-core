@@ -19,13 +19,15 @@ import io.github.djfx229.rangpur.feature.playlist.domain.interactor.PlaylistInte
  *
  * Создан в связи с необходимостью иметь возможность в runtime подсветить отсутствующие зависимости из core.
  */
-fun io.github.djfx229.rangpur.common.domain.di.DependencyInjector.registryCoreDependencies(
+fun DependencyInjector.registryCoreDependencies(
     applicationConfig: ApplicationConfig,
     logger: Logger,
     database: Database,
     configRepository: ConfigRepository<CoreConfig>,
     playerController: PlayerController,
 ) {
+    configRepository.load()
+
     addSingleton(
         ApplicationConfig::class,
         applicationConfig,

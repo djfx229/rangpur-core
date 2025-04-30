@@ -1,9 +1,7 @@
 package io.github.djfx229.rangpur.feature.audio.domain.model
 
-import io.github.djfx229.rangpur.core.repository.Configuration
 import io.github.djfx229.rangpur.feature.database.domain.model.TestItem
 import io.github.djfx229.rangpur.feature.database.domain.model.WithId
-import java.io.File
 
 interface Directory : WithId {
     var parent: Directory?
@@ -26,10 +24,3 @@ class TestDirectory(
 ) : TestItem(), Directory
 
 const val universalSeparator = "/"
-
-fun Directory.getJavaFile(config: Configuration): File {
-    val libraryLocation = config.getMusicDirectoryLocation()
-    val fullPath = libraryLocation + this.locationInMusicDirectory
-    val file = File(fullPath)
-    return file
-}
