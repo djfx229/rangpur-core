@@ -1,9 +1,9 @@
 package io.github.djfx229.rangpur.core.common.data.database
 
-import io.github.iamfacetheflames.rangpur.core.data.AudioField
-import io.github.iamfacetheflames.rangpur.core.common.domain.model.sort.Sort
-import io.github.iamfacetheflames.rangpur.core.common.domain.model.sort.SortDirection
-import io.github.iamfacetheflames.rangpur.core.common.domain.model.sort.SortedAudioField
+import io.github.djfx229.rangpur.core.data.AudioField
+import io.github.djfx229.rangpur.core.common.domain.model.sort.Sort
+import io.github.djfx229.rangpur.core.common.domain.model.sort.SortDirection
+import io.github.djfx229.rangpur.core.common.domain.model.sort.SortedAudioField
 
 object SqliteRequestUtils {
 

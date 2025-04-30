@@ -1,9 +1,9 @@
 package io.github.djfx229.rangpur.core.feature.player.domain.controller
 
-import io.github.iamfacetheflames.rangpur.core.feature.player.domain.model.PlayerPosition
-import io.github.iamfacetheflames.rangpur.core.feature.player.domain.model.PlayerSource
-import io.github.iamfacetheflames.rangpur.core.feature.player.domain.model.state.PlaybackState
-import io.github.iamfacetheflames.rangpur.core.feature.radio.domain.model.StreamMetadata
+import io.github.djfx229.rangpur.core.feature.player.domain.model.PlayerPosition
+import io.github.djfx229.rangpur.core.feature.player.domain.model.PlayerSource
+import io.github.djfx229.rangpur.core.feature.player.domain.model.state.PlaybackState
+import io.github.djfx229.rangpur.core.feature.radio.domain.model.StreamMetadata
 
 interface PlayerController {
 

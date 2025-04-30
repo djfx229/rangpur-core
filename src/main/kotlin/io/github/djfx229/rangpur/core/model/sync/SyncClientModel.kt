@@ -1,7 +1,7 @@
 package io.github.djfx229.rangpur.core.model.sync
 
-import io.github.iamfacetheflames.rangpur.core.data.*
-import io.github.iamfacetheflames.rangpur.core.repository.Configuration
+import io.github.djfx229.rangpur.core.data.*
+import io.github.djfx229.rangpur.core.repository.Configuration
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.net.InetSocketAddress

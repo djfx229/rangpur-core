@@ -1,7 +1,7 @@
 package io.github.djfx229.rangpur.core.feature.library.domain.model.filter
 
-import io.github.iamfacetheflames.rangpur.core.data.Directory
-import io.github.iamfacetheflames.rangpur.core.data.Keys
+import io.github.djfx229.rangpur.core.data.Directory
+import io.github.djfx229.rangpur.core.data.Keys
 
 sealed class FilterItem {
     data class Text(

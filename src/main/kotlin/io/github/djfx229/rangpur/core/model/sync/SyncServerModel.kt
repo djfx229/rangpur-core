@@ -1,6 +1,6 @@
 package io.github.djfx229.rangpur.core.model.sync
 
-import io.github.iamfacetheflames.rangpur.core.data.SyncInfo
+import io.github.djfx229.rangpur.core.data.SyncInfo
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext

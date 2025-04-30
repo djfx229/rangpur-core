@@ -1,10 +1,10 @@
 package io.github.djfx229.rangpur.core.model
 
-import io.github.iamfacetheflames.rangpur.core.repository.database.Database
-import io.github.iamfacetheflames.rangpur.core.data.Audio
-import io.github.iamfacetheflames.rangpur.core.data.AudioInPlaylist
-import io.github.iamfacetheflames.rangpur.core.data.Playlist
-import io.github.iamfacetheflames.rangpur.core.data.PlaylistFolder
+import io.github.djfx229.rangpur.core.repository.database.Database
+import io.github.djfx229.rangpur.core.data.Audio
+import io.github.djfx229.rangpur.core.data.AudioInPlaylist
+import io.github.djfx229.rangpur.core.data.Playlist
+import io.github.djfx229.rangpur.core.data.PlaylistFolder
 import java.io.File
 import java.util.*
 

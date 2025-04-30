@@ -1,8 +1,8 @@
-package test.kotlin.io.github.iamfacetheflames.rangpur.core.model
-import io.github.iamfacetheflames.rangpur.core.data.SyncInfo
-import io.github.iamfacetheflames.rangpur.core.model.CachedDirectories
-import io.github.iamfacetheflames.rangpur.core.model.sync.*
-import io.github.iamfacetheflames.rangpur.core.repository.database.Database
+package test.kotlin.io.github.djfx229.rangpur.core.model
+import io.github.djfx229.rangpur.core.data.SyncInfo
+import io.github.djfx229.rangpur.core.model.CachedDirectories
+import io.github.djfx229.rangpur.core.model.sync.*
+import io.github.djfx229.rangpur.core.repository.database.Database
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk

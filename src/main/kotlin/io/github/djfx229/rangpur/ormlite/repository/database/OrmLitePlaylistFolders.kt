@@ -2,9 +2,9 @@ package io.github.djfx229.rangpur.ormlite.repository.database
 
 import com.j256.ormlite.dao.DaoManager
 import com.j256.ormlite.support.ConnectionSource
-import io.github.iamfacetheflames.rangpur.core.data.PlaylistFolder
-import io.github.iamfacetheflames.rangpur.core.repository.database.Database
-import io.github.iamfacetheflames.rangpur.ormlite.data.OrmLitePlaylistFolder
+import io.github.djfx229.rangpur.core.data.PlaylistFolder
+import io.github.djfx229.rangpur.core.repository.database.Database
+import io.github.djfx229.rangpur.ormlite.data.OrmLitePlaylistFolder
 import java.sql.SQLException
 
 class OrmLitePlaylistFolders(val source: ConnectionSource) : Database.PlaylistFolders {

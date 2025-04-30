@@ -1,8 +1,8 @@
 package io.github.djfx229.rangpur.core.model
 
-import io.github.iamfacetheflames.rangpur.core.data.*
-import io.github.iamfacetheflames.rangpur.core.repository.database.Database
-import io.github.iamfacetheflames.rangpur.core.repository.Configuration
+import io.github.djfx229.rangpur.core.data.*
+import io.github.djfx229.rangpur.core.repository.database.Database
+import io.github.djfx229.rangpur.core.repository.Configuration
 import java.io.File
 
 class AudioLibraryModel(

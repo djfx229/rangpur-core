@@ -1,9 +1,9 @@
 package io.github.djfx229.rangpur.core.model
 
-import io.github.iamfacetheflames.rangpur.core.data.Audio
-import io.github.iamfacetheflames.rangpur.core.data.Directory
-import io.github.iamfacetheflames.rangpur.core.repository.Configuration
-import io.github.iamfacetheflames.rangpur.core.repository.database.Database
+import io.github.djfx229.rangpur.core.data.Audio
+import io.github.djfx229.rangpur.core.data.Directory
+import io.github.djfx229.rangpur.core.repository.Configuration
+import io.github.djfx229.rangpur.core.repository.database.Database
 import kotlin.collections.HashMap
 
 class CachedDirectories(

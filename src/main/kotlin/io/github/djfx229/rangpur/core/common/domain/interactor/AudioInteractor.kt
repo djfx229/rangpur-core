@@ -1,10 +1,10 @@
 package io.github.djfx229.rangpur.core.common.domain.interactor
 
-import io.github.iamfacetheflames.rangpur.core.common.domain.di.DependencyInjector
-import io.github.iamfacetheflames.rangpur.core.data.Audio
-import io.github.iamfacetheflames.rangpur.core.data.Directory
-import io.github.iamfacetheflames.rangpur.core.data.copy
-import io.github.iamfacetheflames.rangpur.core.repository.database.Database
+import io.github.djfx229.rangpur.core.common.domain.di.DependencyInjector
+import io.github.djfx229.rangpur.core.data.Audio
+import io.github.djfx229.rangpur.core.data.Directory
+import io.github.djfx229.rangpur.core.data.copy
+import io.github.djfx229.rangpur.core.repository.database.Database
 
 class AudioInteractor(
     private val di: DependencyInjector,

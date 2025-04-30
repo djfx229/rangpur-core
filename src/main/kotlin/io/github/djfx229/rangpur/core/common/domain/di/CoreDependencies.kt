@@ -1,17 +1,17 @@
 package io.github.djfx229.rangpur.core.common.domain.di
 
-import io.github.iamfacetheflames.rangpur.core.feature.player.domain.controller.PlayerController
-import io.github.iamfacetheflames.rangpur.core.feature.player.domain.interactor.PlayerInteractor
-import io.github.iamfacetheflames.rangpur.core.common.domain.Logger
-import io.github.iamfacetheflames.rangpur.core.common.domain.interactor.DirectoryInteractor
-import io.github.iamfacetheflames.rangpur.core.common.domain.model.ApplicationConfig
-import io.github.iamfacetheflames.rangpur.core.common.domain.model.CoreConfig
-import io.github.iamfacetheflames.rangpur.core.common.domain.repository.ConfigRepository
-import io.github.iamfacetheflames.rangpur.core.feature.library.domain.interactor.LibraryInteractor
-import io.github.iamfacetheflames.rangpur.core.feature.library.domain.repository.LibraryRepository
-import io.github.iamfacetheflames.rangpur.core.feature.player.data.repository.PlayerConfigRepository
-import io.github.iamfacetheflames.rangpur.core.feature.player.domain.model.PlayerConfig
-import io.github.iamfacetheflames.rangpur.core.repository.database.Database
+import io.github.djfx229.rangpur.core.feature.player.domain.controller.PlayerController
+import io.github.djfx229.rangpur.core.feature.player.domain.interactor.PlayerInteractor
+import io.github.djfx229.rangpur.core.common.domain.Logger
+import io.github.djfx229.rangpur.core.common.domain.interactor.DirectoryInteractor
+import io.github.djfx229.rangpur.core.common.domain.model.ApplicationConfig
+import io.github.djfx229.rangpur.core.common.domain.model.CoreConfig
+import io.github.djfx229.rangpur.core.common.domain.repository.ConfigRepository
+import io.github.djfx229.rangpur.core.feature.library.domain.interactor.LibraryInteractor
+import io.github.djfx229.rangpur.core.feature.library.domain.repository.LibraryRepository
+import io.github.djfx229.rangpur.core.feature.player.data.repository.PlayerConfigRepository
+import io.github.djfx229.rangpur.core.feature.player.domain.model.PlayerConfig
+import io.github.djfx229.rangpur.core.repository.database.Database
 
 /**
  * Метод, осуществляющий регистрацию зависимостей необходимых для классов из core.

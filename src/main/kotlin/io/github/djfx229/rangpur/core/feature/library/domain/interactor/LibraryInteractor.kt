@@ -1,12 +1,12 @@
 package io.github.djfx229.rangpur.core.feature.library.domain.interactor
 
-import io.github.iamfacetheflames.rangpur.core.common.domain.di.DependencyInjector
-import io.github.iamfacetheflames.rangpur.core.common.domain.interactor.DirectoryInteractor
-import io.github.iamfacetheflames.rangpur.core.data.Audio
-import io.github.iamfacetheflames.rangpur.core.data.Directory
-import io.github.iamfacetheflames.rangpur.core.feature.library.domain.model.filter.Filter
-import io.github.iamfacetheflames.rangpur.core.common.domain.model.sort.Sort
-import io.github.iamfacetheflames.rangpur.core.feature.library.domain.repository.LibraryRepository
+import io.github.djfx229.rangpur.core.common.domain.di.DependencyInjector
+import io.github.djfx229.rangpur.core.common.domain.interactor.DirectoryInteractor
+import io.github.djfx229.rangpur.core.data.Audio
+import io.github.djfx229.rangpur.core.data.Directory
+import io.github.djfx229.rangpur.core.feature.library.domain.model.filter.Filter
+import io.github.djfx229.rangpur.core.common.domain.model.sort.Sort
+import io.github.djfx229.rangpur.core.feature.library.domain.repository.LibraryRepository
 
 class LibraryInteractor(
     private val di: DependencyInjector,

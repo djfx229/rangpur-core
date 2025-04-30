@@ -2,7 +2,7 @@ package io.github.djfx229.rangpur.ormlite.data
 
 import com.j256.ormlite.field.DatabaseField
 import com.j256.ormlite.table.DatabaseTable
-import io.github.iamfacetheflames.rangpur.core.data.*
+import io.github.djfx229.rangpur.core.data.*
 import java.util.*
 
 @DatabaseTable(tableName = "audio_in_playlist")

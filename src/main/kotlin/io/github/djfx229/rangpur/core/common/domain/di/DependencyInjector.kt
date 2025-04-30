@@ -1,7 +1,7 @@
 package io.github.djfx229.rangpur.core.common.domain.di
 
-import io.github.iamfacetheflames.rangpur.core.common.domain.model.Config
-import io.github.iamfacetheflames.rangpur.core.common.domain.repository.ConfigRepository
+import io.github.djfx229.rangpur.core.common.domain.model.Config
+import io.github.djfx229.rangpur.core.common.domain.repository.ConfigRepository
 import kotlin.reflect.KClass
 
 abstract class DependencyInjector {

@@ -1,11 +1,11 @@
 package io.github.djfx229.rangpur.core.model.sync
 
-import io.github.iamfacetheflames.rangpur.core.data.SyncInfoReceivingAudio
-import io.github.iamfacetheflames.rangpur.core.data.SyncInfo
-import io.github.iamfacetheflames.rangpur.core.data.SyncInfoFinished
-import io.github.iamfacetheflames.rangpur.core.data.WithId
-import io.github.iamfacetheflames.rangpur.core.model.CachedDirectories
-import io.github.iamfacetheflames.rangpur.core.repository.database.Database
+import io.github.djfx229.rangpur.core.data.SyncInfoReceivingAudio
+import io.github.djfx229.rangpur.core.data.SyncInfo
+import io.github.djfx229.rangpur.core.data.SyncInfoFinished
+import io.github.djfx229.rangpur.core.data.WithId
+import io.github.djfx229.rangpur.core.model.CachedDirectories
+import io.github.djfx229.rangpur.core.repository.database.Database
 
 interface ServerHandler {
     suspend fun connected(client: SyncBridge, listener: (SyncInfo) -> Unit)

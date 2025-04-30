@@ -1,6 +1,6 @@
 package io.github.djfx229.rangpur.core.common.domain.repository
 
-import io.github.iamfacetheflames.rangpur.core.common.domain.model.Config
+import io.github.djfx229.rangpur.core.common.domain.model.Config
 
 /**
  * Его реализоации хранят в приватных полях объект T конфигурации, его поля mutable

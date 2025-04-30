@@ -1,8 +1,8 @@
 package io.github.djfx229.rangpur.core.feature.player.domain.model.state
 
-import io.github.iamfacetheflames.rangpur.core.feature.radio.domain.model.RadioStation
-import io.github.iamfacetheflames.rangpur.core.feature.radio.domain.model.StreamMetadata
-import io.github.iamfacetheflames.rangpur.core.data.Audio
+import io.github.djfx229.rangpur.core.feature.radio.domain.model.RadioStation
+import io.github.djfx229.rangpur.core.feature.radio.domain.model.StreamMetadata
+import io.github.djfx229.rangpur.core.data.Audio
 
 sealed class MetadataState {
 

@@ -3,11 +3,11 @@ package io.github.djfx229.rangpur.ormlite.repository.database
 import com.j256.ormlite.dao.DaoManager
 import com.j256.ormlite.support.ConnectionSource
 import com.j256.ormlite.table.TableUtils
-import io.github.iamfacetheflames.rangpur.core.data.*
-import io.github.iamfacetheflames.rangpur.core.feature.library.data.repository.LibraryRepositoryImpl
-import io.github.iamfacetheflames.rangpur.core.feature.library.domain.repository.LibraryRepository
-import io.github.iamfacetheflames.rangpur.core.repository.database.Database
-import io.github.iamfacetheflames.rangpur.ormlite.data.*
+import io.github.djfx229.rangpur.core.data.*
+import io.github.djfx229.rangpur.core.feature.library.data.repository.LibraryRepositoryImpl
+import io.github.djfx229.rangpur.core.feature.library.domain.repository.LibraryRepository
+import io.github.djfx229.rangpur.core.repository.database.Database
+import io.github.djfx229.rangpur.ormlite.data.*
 import java.sql.Date
 
 class OrmLiteDatabase(var source: ConnectionSource): Database {

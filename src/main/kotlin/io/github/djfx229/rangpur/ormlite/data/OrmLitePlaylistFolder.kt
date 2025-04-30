@@ -2,8 +2,8 @@ package io.github.djfx229.rangpur.ormlite.data
 
 import com.j256.ormlite.field.DatabaseField
 import com.j256.ormlite.table.DatabaseTable
-import io.github.iamfacetheflames.rangpur.core.data.PlaylistFolder
-import io.github.iamfacetheflames.rangpur.core.data.equalsUUID
+import io.github.djfx229.rangpur.core.data.PlaylistFolder
+import io.github.djfx229.rangpur.core.data.equalsUUID
 import java.util.*
 
 @DatabaseTable(tableName = "playlist_folder")

@@ -2,25 +2,25 @@ package io.github.djfx229.rangpur.ormlite.data
 
 import com.j256.ormlite.field.DatabaseField
 import com.j256.ormlite.table.DatabaseTable
-import io.github.iamfacetheflames.rangpur.core.data.Audio
-import io.github.iamfacetheflames.rangpur.core.data.AudioField.ALBUM
-import io.github.iamfacetheflames.rangpur.core.data.AudioField.ALBUM_TRACK_NUMBER
-import io.github.iamfacetheflames.rangpur.core.data.AudioField.ARTIST
-import io.github.iamfacetheflames.rangpur.core.data.AudioField.BITRATE
-import io.github.iamfacetheflames.rangpur.core.data.AudioField.BPM
-import io.github.iamfacetheflames.rangpur.core.data.AudioField.COMMENT
-import io.github.iamfacetheflames.rangpur.core.data.AudioField.DATE_CREATED
-import io.github.iamfacetheflames.rangpur.core.data.AudioField.DIRECTORY_UUID
-import io.github.iamfacetheflames.rangpur.core.data.AudioField.DURATION
-import io.github.iamfacetheflames.rangpur.core.data.AudioField.ENCODER
-import io.github.iamfacetheflames.rangpur.core.data.AudioField.FILE_NAME
-import io.github.iamfacetheflames.rangpur.core.data.AudioField.KEY
-import io.github.iamfacetheflames.rangpur.core.data.AudioField.KEY_SORT_POSITION
-import io.github.iamfacetheflames.rangpur.core.data.AudioField.SAMPLERATE
-import io.github.iamfacetheflames.rangpur.core.data.AudioField.TIMESTAMP_CREATED
-import io.github.iamfacetheflames.rangpur.core.data.AudioField.TITLE
-import io.github.iamfacetheflames.rangpur.core.data.AudioField.URL
-import io.github.iamfacetheflames.rangpur.core.data.equalsUUID
+import io.github.djfx229.rangpur.core.data.Audio
+import io.github.djfx229.rangpur.core.data.AudioField.ALBUM
+import io.github.djfx229.rangpur.core.data.AudioField.ALBUM_TRACK_NUMBER
+import io.github.djfx229.rangpur.core.data.AudioField.ARTIST
+import io.github.djfx229.rangpur.core.data.AudioField.BITRATE
+import io.github.djfx229.rangpur.core.data.AudioField.BPM
+import io.github.djfx229.rangpur.core.data.AudioField.COMMENT
+import io.github.djfx229.rangpur.core.data.AudioField.DATE_CREATED
+import io.github.djfx229.rangpur.core.data.AudioField.DIRECTORY_UUID
+import io.github.djfx229.rangpur.core.data.AudioField.DURATION
+import io.github.djfx229.rangpur.core.data.AudioField.ENCODER
+import io.github.djfx229.rangpur.core.data.AudioField.FILE_NAME
+import io.github.djfx229.rangpur.core.data.AudioField.KEY
+import io.github.djfx229.rangpur.core.data.AudioField.KEY_SORT_POSITION
+import io.github.djfx229.rangpur.core.data.AudioField.SAMPLERATE
+import io.github.djfx229.rangpur.core.data.AudioField.TIMESTAMP_CREATED
+import io.github.djfx229.rangpur.core.data.AudioField.TITLE
+import io.github.djfx229.rangpur.core.data.AudioField.URL
+import io.github.djfx229.rangpur.core.data.equalsUUID
 import java.util.*
 
 @DatabaseTable(tableName = "audio")
