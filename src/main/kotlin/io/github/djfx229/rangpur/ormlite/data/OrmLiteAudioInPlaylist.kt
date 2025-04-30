@@ -2,8 +2,8 @@ package io.github.djfx229.rangpur.ormlite.data
 
 import com.j256.ormlite.field.DatabaseField
 import com.j256.ormlite.table.DatabaseTable
-import io.github.djfx229.rangpur.core.data.*
 import io.github.djfx229.rangpur.feature.audio.domain.model.Audio
+import io.github.djfx229.rangpur.feature.database.domain.model.equalsUUID
 import io.github.djfx229.rangpur.feature.playlist.domain.model.AudioInPlaylist
 import io.github.djfx229.rangpur.feature.playlist.domain.model.Playlist
 import java.util.*

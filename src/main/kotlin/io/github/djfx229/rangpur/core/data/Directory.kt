@@ -1,8 +1,9 @@
 package io.github.djfx229.rangpur.core.data
 
 import io.github.djfx229.rangpur.core.repository.Configuration
+import io.github.djfx229.rangpur.feature.database.domain.model.TestItem
+import io.github.djfx229.rangpur.feature.database.domain.model.WithId
 import java.io.File
-import java.sql.Date
 
 interface Directory : WithId {
     var parent: Directory?

@@ -20,7 +20,7 @@ import io.github.djfx229.rangpur.core.data.AudioField.SAMPLERATE
 import io.github.djfx229.rangpur.core.data.AudioField.TIMESTAMP_CREATED
 import io.github.djfx229.rangpur.core.data.AudioField.TITLE
 import io.github.djfx229.rangpur.core.data.AudioField.URL
-import io.github.djfx229.rangpur.core.data.equalsUUID
+import io.github.djfx229.rangpur.feature.database.domain.model.equalsUUID
 import java.util.*
 
 @DatabaseTable(tableName = "audio")

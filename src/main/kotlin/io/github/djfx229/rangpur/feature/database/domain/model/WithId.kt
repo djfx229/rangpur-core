@@ -1,4 +1,4 @@
-package io.github.djfx229.rangpur.core.data
+package io.github.djfx229.rangpur.feature.database.domain.model
 
 import java.io.Serializable
 import java.util.*

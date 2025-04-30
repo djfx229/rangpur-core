@@ -4,7 +4,7 @@ import com.j256.ormlite.field.DatabaseField
 import com.j256.ormlite.table.DatabaseTable
 import io.github.djfx229.rangpur.feature.playlist.domain.model.Playlist
 import io.github.djfx229.rangpur.feature.playlist.domain.model.PlaylistFolder
-import io.github.djfx229.rangpur.core.data.equalsUUID
+import io.github.djfx229.rangpur.feature.database.domain.model.equalsUUID
 import java.util.*
 
 @DatabaseTable(tableName = "playlist")

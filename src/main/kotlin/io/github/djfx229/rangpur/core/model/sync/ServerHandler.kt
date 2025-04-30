@@ -3,7 +3,7 @@ package io.github.djfx229.rangpur.core.model.sync
 import io.github.djfx229.rangpur.core.data.SyncInfoReceivingAudio
 import io.github.djfx229.rangpur.core.data.SyncInfo
 import io.github.djfx229.rangpur.core.data.SyncInfoFinished
-import io.github.djfx229.rangpur.core.data.WithId
+import io.github.djfx229.rangpur.feature.database.domain.model.WithId
 import io.github.djfx229.rangpur.core.model.CachedDirectories
 import io.github.djfx229.rangpur.core.repository.database.Database
 

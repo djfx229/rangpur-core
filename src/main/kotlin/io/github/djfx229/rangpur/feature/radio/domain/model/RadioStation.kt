@@ -1,6 +1,6 @@
 package io.github.djfx229.rangpur.feature.radio.domain.model
 
-import io.github.djfx229.rangpur.core.data.WithId
+import io.github.djfx229.rangpur.feature.database.domain.model.WithId
 import java.util.UUID
 
 interface RadioStation : WithId {
