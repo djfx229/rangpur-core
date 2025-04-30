@@ -4,7 +4,7 @@ import com.j256.ormlite.dao.Dao
 import com.j256.ormlite.dao.DaoManager
 import com.j256.ormlite.dao.GenericRawResults
 import com.j256.ormlite.support.ConnectionSource
-import io.github.djfx229.rangpur.core.common.data.database.SqliteRequestUtils
+import io.github.djfx229.rangpur.common.data.database.SqliteRequestUtils
 import io.github.djfx229.rangpur.core.data.*
 import io.github.djfx229.rangpur.core.repository.database.Database
 import io.github.djfx229.rangpur.ormlite.data.OrmLiteAudio

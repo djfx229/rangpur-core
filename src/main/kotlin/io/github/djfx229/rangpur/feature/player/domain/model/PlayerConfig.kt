@@ -1,6 +1,6 @@
 package io.github.djfx229.rangpur.feature.player.domain.model
 
-import io.github.djfx229.rangpur.core.common.domain.model.Config
+import io.github.djfx229.rangpur.common.domain.model.Config
 
 class PlayerConfig : Config {
     var repeatModeOrdinal: Int = -1

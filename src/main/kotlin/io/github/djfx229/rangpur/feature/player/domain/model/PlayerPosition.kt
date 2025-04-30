@@ -1,6 +1,6 @@
 package io.github.djfx229.rangpur.feature.player.domain.model
 
-import io.github.djfx229.rangpur.core.common.domain.util.DurationFormat
+import io.github.djfx229.rangpur.common.domain.util.DurationFormat
 
 class PlayerPosition(
     /**

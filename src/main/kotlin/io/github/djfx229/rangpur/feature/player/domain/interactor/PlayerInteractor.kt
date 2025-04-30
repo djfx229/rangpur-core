@@ -1,14 +1,14 @@
 package io.github.djfx229.rangpur.feature.player.domain.interactor
 
-import io.github.djfx229.rangpur.core.common.domain.Logger
+import io.github.djfx229.rangpur.common.domain.Logger
 import io.github.djfx229.rangpur.feature.player.domain.controller.PlayerController
 import io.github.djfx229.rangpur.feature.player.domain.model.state.MetadataState
 import io.github.djfx229.rangpur.feature.player.domain.model.state.PlaybackState
 import io.github.djfx229.rangpur.feature.radio.domain.model.StreamMetadata
-import io.github.djfx229.rangpur.core.common.domain.di.DependencyInjector
-import io.github.djfx229.rangpur.core.common.domain.di.getConfigRepository
-import io.github.djfx229.rangpur.core.common.domain.interactor.AudioInteractor
-import io.github.djfx229.rangpur.core.common.domain.repository.ConfigRepository
+import io.github.djfx229.rangpur.common.domain.di.DependencyInjector
+import io.github.djfx229.rangpur.common.domain.di.getConfigRepository
+import io.github.djfx229.rangpur.common.domain.interactor.AudioInteractor
+import io.github.djfx229.rangpur.common.domain.repository.ConfigRepository
 import io.github.djfx229.rangpur.core.data.Audio
 import io.github.djfx229.rangpur.core.data.AudioInPlaylist
 import io.github.djfx229.rangpur.feature.player.domain.model.PlayerSource

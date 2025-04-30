@@ -2,11 +2,11 @@ package io.github.djfx229.rangpur.common.domain.di
 
 import io.github.djfx229.rangpur.feature.player.domain.controller.PlayerController
 import io.github.djfx229.rangpur.feature.player.domain.interactor.PlayerInteractor
-import io.github.djfx229.rangpur.core.common.domain.Logger
-import io.github.djfx229.rangpur.core.common.domain.interactor.DirectoryInteractor
-import io.github.djfx229.rangpur.core.common.domain.model.ApplicationConfig
-import io.github.djfx229.rangpur.core.common.domain.model.CoreConfig
-import io.github.djfx229.rangpur.core.common.domain.repository.ConfigRepository
+import io.github.djfx229.rangpur.common.domain.Logger
+import io.github.djfx229.rangpur.common.domain.interactor.DirectoryInteractor
+import io.github.djfx229.rangpur.common.domain.model.ApplicationConfig
+import io.github.djfx229.rangpur.common.domain.model.CoreConfig
+import io.github.djfx229.rangpur.common.domain.repository.ConfigRepository
 import io.github.djfx229.rangpur.feature.library.domain.interactor.LibraryInteractor
 import io.github.djfx229.rangpur.feature.library.domain.repository.LibraryRepository
 import io.github.djfx229.rangpur.feature.player.data.repository.PlayerConfigRepository

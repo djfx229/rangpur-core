@@ -2,10 +2,10 @@ package io.github.djfx229.rangpur.common.data.repository
 
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
-import io.github.djfx229.rangpur.core.common.domain.Logger
-import io.github.djfx229.rangpur.core.common.domain.model.ApplicationConfig
-import io.github.djfx229.rangpur.core.common.domain.model.Config
-import io.github.djfx229.rangpur.core.common.domain.repository.ConfigRepository
+import io.github.djfx229.rangpur.common.domain.Logger
+import io.github.djfx229.rangpur.common.domain.model.ApplicationConfig
+import io.github.djfx229.rangpur.common.domain.model.Config
+import io.github.djfx229.rangpur.common.domain.repository.ConfigRepository
 import java.io.File
 import java.io.FileNotFoundException
 import java.lang.reflect.Type

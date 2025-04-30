@@ -1,8 +1,8 @@
 package io.github.djfx229.rangpur.core.data
 
-import io.github.djfx229.rangpur.core.common.domain.model.sort.Sort
-import io.github.djfx229.rangpur.core.common.domain.model.sort.SortDirection
-import io.github.djfx229.rangpur.core.common.domain.model.sort.SortedAudioField
+import io.github.djfx229.rangpur.common.domain.model.sort.Sort
+import io.github.djfx229.rangpur.common.domain.model.sort.SortDirection
+import io.github.djfx229.rangpur.common.domain.model.sort.SortedAudioField
 import java.util.*
 
 class Filter {
