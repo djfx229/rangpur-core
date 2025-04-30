@@ -12,6 +12,7 @@ import io.github.djfx229.rangpur.feature.library.domain.repository.LibraryReposi
 import io.github.djfx229.rangpur.feature.player.data.repository.PlayerConfigRepository
 import io.github.djfx229.rangpur.feature.player.domain.model.PlayerConfig
 import io.github.djfx229.rangpur.core.repository.database.Database
+import io.github.djfx229.rangpur.feature.playlist.domain.interactor.PlaylistInteractor
 
 /**
  * Метод, осуществляющий регистрацию зависимостей необходимых для классов из core.
@@ -46,12 +47,13 @@ fun io.github.djfx229.rangpur.common.domain.di.DependencyInjector.registryCoreDe
         DirectoryInteractor::class,
         DirectoryInteractor(this)
     )
-    io.github.djfx229.rangpur.common.domain.di.initLibrary(this, database)
-    io.github.djfx229.rangpur.common.domain.di.initPlayer(this, playerController)
+    initLibrary(this, database)
+    initPlaylist(this)
+    initPlayer(this, playerController)
 }
 
 private fun initLibrary(
-    di: io.github.djfx229.rangpur.common.domain.di.DependencyInjector,
+    di: DependencyInjector,
     database: Database,
 ) = di.apply {
     addSingleton(
@@ -63,8 +65,16 @@ private fun initLibrary(
     }
 }
 
+private fun initPlaylist(
+    di: DependencyInjector,
+) = di.apply {
+    add(PlaylistInteractor::class) {
+        PlaylistInteractor(di)
+    }
+}
+
 private fun initPlayer(
-    di: io.github.djfx229.rangpur.common.domain.di.DependencyInjector,
+    di: DependencyInjector,
     playerController: PlayerController,
 ) = di.apply {
     addSingleton(

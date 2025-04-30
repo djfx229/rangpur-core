@@ -6,6 +6,7 @@ import io.github.djfx229.rangpur.feature.audio.domain.model.Directory
 import io.github.djfx229.rangpur.feature.audio.domain.model.copy
 import io.github.djfx229.rangpur.core.repository.database.Database
 
+@Deprecated("Перенести в LibraryInteractor")
 class AudioInteractor(
     private val di: DependencyInjector,
 ) {
@@ -18,7 +19,10 @@ class AudioInteractor(
         di.get<Database>()
     }
 
-    fun getFullPath(audio: Audio, cacheDirectories: HashMap<String, Directory>? = null): String {
+    fun getFullPath(
+        audio: Audio,
+        cacheDirectories: HashMap<String, Directory>? = null,
+    ): String {
         val path = directoryInteractor.getFullPath(
             audio.directoryUUID,
             cacheDirectories,

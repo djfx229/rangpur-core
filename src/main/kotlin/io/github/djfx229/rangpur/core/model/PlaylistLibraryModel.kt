@@ -71,12 +71,4 @@ class PlaylistLibraryModel(private val database: Database) {
         return finalList
     }
 
-    fun exportPlaylistToTextFile(
-        file: File,
-        playlist: Playlist
-    ) {
-        val audios = database.playlistWithAudios.getFrom(playlist.uuid)
-        io.github.djfx229.rangpur.core.model.PlaylistToFile.exportPlaylistTxt(file.name, file.parentFile.absolutePath, audios)
-    }
-
 }

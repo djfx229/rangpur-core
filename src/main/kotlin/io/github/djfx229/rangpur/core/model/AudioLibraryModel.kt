@@ -10,6 +10,7 @@ import io.github.djfx229.rangpur.feature.playlist.domain.model.AudioInPlaylist
 import io.github.djfx229.rangpur.feature.playlist.domain.model.Playlist
 import java.io.File
 
+@Deprecated("Переходим на LibraryInteractor")
 class AudioLibraryModel(
     private val database: Database,
     private val config: Configuration
@@ -21,26 +22,7 @@ class AudioLibraryModel(
         return database.audios.getFiltered(filter)
     }
 
-    fun getAudios(playlist: Playlist): List<AudioInPlaylist> {
-        return database.playlistWithAudios.getFrom(playlist.uuid)
-    }
 
-    suspend fun createM3u8PlaylistWithFilteredAudios(
-        directoryForM3u: File,
-        fileName: String,
-        filter: Filter
-    ): File {
-        val audios = getAudios(filter)
-        val cachedDirectories = CachedDirectories(database.directories, config)
-        val file = io.github.djfx229.rangpur.core.model.PlaylistToFile.exportPlaylistM3u8(
-            fileName,
-            directoryForM3u.absolutePath,
-            audios,
-            cachedDirectories
-        )
-        cachedDirectories.release()
-        return file
-    }
 
     suspend fun getFullPath(audio: Audio): File? {
         val directory = database.directories.getItem(audio.directoryUUID)

@@ -1,23 +1,26 @@
 package io.github.djfx229.rangpur.feature.library.domain.interactor
 
 import io.github.djfx229.rangpur.common.domain.di.DependencyInjector
+import io.github.djfx229.rangpur.common.domain.di.getConfigRepository
 import io.github.djfx229.rangpur.common.domain.interactor.DirectoryInteractor
+import io.github.djfx229.rangpur.common.domain.model.CoreConfig
+import io.github.djfx229.rangpur.common.domain.model.sort.Sort
+import io.github.djfx229.rangpur.common.domain.repository.ConfigRepository
 import io.github.djfx229.rangpur.feature.audio.domain.model.Audio
 import io.github.djfx229.rangpur.feature.audio.domain.model.Directory
 import io.github.djfx229.rangpur.feature.library.domain.model.filter.Filter
-import io.github.djfx229.rangpur.common.domain.model.sort.Sort
 import io.github.djfx229.rangpur.feature.library.domain.repository.LibraryRepository
 
 class LibraryInteractor(
     private val di: DependencyInjector,
 ) {
 
-    private val directoryInteractor by lazy {
-        di.get<DirectoryInteractor>()
-    }
+    private val directoryInteractor: DirectoryInteractor by lazy { di.get()}
+    private val repository: LibraryRepository by lazy { di.get() }
+    private val configRepository: ConfigRepository<CoreConfig> by lazy { di.getConfigRepository() }
 
-    private val repository by lazy {
-        di.get<LibraryRepository>()
+    fun getMusicDirectoryLocation(): String {
+        return configRepository.get().musicLibraryPath!!
     }
 
     fun getFullPath(audio: Audio, cacheDirectories: HashMap<String, Directory>? = null): String {
