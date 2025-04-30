@@ -1,4 +1,4 @@
-package io.github.djfx229.rangpur.feature.audio.domain.model
+package io.github.djfx229.rangpur.feature.library.domain.model
 
 object Keys {
 

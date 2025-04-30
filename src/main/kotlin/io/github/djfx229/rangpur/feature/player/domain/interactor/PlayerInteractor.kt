@@ -1,22 +1,18 @@
 package io.github.djfx229.rangpur.feature.player.domain.interactor
 
 import io.github.djfx229.rangpur.common.domain.Logger
-import io.github.djfx229.rangpur.feature.player.domain.controller.PlayerController
-import io.github.djfx229.rangpur.feature.player.domain.model.state.MetadataState
-import io.github.djfx229.rangpur.feature.player.domain.model.state.PlaybackState
-import io.github.djfx229.rangpur.feature.radio.domain.model.StreamMetadata
 import io.github.djfx229.rangpur.common.domain.di.DependencyInjector
 import io.github.djfx229.rangpur.common.domain.di.getConfigRepository
-import io.github.djfx229.rangpur.common.domain.interactor.AudioInteractor
 import io.github.djfx229.rangpur.common.domain.repository.ConfigRepository
-import io.github.djfx229.rangpur.feature.audio.domain.model.Audio
+import io.github.djfx229.rangpur.feature.library.domain.interactor.LibraryInteractor
+import io.github.djfx229.rangpur.feature.library.domain.model.Audio
+import io.github.djfx229.rangpur.feature.player.domain.controller.PlayerController
+import io.github.djfx229.rangpur.feature.player.domain.model.*
+import io.github.djfx229.rangpur.feature.player.domain.model.state.MetadataState
+import io.github.djfx229.rangpur.feature.player.domain.model.state.PlaybackState
 import io.github.djfx229.rangpur.feature.playlist.domain.model.AudioInPlaylist
-import io.github.djfx229.rangpur.feature.player.domain.model.PlayerSource
 import io.github.djfx229.rangpur.feature.radio.domain.model.RadioStation
-import io.github.djfx229.rangpur.feature.player.domain.model.PlayerCommand
-import io.github.djfx229.rangpur.feature.player.domain.model.PlayerConfig
-import io.github.djfx229.rangpur.feature.player.domain.model.PlayerPosition
-import io.github.djfx229.rangpur.feature.player.domain.model.PlayerRepeatMode
+import io.github.djfx229.rangpur.feature.radio.domain.model.StreamMetadata
 import kotlinx.coroutines.*
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -45,9 +41,7 @@ class PlayerInteractor(
         di.get(PlayerController::class)
     }
 
-    private val audioInteractor by lazy {
-        di.get(AudioInteractor::class)
-    }
+    private val libraryInteractor: LibraryInteractor by lazy { di.get() }
 
     private val configRepository: ConfigRepository<PlayerConfig> by lazy {
         di.getConfigRepository()
@@ -159,13 +153,13 @@ class PlayerInteractor(
         val source = when (item) {
             is Audio -> {
                 setMetadataState(MetadataState.AudioItem(item))
-                PlayerSource.File(audioInteractor.getFullPath(item))
+                PlayerSource.File(libraryInteractor.getFullPath(item))
             }
 
             is AudioInPlaylist -> {
                 val audio = item.audio ?: return
                 setMetadataState(MetadataState.AudioItem(audio))
-                PlayerSource.File(audioInteractor.getFullPath(audio))
+                PlayerSource.File(libraryInteractor.getFullPath(audio))
             }
 
             is File -> {

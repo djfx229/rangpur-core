@@ -1,7 +1,7 @@
 package io.github.djfx229.rangpur.core.model
 
 import io.github.djfx229.rangpur.core.repository.database.Database
-import io.github.djfx229.rangpur.feature.audio.domain.model.Directory
+import io.github.djfx229.rangpur.feature.library.domain.model.Directory
 
 class FilterLibraryModel(private val database: Database) {
     fun getDateList(): List<String> = database.calendar.getDateList()

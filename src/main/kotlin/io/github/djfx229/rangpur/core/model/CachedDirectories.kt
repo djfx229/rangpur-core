@@ -1,9 +1,9 @@
 package io.github.djfx229.rangpur.core.model
 
 import io.github.djfx229.rangpur.common.domain.di.DependencyInjector
-import io.github.djfx229.rangpur.common.domain.interactor.DirectoryInteractor
-import io.github.djfx229.rangpur.feature.audio.domain.model.Audio
-import io.github.djfx229.rangpur.feature.audio.domain.model.Directory
+import io.github.djfx229.rangpur.feature.library.domain.interactor.DirectoryInteractor
+import io.github.djfx229.rangpur.feature.library.domain.model.Audio
+import io.github.djfx229.rangpur.feature.library.domain.model.Directory
 import io.github.djfx229.rangpur.feature.library.domain.interactor.LibraryInteractor
 
 class CachedDirectories(

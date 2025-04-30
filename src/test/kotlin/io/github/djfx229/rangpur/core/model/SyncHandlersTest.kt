@@ -2,7 +2,7 @@ package io.github.djfx229.rangpur.core.model
 
 import io.github.djfx229.rangpur.core.model.sync.*
 import io.github.djfx229.rangpur.core.repository.database.Database
-import io.github.djfx229.rangpur.feature.audio.domain.model.*
+import io.github.djfx229.rangpur.feature.library.domain.model.*
 import io.mockk.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest

@@ -1,7 +1,7 @@
 package io.github.djfx229.rangpur.feature.library.domain.model.filter
 
-import io.github.djfx229.rangpur.feature.audio.domain.model.Directory
-import io.github.djfx229.rangpur.feature.audio.domain.model.Keys
+import io.github.djfx229.rangpur.feature.library.domain.model.Directory
+import io.github.djfx229.rangpur.feature.library.domain.model.Keys
 
 sealed class FilterItem {
     data class Text(

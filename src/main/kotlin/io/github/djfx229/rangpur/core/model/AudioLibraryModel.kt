@@ -3,8 +3,8 @@ package io.github.djfx229.rangpur.core.model
 import io.github.djfx229.rangpur.common.domain.di.DependencyInjector
 import io.github.djfx229.rangpur.core.data.*
 import io.github.djfx229.rangpur.core.repository.database.Database
-import io.github.djfx229.rangpur.feature.audio.domain.model.Audio
-import io.github.djfx229.rangpur.feature.audio.domain.model.Directory
+import io.github.djfx229.rangpur.feature.library.domain.model.Audio
+import io.github.djfx229.rangpur.feature.library.domain.model.Directory
 import io.github.djfx229.rangpur.feature.library.domain.interactor.LibraryInteractor
 import java.io.File
 

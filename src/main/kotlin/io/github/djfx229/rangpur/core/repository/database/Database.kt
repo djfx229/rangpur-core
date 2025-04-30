@@ -1,8 +1,8 @@
 package io.github.djfx229.rangpur.core.repository.database
 
 import io.github.djfx229.rangpur.core.data.*
-import io.github.djfx229.rangpur.feature.audio.domain.model.Audio
-import io.github.djfx229.rangpur.feature.audio.domain.model.Directory
+import io.github.djfx229.rangpur.feature.library.domain.model.Audio
+import io.github.djfx229.rangpur.feature.library.domain.model.Directory
 import io.github.djfx229.rangpur.feature.library.domain.repository.LibraryRepository
 import io.github.djfx229.rangpur.feature.playlist.domain.model.AudioInPlaylist
 import io.github.djfx229.rangpur.feature.playlist.domain.model.Playlist
