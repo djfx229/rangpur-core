@@ -4,7 +4,7 @@ import com.j256.ormlite.dao.DaoManager
 import com.j256.ormlite.support.ConnectionSource
 import io.github.djfx229.rangpur.common.data.database.SqliteRequestUtils
 import io.github.djfx229.rangpur.common.domain.model.sort.Sort
-import io.github.djfx229.rangpur.core.data.Audio
+import io.github.djfx229.rangpur.feature.audio.domain.model.Audio
 import io.github.djfx229.rangpur.core.data.AudioField
 import io.github.djfx229.rangpur.feature.library.domain.model.filter.Filter
 import io.github.djfx229.rangpur.feature.library.domain.model.filter.FilterItem

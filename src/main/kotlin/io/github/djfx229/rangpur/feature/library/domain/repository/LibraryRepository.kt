@@ -1,6 +1,6 @@
 package io.github.djfx229.rangpur.feature.library.domain.repository
 
-import io.github.djfx229.rangpur.core.data.Audio
+import io.github.djfx229.rangpur.feature.audio.domain.model.Audio
 import io.github.djfx229.rangpur.feature.library.domain.model.filter.Filter
 import io.github.djfx229.rangpur.common.domain.model.sort.Sort
 

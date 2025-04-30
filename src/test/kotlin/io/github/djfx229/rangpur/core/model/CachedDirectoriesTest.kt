@@ -1,6 +1,6 @@
 package io.github.djfx229.rangpur.core.model
 
-import io.github.djfx229.rangpur.core.data.Audio
+import io.github.djfx229.rangpur.feature.audio.domain.model.Audio
 import io.github.djfx229.rangpur.core.data.Directory
 import io.github.djfx229.rangpur.core.repository.Configuration
 import io.github.djfx229.rangpur.core.repository.database.Database

@@ -2,7 +2,7 @@ package io.github.djfx229.rangpur.feature.player.domain.model.state
 
 import io.github.djfx229.rangpur.feature.radio.domain.model.RadioStation
 import io.github.djfx229.rangpur.feature.radio.domain.model.StreamMetadata
-import io.github.djfx229.rangpur.core.data.Audio
+import io.github.djfx229.rangpur.feature.audio.domain.model.Audio
 
 sealed class MetadataState {
 

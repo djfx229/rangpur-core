@@ -1,5 +1,7 @@
-package io.github.djfx229.rangpur.core.data
+package io.github.djfx229.rangpur.feature.audio.domain.model
 
+import io.github.djfx229.rangpur.core.data.TestItem
+import io.github.djfx229.rangpur.core.data.WithId
 import io.github.djfx229.rangpur.core.repository.database.Database
 import java.sql.Date
 
