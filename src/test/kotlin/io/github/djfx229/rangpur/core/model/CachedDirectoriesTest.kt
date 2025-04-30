@@ -1,7 +1,7 @@
 package io.github.djfx229.rangpur.core.model
 
 import io.github.djfx229.rangpur.feature.audio.domain.model.Audio
-import io.github.djfx229.rangpur.core.data.Directory
+import io.github.djfx229.rangpur.feature.audio.domain.model.Directory
 import io.github.djfx229.rangpur.core.repository.Configuration
 import io.github.djfx229.rangpur.core.repository.database.Database
 import io.mockk.clearAllMocks

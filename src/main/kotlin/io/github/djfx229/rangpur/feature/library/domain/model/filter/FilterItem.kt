@@ -1,6 +1,6 @@
 package io.github.djfx229.rangpur.feature.library.domain.model.filter
 
-import io.github.djfx229.rangpur.core.data.Directory
+import io.github.djfx229.rangpur.feature.audio.domain.model.Directory
 import io.github.djfx229.rangpur.feature.audio.domain.model.Keys
 
 sealed class FilterItem {

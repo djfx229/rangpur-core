@@ -2,7 +2,7 @@ package io.github.djfx229.rangpur.common.domain.interactor
 
 import io.github.djfx229.rangpur.common.domain.di.DependencyInjector
 import io.github.djfx229.rangpur.feature.audio.domain.model.Audio
-import io.github.djfx229.rangpur.core.data.Directory
+import io.github.djfx229.rangpur.feature.audio.domain.model.Directory
 import io.github.djfx229.rangpur.feature.audio.domain.model.copy
 import io.github.djfx229.rangpur.core.repository.database.Database
 

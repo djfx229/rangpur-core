@@ -1,4 +1,4 @@
-package io.github.djfx229.rangpur.core.data
+package io.github.djfx229.rangpur.feature.audio.domain.model
 
 import io.github.djfx229.rangpur.core.repository.Configuration
 import io.github.djfx229.rangpur.feature.database.domain.model.TestItem
@@ -16,17 +16,6 @@ interface Directory : WithId {
     var locationInMusicDirectory: String?
 
     var name: String?
-}
-
-fun Directory.equalsAllFields(other: Any?): Boolean {
-    return if (other is Directory) {
-        other.uuid == this.uuid &&
-        other.parent == this.parent &&
-        other.locationInMusicDirectory == this.locationInMusicDirectory &&
-        other.name == this.name
-    } else {
-        false
-    }
 }
 
 class TestDirectory(

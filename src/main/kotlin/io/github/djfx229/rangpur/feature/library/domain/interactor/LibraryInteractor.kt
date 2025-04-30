@@ -3,7 +3,7 @@ package io.github.djfx229.rangpur.feature.library.domain.interactor
 import io.github.djfx229.rangpur.common.domain.di.DependencyInjector
 import io.github.djfx229.rangpur.common.domain.interactor.DirectoryInteractor
 import io.github.djfx229.rangpur.feature.audio.domain.model.Audio
-import io.github.djfx229.rangpur.core.data.Directory
+import io.github.djfx229.rangpur.feature.audio.domain.model.Directory
 import io.github.djfx229.rangpur.feature.library.domain.model.filter.Filter
 import io.github.djfx229.rangpur.common.domain.model.sort.Sort
 import io.github.djfx229.rangpur.feature.library.domain.repository.LibraryRepository
