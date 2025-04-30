@@ -1,7 +1,7 @@
 package io.github.djfx229.rangpur.core.model
 
 import io.github.djfx229.rangpur.feature.audio.domain.model.Audio
-import io.github.djfx229.rangpur.core.data.AudioInPlaylist
+import io.github.djfx229.rangpur.feature.playlist.domain.model.AudioInPlaylist
 import java.io.File
 import java.io.FileWriter
 

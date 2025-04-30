@@ -10,7 +10,7 @@ import io.github.djfx229.rangpur.common.domain.di.getConfigRepository
 import io.github.djfx229.rangpur.common.domain.interactor.AudioInteractor
 import io.github.djfx229.rangpur.common.domain.repository.ConfigRepository
 import io.github.djfx229.rangpur.feature.audio.domain.model.Audio
-import io.github.djfx229.rangpur.core.data.AudioInPlaylist
+import io.github.djfx229.rangpur.feature.playlist.domain.model.AudioInPlaylist
 import io.github.djfx229.rangpur.feature.player.domain.model.PlayerSource
 import io.github.djfx229.rangpur.feature.radio.domain.model.RadioStation
 import io.github.djfx229.rangpur.feature.player.domain.model.PlayerCommand

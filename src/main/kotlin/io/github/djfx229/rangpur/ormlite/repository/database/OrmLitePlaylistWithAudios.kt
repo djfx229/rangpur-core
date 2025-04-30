@@ -2,9 +2,9 @@ package io.github.djfx229.rangpur.ormlite.repository.database
 
 import com.j256.ormlite.dao.DaoManager
 import com.j256.ormlite.support.ConnectionSource
-import io.github.djfx229.rangpur.core.data.*
 import io.github.djfx229.rangpur.core.repository.database.Database
 import io.github.djfx229.rangpur.feature.audio.domain.model.Audio
+import io.github.djfx229.rangpur.feature.playlist.domain.model.AudioInPlaylist
 import io.github.djfx229.rangpur.ormlite.data.OrmLiteAudioInPlaylist
 import java.sql.SQLException
 import java.util.*

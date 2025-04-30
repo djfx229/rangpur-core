@@ -1,4 +1,4 @@
-package io.github.djfx229.rangpur.core.data
+package io.github.djfx229.rangpur.feature.playlist.domain.model
 
 class RootPlaylistFolder(
     override var name: String? = "All",

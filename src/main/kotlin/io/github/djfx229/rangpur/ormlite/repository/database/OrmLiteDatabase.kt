@@ -8,6 +8,9 @@ import io.github.djfx229.rangpur.feature.library.data.repository.LibraryReposito
 import io.github.djfx229.rangpur.feature.library.domain.repository.LibraryRepository
 import io.github.djfx229.rangpur.core.repository.database.Database
 import io.github.djfx229.rangpur.feature.audio.domain.model.Audio
+import io.github.djfx229.rangpur.feature.playlist.domain.model.AudioInPlaylist
+import io.github.djfx229.rangpur.feature.playlist.domain.model.Playlist
+import io.github.djfx229.rangpur.feature.playlist.domain.model.PlaylistFolder
 import io.github.djfx229.rangpur.ormlite.data.*
 import java.sql.Date
 

@@ -3,8 +3,8 @@ package io.github.djfx229.rangpur.ormlite.repository.database
 import com.j256.ormlite.dao.DaoManager
 import com.j256.ormlite.dao.GenericRawResults
 import com.j256.ormlite.support.ConnectionSource
-import io.github.djfx229.rangpur.core.data.Playlist
-import io.github.djfx229.rangpur.core.data.PlaylistFolder
+import io.github.djfx229.rangpur.feature.playlist.domain.model.Playlist
+import io.github.djfx229.rangpur.feature.playlist.domain.model.PlaylistFolder
 import io.github.djfx229.rangpur.core.repository.database.Database
 import io.github.djfx229.rangpur.ormlite.data.OrmLiteAudioInPlaylist
 import io.github.djfx229.rangpur.ormlite.data.OrmLitePlaylist
