@@ -4,9 +4,9 @@ import com.j256.ormlite.jdbc.JdbcConnectionSource
 import com.j256.ormlite.logger.Log
 import com.j256.ormlite.logger.Logger
 import com.j256.ormlite.support.ConnectionSource
-import io.github.djfx229.rangpur.core.data.Filter
-import io.github.djfx229.rangpur.core.repository.database.Database
-import io.github.djfx229.rangpur.ormlite.repository.database.OrmLiteDatabase
+import io.github.djfx229.rangpur.feature.library.domain.model.filter.LegacyFilter
+import io.github.djfx229.rangpur.common.domain.database.Database
+import io.github.djfx229.rangpur.common.data.database.OrmLiteDatabase
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
@@ -177,7 +177,7 @@ internal class OrmLiteAudiosTest {
         }
 
         database.audios.getFiltered(
-            Filter().apply {
+            LegacyFilter().apply {
                 dateList.add("2010")
             }
         ).forEach { audio ->
@@ -188,7 +188,7 @@ internal class OrmLiteAudiosTest {
             }
         }
         database.audios.getFiltered(
-            Filter().apply {
+            LegacyFilter().apply {
                 dateList.add("2016")
             }
         ).forEach { audio ->
@@ -199,7 +199,7 @@ internal class OrmLiteAudiosTest {
             }
         }
         database.audios.getFiltered(
-            Filter().apply {
+            LegacyFilter().apply {
                 dateList.add("2021")
             }
         ).forEach { audio ->
@@ -210,7 +210,7 @@ internal class OrmLiteAudiosTest {
             }
         }
 
-        val searchFilter = Filter().apply {
+        val searchFilter = LegacyFilter().apply {
             searchRequest = forTestSearch.artist!!
         }
         val testSearch = database.audios.getFiltered(searchFilter)

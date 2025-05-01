@@ -11,8 +11,8 @@ import io.github.djfx229.rangpur.feature.library.domain.interactor.LibraryIntera
 import io.github.djfx229.rangpur.feature.library.domain.repository.LibraryRepository
 import io.github.djfx229.rangpur.feature.player.data.repository.PlayerConfigRepository
 import io.github.djfx229.rangpur.feature.player.domain.model.PlayerConfig
-import io.github.djfx229.rangpur.core.repository.database.Database
-import io.github.djfx229.rangpur.feature.playlist.domain.interactor.PlaylistInteractor
+import io.github.djfx229.rangpur.common.domain.database.Database
+import io.github.djfx229.rangpur.feature.playlist.domain.interactor.AudiosInPlaylistInteractor
 
 /**
  * Метод, осуществляющий регистрацию зависимостей необходимых для классов из core.
@@ -70,8 +70,8 @@ private fun initLibrary(
 private fun initPlaylist(
     di: DependencyInjector,
 ) = di.apply {
-    add(PlaylistInteractor::class) {
-        PlaylistInteractor(di)
+    add(AudiosInPlaylistInteractor::class) {
+        AudiosInPlaylistInteractor(di)
     }
 }
 

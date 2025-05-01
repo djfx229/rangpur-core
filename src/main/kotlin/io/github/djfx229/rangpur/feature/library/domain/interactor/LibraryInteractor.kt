@@ -5,11 +5,12 @@ import io.github.djfx229.rangpur.common.domain.di.getConfigRepository
 import io.github.djfx229.rangpur.common.domain.model.CoreConfig
 import io.github.djfx229.rangpur.common.domain.model.sort.Sort
 import io.github.djfx229.rangpur.common.domain.repository.ConfigRepository
-import io.github.djfx229.rangpur.core.repository.database.Database
+import io.github.djfx229.rangpur.common.domain.database.Database
 import io.github.djfx229.rangpur.feature.library.domain.model.Audio
 import io.github.djfx229.rangpur.feature.library.domain.model.Directory
 import io.github.djfx229.rangpur.feature.library.domain.model.copy
 import io.github.djfx229.rangpur.feature.library.domain.model.filter.Filter
+import io.github.djfx229.rangpur.feature.library.domain.model.filter.LegacyFilter
 import io.github.djfx229.rangpur.feature.library.domain.repository.LibraryRepository
 import java.io.File
 
@@ -57,7 +58,7 @@ class LibraryInteractor(
         return database.audios.update(listOf(audio))
     }
 
-    fun getAudiosByLegacyFilter(filter: io.github.djfx229.rangpur.core.data.Filter): List<Audio> {
+    fun getAudiosByLegacyFilter(filter: LegacyFilter): List<Audio> {
         return database.audios.getFiltered(filter)
     }
 

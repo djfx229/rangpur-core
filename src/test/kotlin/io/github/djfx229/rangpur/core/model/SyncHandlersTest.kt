@@ -1,8 +1,12 @@
 package io.github.djfx229.rangpur.core.model
 
-import io.github.djfx229.rangpur.core.model.sync.*
-import io.github.djfx229.rangpur.core.repository.database.Database
+import io.github.djfx229.rangpur.common.domain.interactor.CachedDirectories
+import io.github.djfx229.rangpur.common.domain.database.Database
 import io.github.djfx229.rangpur.feature.library.domain.model.*
+import io.github.djfx229.rangpur.feature.sync.ClientHandlerImpl
+import io.github.djfx229.rangpur.feature.sync.ServerHandlerImpl
+import io.github.djfx229.rangpur.feature.sync.SyncClientModel
+import io.github.djfx229.rangpur.feature.sync.SyncServerModel
 import io.mockk.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest

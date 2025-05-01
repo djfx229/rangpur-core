@@ -1,8 +1,8 @@
 package test.kotlin.io.github.djfx229.rangpur.core.model
-import io.github.djfx229.rangpur.core.data.SyncInfo
-import io.github.djfx229.rangpur.core.model.CachedDirectories
-import io.github.djfx229.rangpur.core.model.sync.*
-import io.github.djfx229.rangpur.core.repository.database.Database
+import io.github.djfx229.rangpur.feature.sync.domain.model.SyncInfo
+import io.github.djfx229.rangpur.common.domain.interactor.CachedDirectories
+import io.github.djfx229.rangpur.common.domain.database.Database
+import io.github.djfx229.rangpur.feature.sync.*
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk

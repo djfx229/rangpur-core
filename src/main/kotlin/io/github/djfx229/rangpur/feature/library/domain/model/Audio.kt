@@ -1,8 +1,8 @@
 package io.github.djfx229.rangpur.feature.library.domain.model
 
-import io.github.djfx229.rangpur.feature.database.domain.model.TestItem
-import io.github.djfx229.rangpur.feature.database.domain.model.WithId
-import io.github.djfx229.rangpur.core.repository.database.Database
+import io.github.djfx229.rangpur.common.domain.model.TestItem
+import io.github.djfx229.rangpur.common.domain.model.WithId
+import io.github.djfx229.rangpur.common.domain.database.Database
 import java.sql.Date
 
 interface Audio : WithId {

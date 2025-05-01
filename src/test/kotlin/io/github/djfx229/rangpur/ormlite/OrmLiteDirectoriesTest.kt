@@ -4,8 +4,8 @@ import com.j256.ormlite.jdbc.JdbcConnectionSource
 import com.j256.ormlite.logger.Log
 import com.j256.ormlite.logger.Logger
 import com.j256.ormlite.support.ConnectionSource
-import io.github.djfx229.rangpur.core.repository.database.Database
-import io.github.djfx229.rangpur.ormlite.repository.database.OrmLiteDatabase
+import io.github.djfx229.rangpur.common.domain.database.Database
+import io.github.djfx229.rangpur.common.data.database.OrmLiteDatabase
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import java.io.File

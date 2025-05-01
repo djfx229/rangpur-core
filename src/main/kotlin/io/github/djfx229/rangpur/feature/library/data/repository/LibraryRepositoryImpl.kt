@@ -5,12 +5,12 @@ import com.j256.ormlite.support.ConnectionSource
 import io.github.djfx229.rangpur.common.data.database.SqliteRequestUtils
 import io.github.djfx229.rangpur.common.domain.model.sort.Sort
 import io.github.djfx229.rangpur.feature.library.domain.model.Audio
-import io.github.djfx229.rangpur.core.data.AudioField
+import io.github.djfx229.rangpur.common.data.database.AudioField
 import io.github.djfx229.rangpur.feature.library.domain.model.filter.Filter
 import io.github.djfx229.rangpur.feature.library.domain.model.filter.FilterItem
 import io.github.djfx229.rangpur.feature.library.domain.model.filter.FilteredAudioField
 import io.github.djfx229.rangpur.feature.library.domain.repository.LibraryRepository
-import io.github.djfx229.rangpur.ormlite.data.OrmLiteAudio
+import io.github.djfx229.rangpur.feature.library.data.entity.OrmLiteAudio
 
 class LibraryRepositoryImpl(
     private var source: ConnectionSource,
