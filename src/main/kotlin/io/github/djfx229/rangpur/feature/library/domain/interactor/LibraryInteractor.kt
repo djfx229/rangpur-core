@@ -11,6 +11,7 @@ import io.github.djfx229.rangpur.feature.library.domain.model.Directory
 import io.github.djfx229.rangpur.feature.library.domain.model.copy
 import io.github.djfx229.rangpur.feature.library.domain.model.filter.Filter
 import io.github.djfx229.rangpur.feature.library.domain.repository.LibraryRepository
+import java.io.File
 
 class LibraryInteractor(
     private val di: DependencyInjector,
@@ -54,6 +55,30 @@ class LibraryInteractor(
 
     fun updateAudio(audio: Audio) {
         return database.audios.update(listOf(audio))
+    }
+
+    fun getAudiosByLegacyFilter(filter: io.github.djfx229.rangpur.core.data.Filter): List<Audio> {
+        return database.audios.getFiltered(filter)
+    }
+
+    fun getAudioFile(audio: Audio): File {
+        return File(getFullPath(audio))
+    }
+
+    fun getFilesForAudios(
+        audios: List<Audio>
+    ): List<File> {
+        val cacheDirectories: HashMap<String, Directory> = hashMapOf()
+        val files: MutableList<File> = mutableListOf()
+        for (audio in audios) {
+            try {
+                files.add(File(getFullPath(audio)))
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+        cacheDirectories.clear()
+        return files
     }
 
 }

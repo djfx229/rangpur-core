@@ -6,6 +6,7 @@ import io.github.djfx229.rangpur.common.domain.model.sort.SortedAudioField
 import io.github.djfx229.rangpur.feature.library.domain.model.Directory
 import java.util.*
 
+@Deprecated("Будет удалено в RNG-046")
 class Filter {
 
     var mode: Mode = Mode.LIBRARY
