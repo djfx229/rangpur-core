@@ -10,7 +10,7 @@ sealed class PlayerCommand {
 
     object Play : PlayerCommand()
 
-    object Pause : PlayerCommand()
+    object TogglePlayOrPause : PlayerCommand()
 
     object Stop : PlayerCommand()
 

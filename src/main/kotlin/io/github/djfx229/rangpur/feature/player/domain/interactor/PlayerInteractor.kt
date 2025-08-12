@@ -24,15 +24,16 @@ import kotlin.math.max
 class PlayerInteractor(
     private val di: DependencyInjector,
     private val ioScope: CoroutineScope = CoroutineScope(Dispatchers.IO),
+    private val playbackDispatcher: CoroutineDispatcher = Dispatchers.Main,
 ) {
 
     interface Listener {
-        fun onChangePosition(info: PlayerPosition)
+        fun onChangePosition(info: PlayerPosition) {}
         fun onChangeState(state: PlaybackState) {}
         fun onChangeMetadata(state: MetadataState) {}
         fun onChangeCurrentIndex(index: Int, item: Any) {}
-        fun onChangeRepeatMode(mode: PlayerRepeatMode)
-        fun onChangeShuffleMode(isShuffleMode: Boolean)
+        fun onChangeRepeatMode(mode: PlayerRepeatMode) {}
+        fun onChangeShuffleMode(isShuffleMode: Boolean) {}
     }
 
     private val log: Logger by lazy { di.get() }
@@ -64,18 +65,21 @@ class PlayerInteractor(
 
     private val playerListener = object : PlayerController.Listener {
         override fun onPlay() {
+            log.d(this, "onPlay()")
             currentItem?.let {
                 setPlaybackState(PlaybackState.Playing)
             }
         }
 
         override fun onPause() {
+            log.d(this, "onPause()")
             currentItem?.let {
                 setPlaybackState(PlaybackState.Paused)
             }
         }
 
         override fun onChangeStreamMetadata(metadata: StreamMetadata) {
+            log.d(this, "onChangeStreamMetadata() // metadata=$metadata")
             currentItem?.let { item ->
                 if (item is RadioStation) {
                     setMetadataState(
@@ -88,6 +92,9 @@ class PlayerInteractor(
 
     var currentItem: Any? = null
         private set
+
+    val state: PlaybackState
+        get() = player.state
 
     init {
         ioScope.launch(Dispatchers.IO) {
@@ -201,7 +208,7 @@ class PlayerInteractor(
             when (command) {
                 is PlayerCommand.Open<*> -> handleCommandOpen(command)
                 PlayerCommand.Play -> handleCommandPlay()
-                PlayerCommand.Pause -> handleCommandPause()
+                PlayerCommand.TogglePlayOrPause -> handleCommandPause()
                 PlayerCommand.Stop -> handleCommandStop()
 
                 PlayerCommand.Next -> handleCommandNext()
@@ -332,7 +339,7 @@ class PlayerInteractor(
     private fun startTimer() {
         stopTimer()
         job = SupervisorJob()
-        playbackScope = CoroutineScope(Dispatchers.Default + job)
+        playbackScope = CoroutineScope(playbackDispatcher + job)
         playbackScope.launch {
             try {
                 while (isActive) {

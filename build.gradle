@@ -4,7 +4,7 @@
  */
 plugins {
     id 'java-library'
-    id 'org.jetbrains.kotlin.jvm' version '1.8.20'
+    id 'org.jetbrains.kotlin.jvm'
 }
 
 group = 'io.github.djfx229.rangpur.core'
@@ -42,4 +42,8 @@ compileKotlin {
 
 compileTestKotlin {
     kotlinOptions.jvmTarget = '1.8'
+}
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
 }
