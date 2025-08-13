@@ -15,21 +15,22 @@ repositories {
 }
 
 dependencies {
-    implementation group: 'commons-io', name: 'commons-io', version: '2.11.0'
+    implementation group: 'commons-io', name: 'commons-io', version: '2.20.0'
 
     // https://mvnrepository.com/artifact/com.google.code.gson/gson
-    implementation 'com.google.code.gson:gson:2.10.1'
+    implementation 'com.google.code.gson:gson:2.13.1'
 
     implementation 'com.j256.ormlite:ormlite-core:5.2'
     implementation 'com.j256.ormlite:ormlite-jdbc:5.2'
     implementation 'org.xerial:sqlite-jdbc:3.43.0.0'
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4'
+
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2'
     testImplementation 'org.jetbrains.kotlin:kotlin-test'
-    testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.4"
-    testImplementation "io.mockk:mockk:1.13.2"
-    testImplementation 'org.junit.jupiter:junit-jupiter:5.9.0'
+    testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.10.2'
+    testImplementation 'io.mockk:mockk:1.14.5'
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.13.4'
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
-    testImplementation 'io.mockk:mockk:1.13.5'
+    testImplementation 'io.mockk:mockk:1.14.5'
 }
 
 test {
