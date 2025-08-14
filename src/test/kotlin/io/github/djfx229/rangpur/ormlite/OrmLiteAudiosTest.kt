@@ -1,7 +1,7 @@
 package test.kotlin.io.github.djfx229.rangpur.ormlite
 
 import com.j256.ormlite.jdbc.JdbcConnectionSource
-import com.j256.ormlite.logger.Log
+import com.j256.ormlite.logger.Level
 import com.j256.ormlite.logger.Logger
 import com.j256.ormlite.support.ConnectionSource
 import io.github.djfx229.rangpur.feature.library.domain.model.filter.LegacyFilter
@@ -35,7 +35,7 @@ internal class OrmLiteAudiosTest {
             }
             it.mkdirs()
         }
-        Logger.setGlobalLogLevel(Log.Level.ERROR)
+        Logger.setGlobalLogLevel(Level.ERROR)
         val url = "jdbc:sqlite:$dbPath"
         source = JdbcConnectionSource(url, "", "")
         database = OrmLiteDatabase(source)

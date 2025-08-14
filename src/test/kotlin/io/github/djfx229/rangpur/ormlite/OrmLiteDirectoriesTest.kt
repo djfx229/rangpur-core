@@ -1,7 +1,7 @@
 package test.kotlin.io.github.djfx229.rangpur.ormlite
 
 import com.j256.ormlite.jdbc.JdbcConnectionSource
-import com.j256.ormlite.logger.Log
+import com.j256.ormlite.logger.Level
 import com.j256.ormlite.logger.Logger
 import com.j256.ormlite.support.ConnectionSource
 import io.github.djfx229.rangpur.common.domain.database.Database
@@ -25,7 +25,7 @@ internal class OrmLiteDirectoriesTest {
 
     @org.junit.jupiter.api.BeforeEach
     fun setUp() {
-        Logger.setGlobalLogLevel(Log.Level.ERROR)
+        Logger.setGlobalLogLevel(Level.ERROR)
         val url = "jdbc:sqlite:$dbPath"
         val source: ConnectionSource = JdbcConnectionSource(url, "", "")
         database = OrmLiteDatabase(source)
