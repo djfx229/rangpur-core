@@ -9,7 +9,7 @@ import io.github.djfx229.rangpur.common.domain.database.Database
 import io.github.djfx229.rangpur.feature.library.domain.model.Audio
 import io.github.djfx229.rangpur.feature.library.domain.model.Directory
 import io.github.djfx229.rangpur.feature.library.domain.model.copy
-import io.github.djfx229.rangpur.feature.library.domain.model.filter.Filter
+import io.github.djfx229.rangpur.feature.filter.domain.model.filter.Filter
 import io.github.djfx229.rangpur.feature.library.domain.model.filter.LegacyFilter
 import io.github.djfx229.rangpur.feature.library.domain.repository.LibraryRepository
 import java.io.File
