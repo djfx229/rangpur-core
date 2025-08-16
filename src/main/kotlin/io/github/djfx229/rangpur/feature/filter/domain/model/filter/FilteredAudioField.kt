@@ -10,4 +10,5 @@ enum class FilteredAudioField {
     BITRATE,
     KEY,
     BPM,
+    DIRECTORY_LOCATION,
 }

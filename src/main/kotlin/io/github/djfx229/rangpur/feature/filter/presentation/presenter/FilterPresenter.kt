@@ -18,6 +18,9 @@ class FilterPresenter(
     private val flowFilterFieldsUi: MutableStateFlow<List<FilterFieldUi>> = MutableStateFlow(filterFieldUiList())
     private val flowFilter: MutableStateFlow<Filter> = MutableStateFlow(Filter(emptyList()))
 
+    val directoriesField = FilterFieldUi.Directories()
+    val datesField = FilterFieldUi.TextSet(FilteredAudioField.DATE_CREATED)
+
     fun observableFilterFields(): StateFlow<List<FilterFieldUi>> = flowFilterFieldsUi.asStateFlow()
 
     fun observableFilter(): StateFlow<Filter> = flowFilter.asStateFlow()
@@ -25,6 +28,7 @@ class FilterPresenter(
     fun updateFilterField(filterFieldUi: FilterFieldUi) {
         filterFieldUi.item = when (filterFieldUi) {
             is FilterFieldUi.Text -> FilterItem.Text(filterFieldUi.audioField, filterFieldUi.rawValue)
+
             is FilterFieldUi.Numeric -> {
                 if (filterFieldUi.rawValue.contains("-")) {
                     val rangeValues = filterFieldUi.rawValue.split("-")
@@ -45,6 +49,7 @@ class FilterPresenter(
                     }
                 }
             }
+
             is FilterFieldUi.Key -> {
                 val rawValues = filterFieldUi.rawValue.split(" ")
                 if (rawValues.size == 2 && rawValues.last() == "+") {
@@ -57,6 +62,20 @@ class FilterPresenter(
                     }
                     FilterItem.KeyList(keys)
                 }
+            }
+
+            is FilterFieldUi.Directories -> {
+                FilterItem.TextSet(
+                    field = FilteredAudioField.DIRECTORY_LOCATION,
+                    values = filterFieldUi.selectedDirectories.mapNotNull { it.locationInMusicDirectory }.toSet()
+                )
+            }
+
+            is FilterFieldUi.TextSet -> {
+                FilterItem.TextSet(
+                    field = filterFieldUi.audioField,
+                    values = filterFieldUi.values
+                )
             }
         }
 
@@ -76,14 +95,19 @@ class FilterPresenter(
     )
 
     private fun makeFilter(): Filter {
-        val items = mutableListOf<FilterItem>()
-        flowFilterFieldsUi.value.forEach { field ->
-            if (field.isActive) {
-                field.item?.let { filterItem ->
-                    items.add(filterItem)
+        val items = buildList {
+            flowFilterFieldsUi.value.forEach { field ->
+                if (field.isActive) {
+                    field.item?.let { filterItem ->
+                        add(filterItem)
+                    }
                 }
             }
+
+            directoriesField.item?.let(::add)
+            datesField.item?.let(::add)
         }
+
         return Filter(items)
     }
 

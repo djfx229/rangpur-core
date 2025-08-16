@@ -15,6 +15,10 @@ import io.github.djfx229.rangpur.feature.library.data.entity.OrmLiteAudio
 class LibraryRepositoryImpl(
     private var source: ConnectionSource,
 ): LibraryRepository {
+    companion object {
+        const val INNER_DIRECTORY = "dir"
+    }
+
     override fun getAudios(filter: Filter, sort: Sort): List<Audio> {
         val dao = DaoManager.createDao(source, OrmLiteAudio::class.java)
 
@@ -25,26 +29,32 @@ class LibraryRepositoryImpl(
 
         // собираем sql запрос
         val request = StringBuilder().apply {
-            append("SELECT a.* FROM audio as a INNER JOIN directory as p ON a.directory_uuid = p.uuid ")
+            append(
+                "SELECT a.* FROM audio as a " +
+                        "INNER JOIN directory as $INNER_DIRECTORY " +
+                        "ON a.directory_uuid = $INNER_DIRECTORY.uuid "
+            )
 
             // применяем условия фильтра
-            filter.items.forEachIndexed { index, item ->
-                if (index == 0 && filter.items.isNotEmpty()) {
-                    append("WHERE ")
-                }
-                if (index > 0) {
-                    append("AND ")
-                }
-                val condition = when (item) {
-                    is FilterItem.Text -> mapTextItemToCondition(item, args)
-                    is FilterItem.Numeric -> mapNumericItemToCondition(item)
-                    is FilterItem.Directories -> mapDirectoriesItemToCondition(item)
-                    is FilterItem.DateList -> mapDateListItemToCondition(item)
-                    is FilterItem.KeyList -> mapKeyListItemToCondition(item)
-                    is FilterItem.OnlyWithoutPlaylists -> mapOnlyWithoutPlaylistsItemToCondition(item)
-                }
-                append(condition)
-            }
+            append(
+                SqliteRequestUtils.where(
+                    buildList {
+                        filter.items.forEach { item ->
+                            val condition = when (item) {
+                                is FilterItem.Text -> mapTextItemToCondition(item, args)
+                                is FilterItem.Numeric -> mapNumericItemToCondition(item)
+                                is FilterItem.TextSet -> mapTextSetItemToCondition(item)
+                                is FilterItem.DateList -> mapDateListItemToCondition(item)
+                                is FilterItem.KeyList -> mapKeyListItemToCondition(item)
+                                is FilterItem.OnlyWithoutPlaylists -> mapOnlyWithoutPlaylistsItemToCondition(item)
+                            }
+                            if (condition.isNotBlank()) {
+                                add(condition)
+                            }
+                        }
+                    }
+                )
+            )
 
             append(SqliteRequestUtils.sortedBy(sort))
             append(";")
@@ -69,12 +79,15 @@ class LibraryRepositoryImpl(
         return SqliteRequestUtils.likeOrExpression(FilteredAudioField.DATE_CREATED.toDatabaseField(), item.dateList)
     }
 
-    private fun mapDirectoriesItemToCondition(item: FilterItem.Directories): String {
-        val locationDirs = mutableListOf<String>()
-        item.directories.forEach {
-            it.locationInMusicDirectory?.let(locationDirs::add)
+    private fun mapTextSetItemToCondition(item: FilterItem.TextSet): String {
+        return if (item.values.isNotEmpty()) {
+            val items = buildList {
+                item.values.forEach { add(it) }
+            }
+            SqliteRequestUtils.likeOrExpression(item.field.toDatabaseField(), items, true)
+        } else {
+            ""
         }
-        return SqliteRequestUtils.likeOrExpression("p.location", locationDirs, true)
     }
 
     private fun mapNumericItemToCondition(item: FilterItem.Numeric): String {
@@ -103,6 +116,7 @@ class LibraryRepositoryImpl(
             FilteredAudioField.BITRATE -> AudioField.BITRATE
             FilteredAudioField.KEY -> AudioField.KEY_SORT_POSITION
             FilteredAudioField.BPM -> AudioField.BPM
+            FilteredAudioField.DIRECTORY_LOCATION -> "$INNER_DIRECTORY.location"
         }
     }
 

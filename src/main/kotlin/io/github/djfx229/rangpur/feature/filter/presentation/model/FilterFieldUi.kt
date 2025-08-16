@@ -2,6 +2,7 @@ package io.github.djfx229.rangpur.feature.filter.presentation.model
 
 import io.github.djfx229.rangpur.feature.filter.domain.model.filter.FilterItem
 import io.github.djfx229.rangpur.feature.filter.domain.model.filter.FilteredAudioField
+import io.github.djfx229.rangpur.feature.library.domain.model.Directory
 
 sealed class FilterFieldUi(
     open val audioField: FilteredAudioField,
@@ -20,15 +21,25 @@ sealed class FilterFieldUi(
      * но в будущем для filter field будут кастомные поля, вместо единого rawValue.
      */
 
-    data class Text(
+    class Text(
         override val audioField: FilteredAudioField,
     ) : FilterFieldUi(audioField)
 
-    data class Numeric(
+    class Numeric(
         override val audioField: FilteredAudioField,
     ) : FilterFieldUi(audioField)
 
-    data class Key(
+    class Key(
         override val audioField: FilteredAudioField,
     ) : FilterFieldUi(audioField)
+
+    class Directories : FilterFieldUi(FilteredAudioField.DIRECTORY_LOCATION) {
+        var selectedDirectories: Set<Directory> = emptySet()
+    }
+
+    class TextSet(
+        override val audioField: FilteredAudioField,
+    ) : FilterFieldUi(audioField) {
+        var values: Set<String> = emptySet()
+    }
 }

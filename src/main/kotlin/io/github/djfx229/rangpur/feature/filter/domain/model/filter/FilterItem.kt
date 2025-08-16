@@ -22,8 +22,9 @@ sealed class FilterItem {
         val keys: List<Keys.Key>,
     ) : FilterItem()
 
-    data class Directories(
-        val directories: List<Directory>
+    data class TextSet(
+        val field: FilteredAudioField,
+        val values: Set<String>,
     ) : FilterItem()
 
     data class DateList(
