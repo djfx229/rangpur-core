@@ -1,10 +1,7 @@
 package io.github.djfx229.rangpur.feature.filter.presentation.presenter
 
 import io.github.djfx229.rangpur.common.domain.di.DependencyInjector
-import io.github.djfx229.rangpur.feature.library.domain.model.Keys
-import io.github.djfx229.rangpur.feature.library.domain.model.Keys.plusAllCompatible
 import io.github.djfx229.rangpur.feature.filter.domain.model.filter.Filter
-import io.github.djfx229.rangpur.feature.filter.domain.model.filter.FilterItem
 import io.github.djfx229.rangpur.feature.filter.domain.model.filter.FilteredAudioField
 import io.github.djfx229.rangpur.feature.filter.presentation.model.FilterFieldUi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -14,18 +11,20 @@ import kotlinx.coroutines.flow.asStateFlow
 class FilterPresenter(
     private val di: DependencyInjector,
 ) {
+    val fastSearchField = FilterFieldUi.FastSearch()
+    val directoriesField = FilterFieldUi.Directories()
+    val playlistsField = FilterFieldUi.Playlists()
+    val datesField = FilterFieldUi.TextSet(FilteredAudioField.DATE_CREATED)
 
     private val flowFilterFieldsUi: MutableStateFlow<List<FilterFieldUi>> = MutableStateFlow(filterFieldUiList())
     private val flowFilter: MutableStateFlow<Filter> = MutableStateFlow(Filter(emptyList()))
 
-    val fastSearchField = FilterFieldUi.FastSearch()
-    val directoriesField = FilterFieldUi.Directories()
     private val innerFields = listOf(
         fastSearchField,
         directoriesField,
+        datesField,
+        playlistsField,
     )
-
-    val datesField = FilterFieldUi.TextSet(FilteredAudioField.DATE_CREATED)
 
     fun observableFilterFields(): StateFlow<List<FilterFieldUi>> = flowFilterFieldsUi.asStateFlow()
 
@@ -46,6 +45,7 @@ class FilterPresenter(
         FilterFieldUi.Numeric(FilteredAudioField.BITRATE),
         FilterFieldUi.Key(FilteredAudioField.KEY),
         FilterFieldUi.Numeric(FilteredAudioField.BPM),
+        playlistsField,
     )
 
     private fun makeFilter(): Filter {

@@ -33,4 +33,8 @@ sealed class FilterItem {
     data class MultiplyItems(
         val items: List<FilterItem>,
     ) : FilterItem()
+
+    data class Playlists(
+        val uuidItems: List<String>,
+    ) : FilterItem()
 }

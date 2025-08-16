@@ -31,8 +31,28 @@ class LibraryRepositoryImpl(
 
         // собираем sql запрос
         val request = StringBuilder().apply {
+            val playlistsFilter: FilterItem.Playlists? = filter.items.findLast {
+                it is FilterItem.Playlists
+            } as? FilterItem.Playlists
+            val audioForSelect =  if (playlistsFilter != null && playlistsFilter.uuidItems.isNotEmpty()) {
+                val values = playlistsFilter.uuidItems.map { "'$it'" }
+                val inCondition = SqliteRequestUtils.inArray("aip.playlist_uuid ", values)
+                """
+                    SELECT
+                        aa.* FROM audio as aa
+	                INNER JOIN 
+                        audio_in_playlist as aip 
+                        ON 
+                            aip.audio_uuid = aa.uuid 
+                            AND $inCondition
+                """.trimIndent()
+            } else {
+                "audio"
+            }
+
+            // основной select, к которому будут применятся where и сортировка
             append(
-                "SELECT a.* FROM audio as a " +
+                "SELECT a.* FROM ($audioForSelect) as a " +
                         "INNER JOIN directory as $INNER_DIRECTORY " +
                         "ON a.directory_uuid = $INNER_DIRECTORY.uuid "
             )
@@ -71,9 +91,9 @@ class LibraryRepositoryImpl(
             is FilterItem.OnlyWithoutPlaylists -> mapOnlyWithoutPlaylistsItemToCondition(item)
             is FilterItem.MultiplyItems -> {
                 if (item.items.isNotEmpty()) {
-                    val subConditions = item.items.map {
+                    val subConditions = item.items.mapNotNull {
                         mapItemToCondition(it, args, ConditionType.OR)
-                    }.filterNotNull()
+                    }
                     val mergedConditions = SqliteRequestUtils.mergeConditions(subConditions)
                     if (mergedConditions.isNotBlank()) {
                         "($mergedConditions)"
@@ -84,6 +104,9 @@ class LibraryRepositoryImpl(
                     ""
                 }
             }
+
+            // Данные фильтры в рамках where применять не эффективно, они будут выполнены раньше.
+            is FilterItem.Playlists -> ""
         }
         return if (value.isNotBlank()) {
             SqlCondition(

@@ -5,6 +5,7 @@ import io.github.djfx229.rangpur.feature.filter.domain.model.filter.FilteredAudi
 import io.github.djfx229.rangpur.feature.library.domain.model.Directory
 import io.github.djfx229.rangpur.feature.library.domain.model.Keys
 import io.github.djfx229.rangpur.feature.library.domain.model.Keys.plusAllCompatible
+import io.github.djfx229.rangpur.feature.playlist.domain.model.Playlist
 
 sealed class FilterFieldUi {
     abstract val name: String
@@ -122,6 +123,24 @@ sealed class FilterFieldUi {
                         }
                     }
                 )
+            } else {
+                null
+            }
+        }
+    }
+
+    class Playlists : FilterFieldUi() {
+        override val name: String = "PLAYLISTS"
+
+        var isOnlyWithoutPlaylist: Boolean = false
+
+        var selectedPlaylists: List<Playlist> = emptyList()
+
+        override fun parse() {
+            item = if (isOnlyWithoutPlaylist) {
+                FilterItem.OnlyWithoutPlaylists(isOnlyWithoutPlaylist)
+            } else if (selectedPlaylists.isNotEmpty()) {
+                FilterItem.Playlists(selectedPlaylists.map { it.uuid })
             } else {
                 null
             }
