@@ -13,7 +13,6 @@ import io.github.djfx229.rangpur.feature.player.data.repository.PlayerConfigRepo
 import io.github.djfx229.rangpur.feature.player.domain.model.PlayerConfig
 import io.github.djfx229.rangpur.common.domain.database.Database
 import io.github.djfx229.rangpur.common.domain.interactor.CachedDirectories
-import io.github.djfx229.rangpur.feature.filter.presentation.presenter.FilterPresenter
 import io.github.djfx229.rangpur.feature.library.domain.interactor.FilterLibraryInteractor
 import io.github.djfx229.rangpur.feature.playlist.domain.interactor.AudiosInPlaylistInteractor
 import io.github.djfx229.rangpur.feature.playlist.domain.interactor.PlaylistLibraryInteractor
@@ -65,11 +64,6 @@ private fun initLibrary(
     di: DependencyInjector,
     database: Database,
 ) = di.apply {
-    add(FilterPresenter::class) {
-        FilterPresenter(
-            di,
-        )
-    }
     addSingleton(
         LibraryRepository::class,
         database.library,

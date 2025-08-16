@@ -1,7 +1,7 @@
-package io.github.djfx229.rangpur.feature.filter.presentation.model
+package io.github.djfx229.rangpur.feature.library.presentation.model
 
-import io.github.djfx229.rangpur.feature.filter.domain.model.filter.FilterItem
-import io.github.djfx229.rangpur.feature.filter.domain.model.filter.FilteredAudioField
+import io.github.djfx229.rangpur.feature.library.domain.model.filter.FilterItem
+import io.github.djfx229.rangpur.feature.library.domain.model.filter.FilteredAudioField
 import io.github.djfx229.rangpur.feature.library.domain.model.Directory
 import io.github.djfx229.rangpur.feature.library.domain.model.Keys
 import io.github.djfx229.rangpur.feature.library.domain.model.Keys.plusAllCompatible
