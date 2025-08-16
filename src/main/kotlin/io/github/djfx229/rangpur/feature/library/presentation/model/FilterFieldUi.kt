@@ -1,11 +1,13 @@
 package io.github.djfx229.rangpur.feature.library.presentation.model
 
-import io.github.djfx229.rangpur.feature.library.domain.model.filter.FilterItem
-import io.github.djfx229.rangpur.feature.library.domain.model.filter.FilteredAudioField
 import io.github.djfx229.rangpur.feature.library.domain.model.Directory
 import io.github.djfx229.rangpur.feature.library.domain.model.Keys
 import io.github.djfx229.rangpur.feature.library.domain.model.Keys.plusAllCompatible
+import io.github.djfx229.rangpur.feature.library.domain.model.filter.FilterItem
+import io.github.djfx229.rangpur.feature.library.domain.model.filter.FilteredAudioField
 import io.github.djfx229.rangpur.feature.playlist.domain.model.Playlist
+import kotlin.math.max
+import kotlin.math.min
 
 sealed class FilterFieldUi {
     abstract val name: String
@@ -170,6 +172,39 @@ sealed class FilterFieldUi {
             } else {
                 null
             }
+        }
+    }
+
+    class Duration : OneColumnField(FilteredAudioField.DURATION) {
+        override fun parse() {
+            val rangeValues = rawValue.trim().split("-")
+            item = if (rangeValues.size == 2) {
+                val first = parseTime(rangeValues.first())
+                val second = parseTime(rangeValues.last())
+                FilterItem.Numeric(
+                    field = audioField,
+                    value = min(first, second),
+                    max = max(first, second),
+                    isNot = isNot,
+                )
+            } else if (rawValue.isNotBlank()) {
+                val time = parseTime(rawValue)
+                FilterItem.Numeric(
+                    field = audioField,
+                    value = time,
+                    isNot = isNot,
+                )
+            } else {
+                null
+            }
+        }
+
+        private fun parseTime(inputString: String): Long {
+            val values = inputString.trim().split(":").reversed()
+            val seconds = values.getOrNull(0)?.toLong() ?: 0L
+            val minutes = values.getOrNull(1)?.toLong() ?: 0L
+            val hours = values.getOrNull(2)?.toLong() ?: 0L
+            return seconds + (minutes * 60) + (hours * 60 * 60)
         }
     }
 

@@ -11,4 +11,5 @@ enum class FilteredAudioField {
     KEY,
     BPM,
     DIRECTORY_LOCATION,
+    DURATION,
 }

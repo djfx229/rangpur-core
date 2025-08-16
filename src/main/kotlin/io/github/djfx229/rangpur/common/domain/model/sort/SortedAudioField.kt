@@ -11,4 +11,5 @@ enum class SortedAudioField {
     ALBUM,
     COMMENT,
     FILE_NAME,
+    DURATION,
 }

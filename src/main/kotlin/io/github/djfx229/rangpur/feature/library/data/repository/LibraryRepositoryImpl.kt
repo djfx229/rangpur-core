@@ -170,6 +170,7 @@ class LibraryRepositoryImpl(
             FilteredAudioField.KEY -> AudioField.KEY_SORT_POSITION
             FilteredAudioField.BPM -> AudioField.BPM
             FilteredAudioField.DIRECTORY_LOCATION -> "$INNER_DIRECTORY.location"
+            FilteredAudioField.DURATION -> AudioField.DURATION
         }
     }
 

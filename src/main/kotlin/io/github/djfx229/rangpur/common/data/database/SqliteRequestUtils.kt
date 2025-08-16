@@ -107,6 +107,7 @@ object SqliteRequestUtils {
             SortedAudioField.BITRATE -> AudioField.BITRATE
             SortedAudioField.KEY -> AudioField.KEY_SORT_POSITION
             SortedAudioField.BPM -> AudioField.BPM
+            SortedAudioField.DURATION -> AudioField.DURATION
         }
     }
 
