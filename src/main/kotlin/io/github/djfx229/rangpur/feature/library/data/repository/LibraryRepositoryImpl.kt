@@ -37,6 +37,7 @@ class LibraryRepositoryImpl(
             val audioForSelect =  if (playlistsFilter != null && playlistsFilter.uuidItems.isNotEmpty()) {
                 val values = playlistsFilter.uuidItems.map { "'$it'" }
                 val inCondition = SqliteRequestUtils.inArray("aip.playlist_uuid ", values)
+                val isNot = if (playlistsFilter.isNot) "NOT" else ""
                 """
                     SELECT
                         aa.* FROM audio as aa
@@ -44,7 +45,7 @@ class LibraryRepositoryImpl(
                         audio_in_playlist as aip 
                         ON 
                             aip.audio_uuid = aa.uuid 
-                            AND $inCondition
+                            AND $isNot $inCondition
                 """.trimIndent()
             } else {
                 "audio"
@@ -112,6 +113,7 @@ class LibraryRepositoryImpl(
             SqlCondition(
                 type = type,
                 value = value,
+                isNot = item.isNot,
             )
         } else {
             null

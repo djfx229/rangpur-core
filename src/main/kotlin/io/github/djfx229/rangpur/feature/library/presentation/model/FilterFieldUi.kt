@@ -12,6 +12,8 @@ sealed class FilterFieldUi {
 
     var isActive: Boolean = true
 
+    var isNot: Boolean = false
+
     var item: FilterItem? = null
 
     var rawValue: String = ""
@@ -37,7 +39,11 @@ sealed class FilterFieldUi {
         override val audioField: FilteredAudioField,
     ) : OneColumnField(audioField) {
         override fun parse() {
-            item = FilterItem.Text(audioField, rawValue)
+            item = FilterItem.Text(
+                field = audioField,
+                value = rawValue,
+                isNot = isNot,
+            )
         }
     }
 
@@ -51,7 +57,12 @@ sealed class FilterFieldUi {
                     val min = rangeValues.first().toFloatOrNull()
                     val max = rangeValues.last().toFloatOrNull()
                     if (min != null && max != null) {
-                        FilterItem.Numeric(audioField, min, max)
+                        FilterItem.Numeric(
+                            field = audioField,
+                            value = min,
+                            max = max,
+                            isNot = isNot,
+                        )
                     } else {
                         null
                     }
@@ -60,7 +71,11 @@ sealed class FilterFieldUi {
                 }
             } else {
                 rawValue.toFloatOrNull()?.let { value ->
-                    FilterItem.Numeric(audioField, value)
+                    FilterItem.Numeric(
+                        field = audioField,
+                        value = value,
+                        isNot = isNot,
+                    )
                 }
             }
         }
@@ -79,7 +94,8 @@ sealed class FilterFieldUi {
         override fun parse() {
             item = FilterItem.TextSet(
                 field = FilteredAudioField.DIRECTORY_LOCATION,
-                values = selectedDirectories.mapNotNull { it.locationInMusicDirectory }.toSet()
+                values = selectedDirectories.mapNotNull { it.locationInMusicDirectory }.toSet(),
+                isNot = isNot,
             )
         }
     }
@@ -91,7 +107,8 @@ sealed class FilterFieldUi {
         override fun parse() {
             item = FilterItem.TextSet(
                 field = audioField,
-                values = values
+                values = values,
+                isNot = isNot,
             )
         }
     }
@@ -116,7 +133,13 @@ sealed class FilterFieldUi {
                 FilterItem.MultiplyItems(
                     items = buildList {
                         audioFieldsForSearch.forEach {
-                            add(FilterItem.Text(it, rawValue))
+                            add(
+                                FilterItem.Text(
+                                    field = it,
+                                    value = rawValue,
+                                    isNot = isNot,
+                                )
+                            )
                         }
                         parseKeyListFromString(rawValue)?.let {
                             add(it)
@@ -140,7 +163,10 @@ sealed class FilterFieldUi {
             item = if (isOnlyWithoutPlaylist) {
                 FilterItem.OnlyWithoutPlaylists(isOnlyWithoutPlaylist)
             } else if (selectedPlaylists.isNotEmpty()) {
-                FilterItem.Playlists(selectedPlaylists.map { it.uuid })
+                FilterItem.Playlists(
+                    uuidItems = selectedPlaylists.map { it.uuid },
+                    isNot = isNot,
+                )
             } else {
                 null
             }
@@ -151,13 +177,19 @@ sealed class FilterFieldUi {
         val rawValues = rawValue.split(" ")
         return if (rawValues.size == 2 && rawValues.last() == "+") {
             Keys.lancelotMap[rawValues.first().uppercase()]?.let { key ->
-                FilterItem.KeyList(key.plusAllCompatible())
+                FilterItem.KeyList(
+                    keys = key.plusAllCompatible(),
+                    isNot = isNot,
+                )
             }
         } else {
             val keys = rawValues.mapNotNull { rawValuesItem ->
                 Keys.lancelotMap[rawValuesItem.uppercase()]
             }
-            FilterItem.KeyList(keys)
+            FilterItem.KeyList(
+                keys = keys,
+                isNot = isNot,
+            )
         }
     }
 }
