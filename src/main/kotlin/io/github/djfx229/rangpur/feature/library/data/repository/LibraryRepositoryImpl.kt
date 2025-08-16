@@ -6,6 +6,8 @@ import io.github.djfx229.rangpur.common.data.database.SqliteRequestUtils
 import io.github.djfx229.rangpur.common.domain.model.sort.Sort
 import io.github.djfx229.rangpur.feature.library.domain.model.Audio
 import io.github.djfx229.rangpur.common.data.database.AudioField
+import io.github.djfx229.rangpur.common.data.database.ConditionType
+import io.github.djfx229.rangpur.common.data.database.SqlCondition
 import io.github.djfx229.rangpur.feature.filter.domain.model.filter.Filter
 import io.github.djfx229.rangpur.feature.filter.domain.model.filter.FilterItem
 import io.github.djfx229.rangpur.feature.filter.domain.model.filter.FilteredAudioField
@@ -40,15 +42,8 @@ class LibraryRepositoryImpl(
                 SqliteRequestUtils.where(
                     buildList {
                         filter.items.forEach { item ->
-                            val condition = when (item) {
-                                is FilterItem.Text -> mapTextItemToCondition(item, args)
-                                is FilterItem.Numeric -> mapNumericItemToCondition(item)
-                                is FilterItem.TextSet -> mapTextSetItemToCondition(item)
-                                is FilterItem.DateList -> mapDateListItemToCondition(item)
-                                is FilterItem.KeyList -> mapKeyListItemToCondition(item)
-                                is FilterItem.OnlyWithoutPlaylists -> mapOnlyWithoutPlaylistsItemToCondition(item)
-                            }
-                            if (condition.isNotBlank()) {
+                            val condition = mapItemToCondition(item, args)
+                            if (condition != null) {
                                 add(condition)
                             }
                         }
@@ -63,6 +58,43 @@ class LibraryRepositoryImpl(
         return dao.queryRaw(request, dao.rawRowMapper, *args.toTypedArray()).results
     }
 
+    private fun mapItemToCondition(
+        item: FilterItem,
+        args: MutableList<String>,
+        type: ConditionType = ConditionType.AND,
+    ): SqlCondition? {
+        val value = when (item) {
+            is FilterItem.Text -> mapTextItemToCondition(item, args)
+            is FilterItem.Numeric -> mapNumericItemToCondition(item)
+            is FilterItem.TextSet -> mapTextSetItemToCondition(item)
+            is FilterItem.KeyList -> mapKeyListItemToCondition(item)
+            is FilterItem.OnlyWithoutPlaylists -> mapOnlyWithoutPlaylistsItemToCondition(item)
+            is FilterItem.MultiplyItems -> {
+                if (item.items.isNotEmpty()) {
+                    val subConditions = item.items.map {
+                        mapItemToCondition(it, args, ConditionType.OR)
+                    }.filterNotNull()
+                    val mergedConditions = SqliteRequestUtils.mergeConditions(subConditions)
+                    if (mergedConditions.isNotBlank()) {
+                        "($mergedConditions)"
+                    } else {
+                        ""
+                    }
+                } else {
+                    ""
+                }
+            }
+        }
+        return if (value.isNotBlank()) {
+            SqlCondition(
+                type = type,
+                value = value,
+            )
+        } else {
+            null
+        }
+    }
+
     private fun mapOnlyWithoutPlaylistsItemToCondition(item: FilterItem.OnlyWithoutPlaylists): String {
         return if (item.isOnlyWithoutPlaylist) {
             " (SELECT COUNT(*) FROM audio_in_playlist AS aip WHERE aip.audio_uuid = a.uuid) == 0 "
@@ -73,10 +105,6 @@ class LibraryRepositoryImpl(
 
     private fun mapKeyListItemToCondition(item: FilterItem.KeyList): String {
         return SqliteRequestUtils.inArray(FilteredAudioField.KEY.toDatabaseField(), item.keys.map { it.sortPosition.toString() })
-    }
-
-    private fun mapDateListItemToCondition(item: FilterItem.DateList): String {
-        return SqliteRequestUtils.likeOrExpression(FilteredAudioField.DATE_CREATED.toDatabaseField(), item.dateList)
     }
 
     private fun mapTextSetItemToCondition(item: FilterItem.TextSet): String {

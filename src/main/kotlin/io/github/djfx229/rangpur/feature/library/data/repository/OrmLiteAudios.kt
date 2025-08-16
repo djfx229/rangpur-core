@@ -55,12 +55,29 @@ class OrmLiteAudios(var source: ConnectionSource) : Database.Audios {
                         "p.playlist_uuid = '${filter.playlistUUID}' "
                     )
                 }
-                append(SqliteRequestUtils.where(conditions))
+                append(where(conditions))
                 append(SqliteRequestUtils.sortedBy(filter.sort))
                 append(";")
             }
         }.toString()
     }
+
+    private fun where(conditions: List<String>): String =
+        StringBuilder().apply {
+            if (conditions.isNotEmpty()) {
+                append("WHERE ")
+                for ((index, item) in conditions.withIndex()) {
+                    append(
+                        if (index == 0) {
+                            "$item "
+                        } else {
+                            "AND $item "
+                        }
+                    )
+                }
+            }
+            append(" ")
+        }.toString()
 
     private fun getFilteredAudiosRequest(filter: LegacyFilter): String {
         return StringBuilder().apply {
@@ -97,7 +114,7 @@ class OrmLiteAudios(var source: ConnectionSource) : Database.Audios {
                         add("(SELECT COUNT(*) FROM audio_in_playlist AS aip WHERE aip.audio_uuid = a.uuid) == 0 ")
                     }
                 }
-                append(SqliteRequestUtils.where(conditions))
+                append(where(conditions))
                 append(SqliteRequestUtils.sortedBy(filter.sort))
                 append(";")
             }

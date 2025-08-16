@@ -18,7 +18,13 @@ class FilterPresenter(
     private val flowFilterFieldsUi: MutableStateFlow<List<FilterFieldUi>> = MutableStateFlow(filterFieldUiList())
     private val flowFilter: MutableStateFlow<Filter> = MutableStateFlow(Filter(emptyList()))
 
+    val fastSearchField = FilterFieldUi.FastSearch()
     val directoriesField = FilterFieldUi.Directories()
+    private val innerFields = listOf(
+        fastSearchField,
+        directoriesField,
+    )
+
     val datesField = FilterFieldUi.TextSet(FilteredAudioField.DATE_CREATED)
 
     fun observableFilterFields(): StateFlow<List<FilterFieldUi>> = flowFilterFieldsUi.asStateFlow()
@@ -26,59 +32,7 @@ class FilterPresenter(
     fun observableFilter(): StateFlow<Filter> = flowFilter.asStateFlow()
 
     fun updateFilterField(filterFieldUi: FilterFieldUi) {
-        filterFieldUi.item = when (filterFieldUi) {
-            is FilterFieldUi.Text -> FilterItem.Text(filterFieldUi.audioField, filterFieldUi.rawValue)
-
-            is FilterFieldUi.Numeric -> {
-                if (filterFieldUi.rawValue.contains("-")) {
-                    val rangeValues = filterFieldUi.rawValue.split("-")
-                    if (rangeValues.size == 2) {
-                        val min = rangeValues.first().toFloatOrNull()
-                        val max = rangeValues.last().toFloatOrNull()
-                        if (min != null && max != null) {
-                            FilterItem.Numeric(filterFieldUi.audioField, min, max)
-                        } else {
-                            null
-                        }
-                    } else {
-                        null
-                    }
-                } else {
-                    filterFieldUi.rawValue.toFloatOrNull()?.let { value ->
-                        FilterItem.Numeric(filterFieldUi.audioField, value)
-                    }
-                }
-            }
-
-            is FilterFieldUi.Key -> {
-                val rawValues = filterFieldUi.rawValue.split(" ")
-                if (rawValues.size == 2 && rawValues.last() == "+") {
-                    Keys.lancelotMap[rawValues.first().uppercase()]?.let { key ->
-                        FilterItem.KeyList(key.plusAllCompatible())
-                    }
-                } else {
-                    val keys = rawValues.mapNotNull { rawValuesItem ->
-                        Keys.lancelotMap[rawValuesItem.uppercase()]
-                    }
-                    FilterItem.KeyList(keys)
-                }
-            }
-
-            is FilterFieldUi.Directories -> {
-                FilterItem.TextSet(
-                    field = FilteredAudioField.DIRECTORY_LOCATION,
-                    values = filterFieldUi.selectedDirectories.mapNotNull { it.locationInMusicDirectory }.toSet()
-                )
-            }
-
-            is FilterFieldUi.TextSet -> {
-                FilterItem.TextSet(
-                    field = filterFieldUi.audioField,
-                    values = filterFieldUi.values
-                )
-            }
-        }
-
+        filterFieldUi.parse()
         flowFilter.tryEmit(makeFilter())
     }
 
@@ -96,18 +50,20 @@ class FilterPresenter(
 
     private fun makeFilter(): Filter {
         val items = buildList {
-            flowFilterFieldsUi.value.forEach { field ->
+            val addIfActive = { field: FilterFieldUi ->
                 if (field.isActive) {
                     field.item?.let { filterItem ->
                         add(filterItem)
                     }
                 }
             }
-
-            directoriesField.item?.let(::add)
-            datesField.item?.let(::add)
+            flowFilterFieldsUi.value.forEach { field ->
+                addIfActive(field)
+            }
+            innerFields.forEach { field ->
+                addIfActive(field)
+            }
         }
-
         return Filter(items)
     }
 

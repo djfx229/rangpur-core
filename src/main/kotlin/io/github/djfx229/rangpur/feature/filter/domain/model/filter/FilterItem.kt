@@ -1,6 +1,5 @@
 package io.github.djfx229.rangpur.feature.filter.domain.model.filter
 
-import io.github.djfx229.rangpur.feature.library.domain.model.Directory
 import io.github.djfx229.rangpur.feature.library.domain.model.Keys
 
 sealed class FilterItem {
@@ -27,11 +26,11 @@ sealed class FilterItem {
         val values: Set<String>,
     ) : FilterItem()
 
-    data class DateList(
-        var dateList: List<String>,
-    ) : FilterItem()
-
     data class OnlyWithoutPlaylists(
         var isOnlyWithoutPlaylist: Boolean,
+    ) : FilterItem()
+
+    data class MultiplyItems(
+        val items: List<FilterItem>,
     ) : FilterItem()
 }

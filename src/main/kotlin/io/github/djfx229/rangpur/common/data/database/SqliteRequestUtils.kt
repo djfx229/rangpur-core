@@ -6,22 +6,35 @@ import io.github.djfx229.rangpur.common.domain.model.sort.SortedAudioField
 
 object SqliteRequestUtils {
 
-    fun where(conditions: List<String>): String =
-        StringBuilder().apply {
-            if (conditions.isNotEmpty()) {
-                append("WHERE ")
-                for ((index, item) in conditions.withIndex()) {
-                    append(
-                        if (index == 0) {
-                            "$item "
-                        } else {
-                            "AND $item "
-                        }
-                    )
+    fun where(conditions: List<SqlCondition>): String {
+        val mergedConditions = mergeConditions(conditions)
+        return if (mergedConditions.isNotBlank()) {
+            "WHERE $mergedConditions"
+        } else {
+            ""
+        }
+    }
+
+    fun mergeConditions(conditions: List<SqlCondition>): String = buildString {
+        if (conditions.isNotEmpty()) {
+            for ((index, item) in conditions.withIndex()) {
+                val type = if (index == 0) {
+                    ""
+                } else {
+                    when(item.type) {
+                        ConditionType.AND -> "AND"
+                        ConditionType.OR -> "OR"
+                    }
+                }
+                val isNot = if (item.isNot) "NOT" else ""
+                val conditionString = "$type $isNot ${item.value} "
+                if (conditionString.isNotBlank()) {
+                    append(conditionString)
                 }
             }
-            append(" ")
-        }.toString()
+        }
+        append(" ")
+    }
 
     fun likeOrExpression(field: String, values: List<String>, startsWith: Boolean = false): String =
         StringBuilder().apply {
