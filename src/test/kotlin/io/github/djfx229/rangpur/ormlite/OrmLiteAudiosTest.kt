@@ -4,7 +4,6 @@ import com.j256.ormlite.jdbc.JdbcConnectionSource
 import com.j256.ormlite.logger.Level
 import com.j256.ormlite.logger.Logger
 import com.j256.ormlite.support.ConnectionSource
-import io.github.djfx229.rangpur.feature.library.domain.model.filter.LegacyFilter
 import io.github.djfx229.rangpur.common.domain.database.Database
 import io.github.djfx229.rangpur.common.data.database.OrmLiteDatabase
 import org.junit.jupiter.api.AfterEach
@@ -175,46 +174,6 @@ internal class OrmLiteAudiosTest {
                 assertTrue(isExistInDatabase, result)
             }
         }
-
-        database.audios.getFiltered(
-            LegacyFilter().apply {
-                dateList.add("2010")
-            }
-        ).forEach { audio ->
-            audio.apply {
-                val isExistInDatabase = audio2010.contains(audio)
-                val result = "check audio '$fileName' -- isExistInDatabase == $isExistInDatabase"
-                assertTrue(isExistInDatabase, result)
-            }
-        }
-        database.audios.getFiltered(
-            LegacyFilter().apply {
-                dateList.add("2016")
-            }
-        ).forEach { audio ->
-            audio.apply {
-                val isExistInDatabase = audio2016.contains(audio)
-                val result = "check audio '$fileName' -- isExistInDatabase == $isExistInDatabase"
-                assertTrue(isExistInDatabase, result)
-            }
-        }
-        database.audios.getFiltered(
-            LegacyFilter().apply {
-                dateList.add("2021")
-            }
-        ).forEach { audio ->
-            audio.apply {
-                val isExistInDatabase = audio2021.contains(audio)
-                val result = "check audio '$fileName' -- isExistInDatabase == $isExistInDatabase"
-                assertTrue(isExistInDatabase, result)
-            }
-        }
-
-        val searchFilter = LegacyFilter().apply {
-            searchRequest = forTestSearch.artist!!
-        }
-        val testSearch = database.audios.getFiltered(searchFilter)
-        assertTrue(testSearch.size == 1 && testSearch.first() == forTestSearch, "test search")
     }
 
 }

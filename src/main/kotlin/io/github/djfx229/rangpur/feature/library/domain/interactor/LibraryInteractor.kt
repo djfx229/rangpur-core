@@ -10,7 +10,6 @@ import io.github.djfx229.rangpur.feature.library.domain.model.Audio
 import io.github.djfx229.rangpur.feature.library.domain.model.Directory
 import io.github.djfx229.rangpur.feature.library.domain.model.copy
 import io.github.djfx229.rangpur.feature.filter.domain.model.filter.Filter
-import io.github.djfx229.rangpur.feature.library.domain.model.filter.LegacyFilter
 import io.github.djfx229.rangpur.feature.library.domain.repository.LibraryRepository
 import java.io.File
 
@@ -56,10 +55,6 @@ class LibraryInteractor(
 
     fun updateAudio(audio: Audio) {
         return database.audios.update(listOf(audio))
-    }
-
-    fun getAudiosByLegacyFilter(filter: LegacyFilter): List<Audio> {
-        return database.audios.getFiltered(filter)
     }
 
     fun getAudioFile(audio: Audio): File {

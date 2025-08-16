@@ -2,7 +2,6 @@ package io.github.djfx229.rangpur.common.domain.database
 
 import io.github.djfx229.rangpur.feature.library.domain.model.Audio
 import io.github.djfx229.rangpur.feature.library.domain.model.Directory
-import io.github.djfx229.rangpur.feature.library.domain.model.filter.LegacyFilter
 import io.github.djfx229.rangpur.feature.library.domain.repository.LibraryRepository
 import io.github.djfx229.rangpur.feature.playlist.domain.model.AudioInPlaylist
 import io.github.djfx229.rangpur.feature.playlist.domain.model.Playlist
@@ -24,9 +23,7 @@ interface Database {
         fun getItemByLocation(location: String): Directory?
     }
 
-    interface Audios: MultipleCRUD<Audio> {
-        fun getFiltered(filter: LegacyFilter): List<Audio>
-    }
+    interface Audios: MultipleCRUD<Audio>
 
     interface PlaylistFolders : AllGetter<PlaylistFolder> {
         fun create(playlistFolder: PlaylistFolder)
