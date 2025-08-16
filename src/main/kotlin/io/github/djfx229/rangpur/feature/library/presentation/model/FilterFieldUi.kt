@@ -220,11 +220,15 @@ sealed class FilterFieldUi {
         } else {
             val keys = rawValues.mapNotNull { rawValuesItem ->
                 Keys.lancelotMap[rawValuesItem.uppercase()]
+            }.filterNot { it.sortPosition == 0 }
+            if (keys.isNotEmpty()) {
+                FilterItem.KeyList(
+                    keys = keys,
+                    isNot = isNot,
+                )
+            } else {
+                null
             }
-            FilterItem.KeyList(
-                keys = keys,
-                isNot = isNot,
-            )
         }
     }
 }
