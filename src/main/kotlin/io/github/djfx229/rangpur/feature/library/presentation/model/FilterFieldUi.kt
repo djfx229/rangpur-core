@@ -208,6 +208,27 @@ sealed class FilterFieldUi {
         }
     }
 
+    class Date : FilterFieldUi() {
+        override val name: String = FilteredAudioField.DATE_CREATED.toString()
+
+        override fun parse() {
+            val rangeValues = rawValue.trim().split(" - ")
+            if (rangeValues.size > 1) {
+                item = FilterItem.DateRange(
+                    min = rangeValues.firstOrNull() ?: "",
+                    max = rangeValues.lastOrNull() ?: "",
+                    isNot = isNot,
+                )
+            } else {
+                item = FilterItem.Text(
+                    field = FilteredAudioField.DATE_CREATED,
+                    value = rawValue,
+                    isNot = isNot,
+                )
+            }
+        }
+    }
+
     protected fun parseKeyListFromString(rawValue: String): FilterItem.KeyList? {
         val rawValues = rawValue.split(" ")
         return if (rawValues.size == 2 && rawValues.last() == "+") {

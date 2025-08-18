@@ -118,6 +118,7 @@ class LibraryRepositoryImpl(
                     ""
                 }
             }
+            is FilterItem.DateRange -> mapDateRangeItemToCondition(item)
 
             // Данные фильтры в рамках where применять не эффективно, они будут выполнены раньше.
             is FilterItem.Playlists -> ""
@@ -131,6 +132,10 @@ class LibraryRepositoryImpl(
         } else {
             null
         }
+    }
+
+    private fun mapDateRangeItemToCondition(item: FilterItem.DateRange): String {
+        return " ${AudioField.DATE_CREATED} BETWEEN ${item.min} AND ${item.max} "
     }
 
     private fun mapOnlyWithoutPlaylistsItemToCondition(item: FilterItem.OnlyWithoutPlaylists): String {

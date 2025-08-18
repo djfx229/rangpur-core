@@ -44,4 +44,10 @@ sealed class FilterItem(
         val uuidItems: List<String>,
         override val isNot: Boolean,
     ) : FilterItem()
+
+    data class DateRange(
+        val min: String,
+        val max: String,
+        override val isNot: Boolean,
+    ) : FilterItem()
 }
