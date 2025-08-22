@@ -178,24 +178,29 @@ sealed class FilterFieldUi {
     class Duration : OneColumnField(FilteredAudioField.DURATION) {
         override fun parse() {
             val rangeValues = rawValue.trim().split("-")
-            item = if (rangeValues.size == 2) {
-                val first = parseTime(rangeValues.first())
-                val second = parseTime(rangeValues.last())
-                FilterItem.Numeric(
-                    field = audioField,
-                    value = min(first, second),
-                    max = max(first, second),
-                    isNot = isNot,
-                )
-            } else if (rawValue.isNotBlank()) {
-                val time = parseTime(rawValue)
-                FilterItem.Numeric(
-                    field = audioField,
-                    value = time,
-                    isNot = isNot,
-                )
-            } else {
-                null
+            item = try {
+                if (rangeValues.size == 2) {
+                    val first = parseTime(rangeValues.first())
+                    val second = parseTime(rangeValues.last())
+                    FilterItem.Numeric(
+                        field = audioField,
+                        value = min(first, second),
+                        max = max(first, second),
+                        isNot = isNot,
+                    )
+                } else if (rawValue.isNotBlank()) {
+                    val time = parseTime(rawValue)
+                    FilterItem.Numeric(
+                        field = audioField,
+                        value = time,
+                        isNot = isNot,
+                    )
+                } else {
+                    null
+                }
+            } catch (_: NumberFormatException) {
+                // сохраняем прошлое значение пока введено промежуточное значение
+                item
             }
         }
 
