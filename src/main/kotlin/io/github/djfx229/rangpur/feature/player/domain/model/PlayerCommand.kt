@@ -1,22 +1,22 @@
 package io.github.djfx229.rangpur.feature.player.domain.model
 
+import io.github.djfx229.rangpur.feature.player.domain.interactor.PlayerQueue
+
 sealed class PlayerCommand {
 
-    data class Open<T : Any>(
-        val index: Int,
-        val currentItem: T,
-        val items: List<T>,
+    data class Open(
+        val queue: PlayerQueue<*>,
     ) : PlayerCommand()
 
-    object Play : PlayerCommand()
+    data object Play : PlayerCommand()
 
-    object TogglePlayOrPause : PlayerCommand()
+    data object TogglePlayOrPause : PlayerCommand()
 
-    object Stop : PlayerCommand()
+    data object Stop : PlayerCommand()
 
-    object Previous : PlayerCommand()
+    data object Previous : PlayerCommand()
 
-    object Next : PlayerCommand()
+    data object Next : PlayerCommand()
 
     data class SeekTo(
         val positionSeconds: Double,
@@ -46,10 +46,10 @@ sealed class PlayerCommand {
     /**
      * Выключает плеер, высвобождает занятые им ресурсы.
      */
-    object Release : PlayerCommand()
+    data object Release : PlayerCommand()
 
-    object ToggleRepeatMode : PlayerCommand()
+    data object ToggleRepeatMode : PlayerCommand()
 
-    object ToggleShuffleMode : PlayerCommand()
+    data object ToggleShuffleMode : PlayerCommand()
 
 }

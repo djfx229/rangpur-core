@@ -5,21 +5,17 @@ import io.github.djfx229.rangpur.common.domain.di.DependencyInjector
 import io.github.djfx229.rangpur.common.domain.di.getConfigRepository
 import io.github.djfx229.rangpur.common.domain.repository.ConfigRepository
 import io.github.djfx229.rangpur.feature.library.domain.interactor.LibraryInteractor
-import io.github.djfx229.rangpur.feature.library.domain.model.Audio
 import io.github.djfx229.rangpur.feature.player.domain.controller.PlayerController
 import io.github.djfx229.rangpur.feature.player.domain.model.*
 import io.github.djfx229.rangpur.feature.player.domain.model.state.MetadataState
 import io.github.djfx229.rangpur.feature.player.domain.model.state.PlaybackState
-import io.github.djfx229.rangpur.feature.playlist.domain.model.AudioInPlaylist
 import io.github.djfx229.rangpur.feature.radio.domain.model.RadioStation
 import io.github.djfx229.rangpur.feature.radio.domain.model.StreamMetadata
 import kotlinx.coroutines.*
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import java.io.File
 import java.lang.Double.min
 import kotlin.math.max
-
 
 class PlayerInteractor(
     private val di: DependencyInjector,
@@ -31,7 +27,6 @@ class PlayerInteractor(
         fun onChangePosition(info: PlayerPosition) {}
         fun onChangeState(state: PlaybackState) {}
         fun onChangeMetadata(state: MetadataState) {}
-        fun onChangeCurrentIndex(index: Int, item: Any) {}
         fun onChangeRepeatMode(mode: PlayerRepeatMode) {}
         fun onChangeShuffleMode(isShuffleMode: Boolean) {}
     }
@@ -48,11 +43,7 @@ class PlayerInteractor(
         di.getConfigRepository()
     }
 
-    private var playlist: List<Any>? = null
-    private var randomQueue: List<Int>? = null
-    private var mapToRealIndex: Map<Int, Int>? = null
-
-    private var currentIndex: Int = -1
+    private var playerQueue: PlayerQueue<*> = PlayerQueue.Empty
     private var currentPlaybackState: PlaybackState = PlaybackState.Stopped
     private var currentMetadataState: MetadataState = MetadataState.EmptyMetadataState
     private var externalPlaybackListeners = emptyList<Listener>().toMutableList()
@@ -66,21 +57,21 @@ class PlayerInteractor(
     private val playerListener = object : PlayerController.Listener {
         override fun onPlay() {
             log.d(this, "onPlay()")
-            currentItem?.let {
+            playerQueue.currentItem?.let {
                 setPlaybackState(PlaybackState.Playing)
             }
         }
 
         override fun onPause() {
             log.d(this, "onPause()")
-            currentItem?.let {
+            playerQueue.currentItem?.let {
                 setPlaybackState(PlaybackState.Paused)
             }
         }
 
         override fun onChangeStreamMetadata(metadata: StreamMetadata) {
             log.d(this, "onChangeStreamMetadata() // metadata=$metadata")
-            currentItem?.let { item ->
+            playerQueue.currentItem?.let { item ->
                 if (item is RadioStation) {
                     setMetadataState(
                         MetadataState.Stream(item, metadata)
@@ -89,9 +80,6 @@ class PlayerInteractor(
             }
         }
     }
-
-    var currentItem: Any? = null
-        private set
 
     val state: PlaybackState
         get() = player.state
@@ -125,63 +113,10 @@ class PlayerInteractor(
 
     fun getPlayerPosition(): PlayerPosition = player.getPosition()
 
-    private fun tryChangeIndexAndPlayAudio(requestIndex: Int) {
-        val size = playlist?.size ?: return
-
-        val index = if (requestIndex < 0) {
-            if (repeatMode == PlayerRepeatMode.PLAYLIST) {
-                size - 1
-            } else {
-                return
-            }
-        } else if (requestIndex >= size) {
-            if (repeatMode == PlayerRepeatMode.PLAYLIST) {
-                0
-            } else {
-                return
-            }
-        } else {
-            requestIndex
-        }
-
-        val newIndex = shuffleNewIndexIfNeed(index)
-        currentItem = playlist?.getOrNull(newIndex) ?: return
-        currentIndex = index
-        tryPlayCurrentItem()
-    }
-
     private fun tryPlayCurrentItem() {
-        val item = currentItem ?: return
-
-        externalPlaybackListeners.forEach { listener ->
-            listener.onChangeCurrentIndex(shuffleNewIndexIfNeed(currentIndex), item)
-        }
-
-        val source = when (item) {
-            is Audio -> {
-                setMetadataState(MetadataState.AudioItem(item))
-                PlayerSource.File(libraryInteractor.getFullPath(item))
-            }
-
-            is AudioInPlaylist -> {
-                val audio = item.audio ?: return
-                setMetadataState(MetadataState.AudioItem(audio))
-                PlayerSource.File(libraryInteractor.getFullPath(audio))
-            }
-
-            is File -> {
-                setMetadataState(MetadataState.File(item.name))
-                PlayerSource.File(item.absolutePath)
-            }
-
-            is RadioStation -> {
-                setMetadataState(MetadataState.Stream(item))
-                PlayerSource.Stream(item.streamUrl)
-            }
-
-            else -> PlayerSource.Unsupported
-        }
-        player.open(source)
+        if (playerQueue.currentItem == null) return
+        setMetadataState(playerQueue.currentMetadata)
+        player.open(playerQueue.currentPlayerSource(libraryInteractor))
         player.play()
         setPlaybackState(PlaybackState.Playing)
         startTimer()
@@ -206,7 +141,7 @@ class PlayerInteractor(
         handleCommandMutex.withLock {
             log.d(this, "handleCommand(command=${command.javaClass}) start handling")
             when (command) {
-                is PlayerCommand.Open<*> -> handleCommandOpen(command)
+                is PlayerCommand.Open -> handleCommandOpen(command)
                 PlayerCommand.Play -> handleCommandPlay()
                 PlayerCommand.TogglePlayOrPause -> handleCommandPause()
                 PlayerCommand.Stop -> handleCommandStop()
@@ -226,16 +161,10 @@ class PlayerInteractor(
         }
     }
 
-    private fun handleCommandOpen(command: PlayerCommand.Open<*>) {
-        this.currentItem = command.currentItem
-        if (playlist != command.items) {
-            playlist = command.items
-            if (isShuffleMode) {
-                generateShuffleData()
-            }
+    private fun handleCommandOpen(command: PlayerCommand.Open) {
+        if (playerQueue != command.queue) {
+            playerQueue = command.queue
         }
-        currentIndex = getRealPlaylistIndex(command.index)
-
         player.setListener(playerListener)
         tryPlayCurrentItem()
     }
@@ -263,15 +192,29 @@ class PlayerInteractor(
     }
 
     private fun handleCommandNext() {
-        tryChangeIndexAndPlayAudio(currentIndex + 1)
+        playerQueue.switchTo(
+            where = SwitchDirection.Next,
+            isShuffleModeOn = isShuffleMode,
+            isInfinityModeOn = repeatMode == PlayerRepeatMode.PLAYLIST,
+            onSuccessfullySwitched = {
+                tryPlayCurrentItem()
+            }
+        )
     }
 
     private fun handleCommandPrevious() {
-        tryChangeIndexAndPlayAudio(currentIndex - 1)
+        playerQueue.switchTo(
+            where = SwitchDirection.Previous,
+            isShuffleModeOn = isShuffleMode,
+            isInfinityModeOn = repeatMode == PlayerRepeatMode.PLAYLIST,
+            onSuccessfullySwitched = {
+                tryPlayCurrentItem()
+            }
+        )
     }
 
     private fun handleCommandSeekTo(command: PlayerCommand.SeekTo) {
-        if (currentItem is Audio || currentItem is AudioInPlaylist || currentItem is File) {
+        if (playerQueue.isSupportsSeek) {
             player.seekTo(command.positionSeconds)
         }
     }
@@ -294,12 +237,7 @@ class PlayerInteractor(
 
     private fun handleCommandBeatsSeek(command: PlayerCommand.BeatsSeek) {
         if (command.beats == 0) return
-        val item = currentItem
-        val bpm = when (item) {
-            is Audio -> item.bpm
-            is AudioInPlaylist -> item.audio?.bpm
-            else -> null
-        } ?: return
+        val bpm = playerQueue.currentAudio?.bpm ?: return
         val beatsToSeconds = 1.0 / command.beats * bpm
         handleCommandRelativeSeek(PlayerCommand.RelativeSeek(beatsToSeconds))
     }
@@ -321,14 +259,6 @@ class PlayerInteractor(
     private fun handleCommandToggleShuffleMode() {
         isShuffleMode = !isShuffleMode
         log.d(this, "change shuffle mode to $isShuffleMode")
-
-        if (isShuffleMode) {
-            generateShuffleData()
-            currentIndex = 0
-        } else {
-            currentIndex = randomQueue.orEmpty().getOrNull(currentIndex) ?: 0
-            releaseShuffleData()
-        }
 
         saveConfig()
         externalPlaybackListeners.forEach { listener ->
@@ -370,15 +300,8 @@ class PlayerInteractor(
 
     private suspend fun onWaitingNextTrack() {
         when (repeatMode) {
-            PlayerRepeatMode.NONE -> handleCommand(PlayerCommand.Next)
             PlayerRepeatMode.ONE_TRACK -> tryPlayCurrentItem()
-            PlayerRepeatMode.PLAYLIST -> {
-                if (currentItem == playlist?.last()) {
-                    tryChangeIndexAndPlayAudio(0)
-                } else {
-                    handleCommand(PlayerCommand.Next)
-                }
-            }
+            else -> handleCommand(PlayerCommand.Next)
         }
     }
 
@@ -399,46 +322,6 @@ class PlayerInteractor(
                 save()
             }
         }
-    }
-
-    private fun getRealPlaylistIndex(index: Int): Int {
-        return if (isShuffleMode) {
-            if (mapToRealIndex == null || playlist?.size != mapToRealIndex?.size) {
-                generateShuffleData()
-            }
-            mapToRealIndex?.get(index) ?: -1
-        } else {
-            index
-        }
-    }
-
-    private fun shuffleNewIndexIfNeed(newIndex: Int): Int {
-        return if (isShuffleMode) {
-            randomQueue.orEmpty().getOrNull(newIndex) ?: -1
-        } else {
-            newIndex
-        }
-    }
-
-    private fun generateShuffleData() {
-        randomQueue = buildList {
-            playlist?.indexOf(currentItem)?.let { add(it) }
-            addAll(
-                playlist.orEmpty().mapIndexed { index, item ->
-                    if (item == currentItem) null else index
-                }.filterNotNull().shuffled()
-            )
-        }
-        mapToRealIndex = buildMap {
-            randomQueue?.forEachIndexed { index, item ->
-                put(item, index)
-            }
-        }
-    }
-
-    private fun releaseShuffleData() {
-        randomQueue = null
-        mapToRealIndex = null
     }
 
 }

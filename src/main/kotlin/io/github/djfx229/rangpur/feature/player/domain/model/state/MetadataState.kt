@@ -6,7 +6,7 @@ import io.github.djfx229.rangpur.feature.library.domain.model.Audio
 
 sealed class MetadataState {
 
-    object EmptyMetadataState : MetadataState()
+    data object EmptyMetadataState : MetadataState()
 
     /**
      * Метаданные для онлайн-радио.
