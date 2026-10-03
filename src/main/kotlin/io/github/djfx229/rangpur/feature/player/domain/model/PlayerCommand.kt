@@ -2,10 +2,16 @@ package io.github.djfx229.rangpur.feature.player.domain.model
 
 import io.github.djfx229.rangpur.feature.player.domain.interactor.PlayerQueue
 
+enum class SwitchReason {
+    UserAction,
+    TrackFinished,
+}
+
 sealed class PlayerCommand {
 
     data class Open(
         val queue: PlayerQueue<*>,
+        val doNotRestartPlaybackForSameTrack: Boolean = false,
     ) : PlayerCommand()
 
     data object Play : PlayerCommand()
@@ -16,7 +22,9 @@ sealed class PlayerCommand {
 
     data object Previous : PlayerCommand()
 
-    data object Next : PlayerCommand()
+    data class Next(
+        val reason: SwitchReason = SwitchReason.UserAction,
+    ) : PlayerCommand()
 
     data class SeekTo(
         val positionSeconds: Double,

@@ -146,7 +146,7 @@ class PlayerInteractor(
                 PlayerCommand.TogglePlayOrPause -> handleCommandPause()
                 PlayerCommand.Stop -> handleCommandStop()
 
-                PlayerCommand.Next -> handleCommandNext()
+                is PlayerCommand.Next -> handleCommandNext(command)
                 PlayerCommand.Previous -> handleCommandPrevious()
 
                 is PlayerCommand.SeekTo -> handleCommandSeekTo(command)
@@ -162,10 +162,12 @@ class PlayerInteractor(
     }
 
     private fun handleCommandOpen(command: PlayerCommand.Open) {
+        val lastItem = playerQueue.currentItem
         if (playerQueue != command.queue) {
             playerQueue = command.queue
         }
         player.setListener(playerListener)
+        if (command.doNotRestartPlaybackForSameTrack && lastItem == playerQueue.currentItem) return
         tryPlayCurrentItem()
     }
 
@@ -191,11 +193,12 @@ class PlayerInteractor(
         setPlaybackState(PlaybackState.Stopped)
     }
 
-    private fun handleCommandNext() {
+    private fun handleCommandNext(command: PlayerCommand.Next) {
         playerQueue.switchTo(
             where = SwitchDirection.Next,
             isShuffleModeOn = isShuffleMode,
             isInfinityModeOn = repeatMode == PlayerRepeatMode.PLAYLIST,
+            isFullListened = command.reason == SwitchReason.TrackFinished,
             onSuccessfullySwitched = {
                 tryPlayCurrentItem()
             }
@@ -207,6 +210,7 @@ class PlayerInteractor(
             where = SwitchDirection.Previous,
             isShuffleModeOn = isShuffleMode,
             isInfinityModeOn = repeatMode == PlayerRepeatMode.PLAYLIST,
+            isFullListened = false,
             onSuccessfullySwitched = {
                 tryPlayCurrentItem()
             }
@@ -301,7 +305,7 @@ class PlayerInteractor(
     private suspend fun onWaitingNextTrack() {
         when (repeatMode) {
             PlayerRepeatMode.ONE_TRACK -> tryPlayCurrentItem()
-            else -> handleCommand(PlayerCommand.Next)
+            else -> handleCommand(PlayerCommand.Next(SwitchReason.TrackFinished))
         }
     }
 

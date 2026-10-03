@@ -13,21 +13,24 @@ enum class SwitchDirection {
     Next,
 }
 
+typealias OnChangeCurrentIndex<T> = (index: Int, item: T, playerQueue: PlayerQueue<*>) -> Unit
+
 /**
  * Определяет очередь того, что будет воспроизводить [PlayerInteractor].
  */
 sealed class PlayerQueue<T> {
     abstract val isSupportsShuffle: Boolean
-    abstract val isSupportsSeek: Boolean
     abstract val isHasPrevious: Boolean
     abstract val isHasNext: Boolean
 
     var currentItem: T? = null
         protected set
 
-    abstract val currentAudio: Audio?
+    open val currentAudio: Audio? = null
 
     abstract val currentMetadata: MetadataState
+
+    open val isSupportsSeek: Boolean = true
 
     /**
      * @param where в какую позицию необходимо переместиться.
@@ -35,12 +38,14 @@ sealed class PlayerQueue<T> {
      * он будет проигнорирован).
      * @param isInfinityModeOn если false, то при попытке переключится в направлении где нет больше элементов
      * необходимо закольцевать список. Поддержка этого параметра для отдельно взятого [PlayerQueue] опциональна.
+     * @param isFullListened если false, значит пользователь сам пропустил трек.
      * @param onSuccessfullySwitched коллбек который вызывается, когда произошло переключение.
      */
     abstract fun switchTo(
         where: SwitchDirection,
         isShuffleModeOn: Boolean,
         isInfinityModeOn: Boolean,
+        isFullListened: Boolean,
         onSuccessfullySwitched: () -> Unit,
     )
 
@@ -58,6 +63,7 @@ sealed class PlayerQueue<T> {
             where: SwitchDirection,
             isShuffleModeOn: Boolean,
             isInfinityModeOn: Boolean,
+            isFullListened: Boolean,
             onSuccessfullySwitched: () -> Unit
         ) {}
 
@@ -71,13 +77,13 @@ sealed class PlayerQueue<T> {
         index: Int,
         item: T,
         private val queue: List<T>,
-        private val onChangeCurrentIndex: (index: Int, item: T) -> Unit,
+        private val onChangeCurrentIndex: OnChangeCurrentIndex<T>,
     ) : PlayerQueue<T>() {
         private var currentIndex: Int = -1
             set(value) {
                 field = value
                 currentItem?.let { item ->
-                    onChangeCurrentIndex(shuffleNewIndexIfNeed(value), item)
+                    onChangeCurrentIndex(shuffleNewIndexIfNeed(value), item, this)
                 }
             }
 
@@ -85,9 +91,6 @@ sealed class PlayerQueue<T> {
         private var mapToRealIndex: Map<Int, Int>? = null
 
         override val isSupportsShuffle: Boolean = true
-
-        override val isSupportsSeek: Boolean
-            get() = currentItem !is RadioStation
 
         override val isHasPrevious: Boolean
             get() = currentIndex - 1 >= 0
@@ -99,16 +102,6 @@ sealed class PlayerQueue<T> {
             currentIndex = index
             currentItem = item
         }
-
-        override val currentAudio: Audio?
-            get() {
-                val item = currentItem ?: return null
-                return when (item) {
-                    is Audio -> item
-                    is AudioInPlaylist -> item.audio
-                    else -> null
-                }
-            }
 
         override fun equals(other: Any?): Boolean {
             return queue == other
@@ -122,7 +115,8 @@ sealed class PlayerQueue<T> {
             where: SwitchDirection,
             isShuffleModeOn: Boolean,
             isInfinityModeOn: Boolean,
-            onSuccessfullySwitched: () -> Unit,
+            isFullListened: Boolean,
+            onSuccessfullySwitched: () -> Unit
         ) {
             if (isShuffleModeOn && randomQueue == null) {
                 generateShuffleData()
@@ -210,8 +204,11 @@ sealed class PlayerQueue<T> {
         index: Int,
         item: Audio,
         queue: List<Audio>,
-        onChangeCurrentIndex: (index: Int, item: Audio) -> Unit,
+        onChangeCurrentIndex: OnChangeCurrentIndex<Audio>,
     ) : DefaultQueue<Audio>(index, item, queue, onChangeCurrentIndex) {
+        override val currentAudio: Audio?
+            get() = currentItem
+
         override val currentMetadata: MetadataState
             get() {
                 currentItem?.let { item ->
@@ -229,11 +226,15 @@ sealed class PlayerQueue<T> {
     }
 
     class PlaylistQueue(
+        val playlistId: String,
         index: Int,
         item: AudioInPlaylist,
         queue: List<AudioInPlaylist>,
-        onChangeCurrentIndex: (index: Int, item: AudioInPlaylist) -> Unit,
+        onChangeCurrentIndex: OnChangeCurrentIndex<AudioInPlaylist>,
     ) : DefaultQueue<AudioInPlaylist>(index, item, queue, onChangeCurrentIndex) {
+        override val currentAudio: Audio?
+            get() = currentItem?.audio
+
         override val currentMetadata: MetadataState
             get() {
                 currentItem?.audio?.let { item ->
@@ -254,7 +255,7 @@ sealed class PlayerQueue<T> {
         index: Int,
         item: File,
         queue: List<File>,
-        onChangeCurrentIndex: (index: Int, item: File) -> Unit,
+        onChangeCurrentIndex: OnChangeCurrentIndex<File>,
     ) : DefaultQueue<File>(index, item, queue, onChangeCurrentIndex) {
         override val currentMetadata: MetadataState
             get() {
@@ -276,8 +277,10 @@ sealed class PlayerQueue<T> {
         index: Int,
         item: RadioStation,
         queue: List<RadioStation>,
-        onChangeCurrentIndex: (index: Int, item: RadioStation) -> Unit,
+        onChangeCurrentIndex: OnChangeCurrentIndex<RadioStation>,
     ) : DefaultQueue<RadioStation>(index, item, queue, onChangeCurrentIndex) {
+        override val isSupportsSeek: Boolean = false
+
         override val currentMetadata: MetadataState
             get() {
                 currentItem?.let { item ->
@@ -289,6 +292,28 @@ sealed class PlayerQueue<T> {
         override fun currentPlayerSource(libraryInteractor: LibraryInteractor): PlayerSource {
             currentItem?.let { item ->
                 return PlayerSource.Stream(item.streamUrl)
+            }
+            return PlayerSource.Unsupported
+        }
+    }
+
+    abstract class DynamicQueue : PlayerQueue<Audio>() {
+        override val isSupportsShuffle: Boolean = false
+
+        override val currentAudio: Audio?
+            get() = currentItem
+
+        override val currentMetadata: MetadataState
+            get() {
+                currentItem?.let { item ->
+                    return MetadataState.AudioItem(item)
+                }
+                return MetadataState.EmptyMetadataState
+            }
+
+        override fun currentPlayerSource(libraryInteractor: LibraryInteractor): PlayerSource {
+            currentItem?.let { item ->
+                return PlayerSource.File(libraryInteractor.getFullPath(item))
             }
             return PlayerSource.Unsupported
         }
