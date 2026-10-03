@@ -62,7 +62,12 @@ abstract class JsonConfigRepository<T : Config>(
         }
     }
 
-    override fun get(): T = dto as T
+    override fun get(): T {
+        if (dto == null) {
+            load()
+        }
+        return dto as T
+    }
 
     override fun save() {
         if (!file.exists()) {
