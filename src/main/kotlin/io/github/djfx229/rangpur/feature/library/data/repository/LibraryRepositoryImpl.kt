@@ -22,6 +22,25 @@ class LibraryRepositoryImpl(
     }
 
     override fun getAudios(filter: Filter, sort: Sort): List<Audio> {
+        return getAudios(filter, SqliteRequestUtils.sortedBy(sort))
+    }
+
+    /**
+     * Игнорирует аудиозаписи, которые были отмечены как полученные в прошлом запросе с помощью [alreadyRequestedId].
+     */
+    override fun getRandomAudios(alreadyRequestedId: String, filter: Filter, limit: Int): List<Audio> {
+        // todo alreadyRequestedId
+        return getAudios(filter, "ORDER BY random() LIMIT $limit")
+    }
+
+    override fun clearAlreadyRequestedIds() {
+        // todo alreadyRequestedId
+    }
+
+    private fun getAudios(
+        filter: Filter,
+        requestSubstring: String,
+    ): List<Audio> {
         val dao = DaoManager.createDao(source, OrmLiteAudio::class.java)
 
         // Значения, которые нуждаются в экранировании (защите от sql инъекции), собираются здесь, а вместо них в
@@ -85,7 +104,7 @@ class LibraryRepositoryImpl(
                 )
             )
 
-            append(SqliteRequestUtils.sortedBy(sort))
+            append(requestSubstring)
             append(";")
         }.toString()
 

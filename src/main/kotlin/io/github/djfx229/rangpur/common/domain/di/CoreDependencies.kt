@@ -13,6 +13,7 @@ import io.github.djfx229.rangpur.feature.player.data.repository.PlayerConfigRepo
 import io.github.djfx229.rangpur.feature.player.domain.model.PlayerConfig
 import io.github.djfx229.rangpur.common.domain.database.Database
 import io.github.djfx229.rangpur.common.domain.interactor.CachedDirectories
+import io.github.djfx229.rangpur.feature.dynamicplaylist.domain.interactor.DynamicPlaylistInteractor
 import io.github.djfx229.rangpur.feature.library.domain.interactor.FilterLibraryInteractor
 import io.github.djfx229.rangpur.feature.playlist.domain.interactor.AudiosInPlaylistInteractor
 import io.github.djfx229.rangpur.feature.playlist.domain.interactor.PlaylistLibraryInteractor
@@ -58,6 +59,7 @@ fun DependencyInjector.registryCoreDependencies(
     initLibrary(this, database)
     initPlaylist(this)
     initPlayer(this, playerController)
+    initDynamicPlaylist(this, database)
 }
 
 private fun initLibrary(
@@ -110,5 +112,15 @@ private fun initPlayer(
     addSingleton(
         PlayerInteractor::class,
         PlayerInteractor(di),
+    )
+}
+
+fun initDynamicPlaylist(
+    di: DependencyInjector,
+    database: Database,
+) = di.apply {
+    addSingleton(
+        DynamicPlaylistInteractor::class,
+        DynamicPlaylistInteractor(di, database),
     )
 }

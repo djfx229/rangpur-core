@@ -6,4 +6,6 @@ import io.github.djfx229.rangpur.common.domain.model.sort.Sort
 
 interface LibraryRepository {
     fun getAudios(filter: Filter, sort: Sort): List<Audio>
+    fun getRandomAudios(alreadyRequestedId: String, filter: Filter, limit: Int): List<Audio>
+    fun clearAlreadyRequestedIds()
 }
