@@ -154,9 +154,7 @@ sealed class FilterFieldUi {
         }
     }
 
-    class Playlists : FilterFieldUi() {
-        override val name: String = "PLAYLISTS"
-
+    class Playlists : OneColumnField(FilteredAudioField.PLAYLISTS) {
         var isOnlyWithoutPlaylist: Boolean = false
 
         var selectedPlaylists: List<Playlist> = emptyList()
@@ -213,9 +211,7 @@ sealed class FilterFieldUi {
         }
     }
 
-    class Date : FilterFieldUi() {
-        override val name: String = FilteredAudioField.DATE_CREATED.toString()
-
+    class Date : OneColumnField(FilteredAudioField.DATE_CREATED) {
         override fun parse() {
             val rangeValues = rawValue.trim().split(" - ")
             if (rangeValues.size > 1) {
@@ -226,7 +222,7 @@ sealed class FilterFieldUi {
                 )
             } else {
                 item = FilterItem.Text(
-                    field = FilteredAudioField.DATE_CREATED,
+                    field = audioField,
                     value = rawValue,
                     isNot = isNot,
                 )

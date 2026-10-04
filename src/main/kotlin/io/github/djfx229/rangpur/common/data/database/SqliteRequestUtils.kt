@@ -97,7 +97,6 @@ object SqliteRequestUtils {
 
     private fun SortedAudioField.toDatabaseField(): String {
         return when (this) {
-            SortedAudioField.KEY_SORT_POSITION -> AudioField.KEY_SORT_POSITION
             SortedAudioField.TIMESTAMP_CREATED -> AudioField.TIMESTAMP_CREATED
             SortedAudioField.ARTIST -> AudioField.ARTIST
             SortedAudioField.TITLE -> AudioField.TITLE

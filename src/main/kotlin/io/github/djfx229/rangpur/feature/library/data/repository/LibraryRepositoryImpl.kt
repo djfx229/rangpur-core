@@ -208,6 +208,7 @@ class LibraryRepositoryImpl(
             FilteredAudioField.BPM -> AudioField.BPM
             FilteredAudioField.DIRECTORY_LOCATION -> "$INNER_DIRECTORY.location"
             FilteredAudioField.DURATION -> AudioField.DURATION
+            FilteredAudioField.PLAYLISTS -> throw IllegalStateException()
         }
     }
 
