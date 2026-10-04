@@ -1,18 +1,19 @@
 package io.github.djfx229.rangpur.feature.library.data.repository
 
 import com.j256.ormlite.dao.DaoManager
+import com.j256.ormlite.field.DatabaseField
 import com.j256.ormlite.support.ConnectionSource
-import io.github.djfx229.rangpur.common.data.database.SqliteRequestUtils
+import com.j256.ormlite.table.DatabaseTable
+import io.github.djfx229.rangpur.common.data.database.*
 import io.github.djfx229.rangpur.common.domain.model.sort.Sort
 import io.github.djfx229.rangpur.feature.library.domain.model.Audio
-import io.github.djfx229.rangpur.common.data.database.AudioField
-import io.github.djfx229.rangpur.common.data.database.ConditionType
-import io.github.djfx229.rangpur.common.data.database.SqlCondition
 import io.github.djfx229.rangpur.feature.library.domain.model.filter.Filter
 import io.github.djfx229.rangpur.feature.library.domain.model.filter.FilterItem
 import io.github.djfx229.rangpur.feature.library.domain.model.filter.FilteredAudioField
 import io.github.djfx229.rangpur.feature.library.domain.repository.LibraryRepository
 import io.github.djfx229.rangpur.feature.library.data.entity.OrmLiteAudio
+import java.sql.SQLException
+import java.util.*
 
 class LibraryRepositoryImpl(
     private var source: ConnectionSource,
@@ -29,17 +30,37 @@ class LibraryRepositoryImpl(
      * Игнорирует аудиозаписи, которые были отмечены как полученные в прошлом запросе с помощью [alreadyRequestedId].
      */
     override fun getRandomAudios(alreadyRequestedId: String, filter: Filter, limit: Int): List<Audio> {
-        // todo alreadyRequestedId
-        return getAudios(filter, "ORDER BY random() LIMIT $limit")
+        return getAudios(filter, "ORDER BY random() LIMIT $limit", alreadyRequestedId)
     }
 
-    override fun clearAlreadyRequestedIds() {
-        // todo alreadyRequestedId
+    override fun markAsRequested(audios: List<Audio>, requestId: String) {
+        val dao = DaoManager.createDao(source, OrmLiteRequestedAudio::class.java)
+        dao.callBatchTasks {
+            val request = "INSERT INTO requested_audios (uuid, audio_uuid, request_id) VALUES (?, ?, ?);"
+            audios.forEach { audio ->
+                try {
+                    dao.executeRaw(request, UUID.randomUUID().toString(), audio.uuid, requestId)
+                } catch (e: SQLException) {
+                    if (e.cause?.message?.contains("SQLITE_CONSTRAINT_UNIQUE") == true) {
+                        // нарушение ограничения здесь не критично
+                    } else {
+                        e.printStackTrace()
+                    }
+                }
+            }
+        }
+    }
+
+    override fun clearRequestStatusMarkers() {
+        val daoAudioInPlaylist = DaoManager.createDao(source, OrmLiteRequestedAudio::class.java)
+        val request = "DELETE FROM requested_audios;"
+        daoAudioInPlaylist.executeRaw(request)
     }
 
     private fun getAudios(
         filter: Filter,
         requestSubstring: String,
+        alreadyRequestedId: String? = null,
     ): List<Audio> {
         val dao = DaoManager.createDao(source, OrmLiteAudio::class.java)
 
@@ -99,6 +120,17 @@ class LibraryRepositoryImpl(
                             if (condition != null) {
                                 add(condition)
                             }
+                        }
+                        
+                        if (alreadyRequestedId != null) {
+                            val value = """
+                            NOT EXISTS (
+                                SELECT 1
+                                FROM requested_audios AS req
+                                WHERE req.audio_uuid = a.uuid AND req.request_id = '$alreadyRequestedId'
+                            )
+                            """.trimIndent()
+                            add(SqlCondition(ConditionType.AND, value))
                         }
                     }
                 )
@@ -211,5 +243,35 @@ class LibraryRepositoryImpl(
             FilteredAudioField.PLAYLISTS -> throw IllegalStateException()
         }
     }
+
+}
+
+@DatabaseTable(tableName = "requested_audios")
+class OrmLiteRequestedAudio {
+
+    @DatabaseField(
+        columnName = "uuid",
+        id = true,
+        canBeNull = false,
+        uniqueIndexName = "unique_uuid",
+    )
+    var uuid: String = UUID.randomUUID().toString()
+
+    @DatabaseField(
+        columnName = "audio_uuid",
+        foreign = true,
+        foreignAutoCreate = true,
+        foreignAutoRefresh = true,
+        uniqueCombo = true,
+        canBeNull = false,
+    )
+    var ormAudio: OrmLiteAudio? = null
+
+    @DatabaseField(
+        columnName = "request_id",
+        canBeNull = false,
+        uniqueCombo = true,
+    )
+    var requestId: String? = null
 
 }

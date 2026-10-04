@@ -3,14 +3,11 @@ package io.github.djfx229.rangpur.common.data.database
 import com.j256.ormlite.dao.DaoManager
 import com.j256.ormlite.support.ConnectionSource
 import com.j256.ormlite.table.TableUtils
-import io.github.djfx229.rangpur.feature.library.data.repository.LibraryRepositoryImpl
 import io.github.djfx229.rangpur.feature.library.domain.repository.LibraryRepository
 import io.github.djfx229.rangpur.common.domain.database.Database
 import io.github.djfx229.rangpur.feature.library.data.entity.OrmLiteAudio
 import io.github.djfx229.rangpur.feature.library.data.entity.OrmLiteDirectory
-import io.github.djfx229.rangpur.feature.library.data.repository.OrmLiteAudios
-import io.github.djfx229.rangpur.feature.library.data.repository.OrmLiteCalendar
-import io.github.djfx229.rangpur.feature.library.data.repository.OrmLiteDirectories
+import io.github.djfx229.rangpur.feature.library.data.repository.*
 import io.github.djfx229.rangpur.feature.library.domain.model.Audio
 import io.github.djfx229.rangpur.feature.library.domain.model.Directory
 import io.github.djfx229.rangpur.feature.playlist.data.entity.OrmLiteAudioInPlaylist
@@ -91,6 +88,7 @@ class OrmLiteDatabase(var source: ConnectionSource): Database {
         TableUtils.createTableIfNotExists(source, OrmLitePlaylistFolder::class.java)
         TableUtils.createTableIfNotExists(source, OrmLitePlaylist::class.java)
         TableUtils.createTableIfNotExists(source, OrmLiteAudioInPlaylist::class.java)
+        TableUtils.createTableIfNotExists(source, OrmLiteRequestedAudio::class.java)
         val dao = DaoManager.createDao(source, OrmLiteAudio::class.java)
         dao.executeRawNoArgs(
             """

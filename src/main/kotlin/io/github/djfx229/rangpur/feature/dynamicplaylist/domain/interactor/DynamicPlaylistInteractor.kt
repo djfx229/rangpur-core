@@ -38,7 +38,7 @@ class DynamicPlaylistInteractor(
         replay = 1,
         onBufferOverflow = BufferOverflow.DROP_OLDEST
     )
-    private var alreadyRequestedId: String = ""
+    private var dynamicPlaylistId: String = ""
 
     private val someMagicCoefficient = 100
     private val minimumCount = (someMagicCoefficient * 0.5).roundToInt()
@@ -46,7 +46,7 @@ class DynamicPlaylistInteractor(
 
     private var currentFilter: Filter = Filter(emptyList())
         set(value) {
-            alreadyRequestedId = UUID.randomUUID().toString()
+            dynamicPlaylistId = UUID.randomUUID().toString()
             field = value
         }
 
@@ -113,21 +113,10 @@ class DynamicPlaylistInteractor(
 
     fun observableNeedUpdateAudioList(): SharedFlow<Int?> = needUpdateCurrentTrackInAudioListFlow
 
-    fun generate() {
-        database.directories.getOnlyRoot().randomOrNull()?.locationInMusicDirectory?.let { locationInMusicDirectory ->
-            val item = FilterItem.TextSet(
-                field = FilteredAudioField.DIRECTORY_LOCATION,
-                values = setOf(locationInMusicDirectory),
-                isNot = false,
-            )
-            currentFilter = Filter(listOf(item))
-        }
-    }
-
     fun generate(audio: Audio, filter: Filter) {
         coroutineScope.launch(Dispatchers.IO) {
             audioListFlow.value = listOf(audio)
-            libraryRepository.clearAlreadyRequestedIds()
+            libraryRepository.clearRequestStatusMarkers()
             currentFilter = filter
             requestNextAudios()
             playerInteractor.handleCommand(
@@ -152,10 +141,25 @@ class DynamicPlaylistInteractor(
 
     private fun requestNextAudios() {
         coroutineScope.launch(Dispatchers.IO) {
-            val audios = libraryRepository.getRandomAudios(alreadyRequestedId, currentFilter, nextPageSize)
+            val audios = libraryRepository.getRandomAudios(dynamicPlaylistId, currentFilter, nextPageSize)
+            libraryRepository.markAsRequested(audios, dynamicPlaylistId)
             audioListFlow.value += audios
-            if (audioListFlow.value.isEmpty()) {
+            if (audios.isEmpty()) {
                 generate()
+            }
+        }
+    }
+
+    private fun generate() {
+        coroutineScope.launch(Dispatchers.IO) {
+            database.directories.getOnlyRoot().randomOrNull()?.locationInMusicDirectory?.let { locationInMusicDirectory ->
+                val item = FilterItem.TextSet(
+                    field = FilteredAudioField.DIRECTORY_LOCATION,
+                    values = setOf(locationInMusicDirectory),
+                    isNot = false,
+                )
+                libraryRepository.clearRequestStatusMarkers()
+                currentFilter = Filter(listOf(item))
             }
         }
     }
