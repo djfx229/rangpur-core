@@ -17,10 +17,12 @@ class CachedDependencyInjector(
 
     inline fun <reified T : Any> get(
         dependencyName: String? = null,
+        ignoreCache: Boolean = false,
     ): T {
         return get(
             classType = T::class,
             dependencyName,
+            ignoreCache,
         )
     }
 
@@ -41,14 +43,19 @@ class CachedDependencyInjector(
     fun <T : Any> get(
         classType: KClass<T>,
         dependencyName: String? = null,
+        ignoreCache: Boolean = false,
     ): T {
-        if (isReleased) throw IllegalStateException("Данный DiScope уже очищен и не может использоваться для получения зависимостей")
-        return cachedDependencies.getOrPut(
-            key = classType.simpleName!! + (dependencyName ?: ""),
-            defaultValue = {
-                di.get(classType, dependencyName)
-            },
-        ) as T
+        return if (ignoreCache) {
+            di.get(classType, dependencyName)
+        } else {
+            if (isReleased) throw IllegalStateException("Данный CachedDependencyInjector уже очищен и не может использоваться для получения зависимостей")
+            return cachedDependencies.getOrPut(
+                key = classType.simpleName!! + (dependencyName ?: ""),
+                defaultValue = {
+                    di.get(classType, dependencyName)
+                },
+            ) as T
+        }
     }
 
     // Был бы этот метод приватным, но из inline функции нельзя обращаться к приватным полям.
