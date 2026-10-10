@@ -8,7 +8,7 @@ plugins {
 }
 
 group = 'io.github.djfx229.rangpur.core'
-version = '12.0'
+version = '13.0'
 
 repositories {
     mavenCentral()
